@@ -44,6 +44,9 @@ const Layout = () => {
       <NavLink to="/" className={navLinkClass} end>Dashboard</NavLink>
       <NavLink to="/classes" className={navLinkClass}>My Classes</NavLink>
       <NavLink to="/assessments" className={navLinkClass}>Assessments</NavLink>
+      <NavLink to="/teacher-assignments" className={navLinkClass}>Teacher Assignments</NavLink>
+      <NavLink to="/learner-groups" className={navLinkClass}>Learner Groups</NavLink>
+      <NavLink to="/clubs" className={navLinkClass}>Clubs &amp; Activities</NavLink>
       <NavLink to="/attendance" className={navLinkClass}>Attendance</NavLink>
     </>
   );

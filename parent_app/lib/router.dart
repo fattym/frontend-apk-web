@@ -5,6 +5,10 @@ import 'core/auth/auth_provider.dart';
 import 'features/shop/pages/shop_home_page.dart';
 import 'features/announcements/pages/announcements_page.dart';
 import 'features/orders/pages/orders_page.dart';
+import 'features/dashboards/pages/dashboard_page.dart';
+import 'features/dashboards/pages/teacher_dashboard_page.dart';
+import 'features/dashboards/pages/student_dashboard_page.dart';
+import 'features/dashboards/pages/trainer_dashboard_page.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/login',
@@ -24,6 +28,10 @@ final GoRouter router = GoRouter(
         GoRoute(path: '/', builder: (context, state) => const ShopHomePage()),
         GoRoute(path: '/announcements', builder: (context, state) => const AnnouncementsPage()),
         GoRoute(path: '/orders', builder: (context, state) => const OrdersPage()),
+        GoRoute(path: '/dashboard', builder: (context, state) => const DashboardPage()),
+        GoRoute(path: '/dashboard/teacher', builder: (context, state) => const TeacherDashboardPage()),
+        GoRoute(path: '/dashboard/student', builder: (context, state) => const StudentDashboardPage()),
+        GoRoute(path: '/dashboard/trainer', builder: (context, state) => const TrainerDashboardPage()),
       ],
     ),
   ],
@@ -117,12 +125,14 @@ class MainShell extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.storefront), label: 'Shop'),
           NavigationDestination(icon: Icon(Icons.announcement), label: 'News'),
           NavigationDestination(icon: Icon(Icons.receipt_long), label: 'Orders'),
+          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
         ],
         onDestinationSelected: (index) {
           switch (index) {
             case 0: context.go('/'); break;
             case 1: context.go('/announcements'); break;
             case 2: context.go('/orders'); break;
+            case 3: context.go('/dashboard'); break;
           }
         },
       ),

@@ -1,6 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useApiList from '../hooks/useApiList';
 import api from '../services/api';
+
+// A <select> whose options are fetched from an API endpoint (FK dropdowns).
+const ApiSelect = ({ field, value, onChange, disabled }) => {
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    api.get(field.optionsUrl)
+      .then((res) => {
+        const results = res.data.results || res.data;
+        const labelField = field.optionLabel || (results[0] && ('email' in results[0]) ? 'email' : 'name');
+        setOptions(
+          results.map((o) => ({ value: o.id, label: o[labelField] || `#${o.id}` }))
+        );
+      })
+      .catch(() => setOptions([]))
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [field.optionsUrl, field.optionLabel]);
+
+  const common = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500';
+  return (
+    <select id={`field-${field.name}`} className={common} value={value ?? ''}
+      onChange={(e) => onChange(field.name, e.target.value === '' ? '' : Number(e.target.value))} disabled={disabled || loading}>
+      <option value="">{loading ? 'Loading…' : 'Select…'}</option>
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>{o.label}</option>
+      ))}
+    </select>
+  );
+};
 
 const renderInput = (field, value, onChange, disabled) => {
   const id = `field-${field.name}`;
@@ -13,6 +46,9 @@ const renderInput = (field, value, onChange, disabled) => {
     );
   }
   if (field.type === 'select') {
+    if (field.optionsUrl) {
+      return <ApiSelect field={field} value={value} onChange={onChange} disabled={disabled} />;
+    }
     return (
       <select id={id} className={common} value={value ?? ''}
         onChange={(e) => onChange(field.name, e.target.value)} disabled={disabled}>
@@ -79,8 +115,12 @@ const ResourceManager = ({ title, endpoint, columns, fields, defaultValues = {} 
     setSaving(true);
     setFormError(null);
     try {
-      if (editing) await api.put(`${endpoint}${editing.id}/`, form);
-      else await api.post(endpoint, form);
+      const payload = {};
+      for (const [k, v] of Object.entries(form)) {
+        payload[k] = v === '' ? null : v;
+      }
+      if (editing) await api.put(`${endpoint}${editing.id}/`, payload);
+      else await api.post(endpoint, payload);
       setShowForm(false);
       refresh();
     } catch (err) {

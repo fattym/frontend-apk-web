@@ -18,6 +18,9 @@ import ShopCategories from './pages/ShopCategories';
 import ShopOrders from './pages/ShopOrders';
 import Schools from './pages/Schools';
 import Assessments from './pages/Assessments';
+import TeacherAssignments from './pages/TeacherAssignments';
+import LearnerGroups from './pages/LearnerGroups';
+import Clubs from './pages/Clubs';
 import Attendance from './pages/Attendance';
 import Exams from './pages/Exams';
 import Fees from './pages/Fees';
@@ -60,6 +63,9 @@ const AppRoutes = () => (
       <Route path="shop/orders" element={<ShopOrders />} />
       <Route path="schools" element={<Schools />} />
       <Route path="assessments" element={<Assessments />} />
+      <Route path="teacher-assignments" element={<TeacherAssignments />} />
+      <Route path="learner-groups" element={<LearnerGroups />} />
+      <Route path="clubs" element={<Clubs />} />
       <Route path="attendance" element={<Attendance />} />
       <Route path="exams" element={<Exams />} />
       <Route path="fees" element={<Fees />} />

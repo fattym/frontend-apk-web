@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../services/api';
 
 const UserForm = ({ user, onClose, onSaved }) => {
@@ -12,9 +12,19 @@ const UserForm = ({ user, onClose, onSaved }) => {
     phone: user?.phone || '',
     address: user?.address || '',
     date_of_birth: user?.date_of_birth || '',
+    tsc_number: user?.tsc_number || '',
+    qualification: user?.qualification || '',
+    subject_specializations: user?.subject_specializations || [],
   });
+  const [learningAreas, setLearningAreas] = useState([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (form.role === 'TEACHER') {
+      api.get('/api/academics/learning-areas/').then((r) => setLearningAreas(r.data.results || r.data)).catch(() => setLearningAreas([]));
+    }
+  }, [form.role]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +32,12 @@ const UserForm = ({ user, onClose, onSaved }) => {
     setError('');
     try {
       const payload = { ...form };
+      if (payload.tsc_number === '') payload.tsc_number = null;
+      if (form.role !== 'TEACHER') {
+        delete payload.tsc_number;
+        delete payload.qualification;
+        delete payload.subject_specializations;
+      }
       if (!isEdit) {
         if (!payload.password) {
           setError('Password is required');
@@ -84,8 +100,26 @@ const UserForm = ({ user, onClose, onSaved }) => {
           </div>
           <div className="col-span-2">
             <label className="block text-sm font-medium mb-1">Address</label>
-            <textarea className="w-full border rounded px-3 py-2" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} />
+            <textarea className="w-full border rounded px-3 py-2" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </div>
+          {form.role === 'TEACHER' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-1">TSC Number</label>
+                <input className="w-full border rounded px-3 py-2" value={form.tsc_number} onChange={(e) => setForm({ ...form, tsc_number: e.target.value })} placeholder="Teachers Service Commission No." />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Qualification</label>
+                <input className="w-full border rounded px-3 py-2" value={form.qualification} onChange={(e) => setForm({ ...form, qualification: e.target.value })} placeholder="e.g. B.Ed" />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium mb-1">Subject Specializations</label>
+                <select multiple className="w-full border rounded px-3 py-2 h-28" value={form.subject_specializations} onChange={(e) => setForm({ ...form, subject_specializations: Array.from(e.target.selectedOptions, (o) => Number(o.value)) })}>
+                  {learningAreas.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+                </select>
+              </div>
+            </>
+          )}
         </div>
         <div className="flex justify-end gap-3 mt-6">
           <button type="button" onClick={onClose} className="px-4 py-2 border rounded">Cancel</button>
