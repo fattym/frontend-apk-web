@@ -30,7 +30,29 @@ class _ParentRequirementsPageState extends State<ParentRequirementsPage> {
       appBar: AppBar(title: const Text('Required Items'), backgroundColor: Theme.of(context).colorScheme.inversePrimary),
       body: provider.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
+          : provider.error != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                        const SizedBox(height: 16),
+                        Text('Failed to load required items', style: TextStyle(color: Colors.grey[600])),
+                        const SizedBox(height: 8),
+                        Text(provider.error!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12)),
+                        const SizedBox(height: 16),
+                        FilledButton.icon(
+                          onPressed: () => provider.fetchRequiredItems(),
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : RefreshIndicator(
               onRefresh: () async {
                 await provider.fetchRequiredItems();
               },
