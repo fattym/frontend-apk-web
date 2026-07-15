@@ -3,7 +3,7 @@ import useApiList from '../hooks/useApiList';
 
 const ShopProducts = () => {
   const { data: distributorProducts, loading: dpLoading, refresh: refreshProducts } = useApiList('/api/distributor/products/');
-  const { data: schoolProducts, loading: spLoading } = useApiList('/api/shop/products/');
+  const { data: schoolProducts, loading: spLoading, refresh: refreshSchoolProducts } = useApiList('/api/shop/products/');
   const { data: categories, loading: catLoading } = useApiList('/api/shop/categories/');
   const [view, setView] = useState('marketplace');
   const [distributorFilter, setDistributorFilter] = useState('');
@@ -14,6 +14,11 @@ const ShopProducts = () => {
   const [orderNotes, setOrderNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+  const [importingProduct, setImportingProduct] = useState(null);
+  const [importMarkupType, setImportMarkupType] = useState('percentage');
+  const [importMarkupValue, setImportMarkupValue] = useState('');
+  const [importCategoryId, setImportCategoryId] = useState('');
+  const [importSubmitting, setImportSubmitting] = useState(false);
 
   const distributors = useMemo(() => {
     if (!distributorProducts) return [];
@@ -99,6 +104,40 @@ const ShopProducts = () => {
       setMessage(err.message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleImport = async (e) => {
+    e.preventDefault();
+    if (!importingProduct) return;
+    setImportSubmitting(true);
+    setMessage('');
+    try {
+      const token = localStorage.getItem('access_token');
+      const payload = {
+        distributor_product_id: importingProduct.id,
+        markup_type: importMarkupType,
+        markup_value: parseFloat(importMarkupValue),
+        category_id: importCategoryId ? parseInt(importCategoryId, 10) : undefined,
+      };
+      const res = await fetch('/api/shop/products/import_from_distributor/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Failed to import product');
+      }
+      setMessage('Product imported to your store!');
+      setImportingProduct(null);
+      setImportMarkupValue('');
+      setImportCategoryId('');
+      refreshSchoolProducts();
+    } catch (err) {
+      setMessage(err.message);
+    } finally {
+      setImportSubmitting(false);
     }
   };
 
@@ -199,13 +238,22 @@ const ShopProducts = () => {
                       <p className="text-lg font-bold text-gray-900">KES {parseFloat(product.unit_price).toLocaleString()}</p>
                       <p className="text-xs text-gray-500 mt-1">Min order: {product.min_order_quantity}</p>
                       <p className="text-xs text-gray-500">Stock: {product.available_stock}</p>
-                      <button
-                        onClick={() => addToCart(product)}
-                        disabled={product.available_stock <= 0}
-                        className="mt-3 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {product.available_stock > 0 ? 'Add to Order' : 'Out of Stock'}
-                      </button>
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          onClick={() => addToCart(product)}
+                          disabled={product.available_stock <= 0}
+                          className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {product.available_stock > 0 ? 'Add to Order' : 'Out of Stock'}
+                        </button>
+                        <button
+                          onClick={() => setImportingProduct(product)}
+                          className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                          title="Import to your store"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -225,7 +273,10 @@ const ShopProducts = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Your Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Distributor Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Commission</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               </tr>
             </thead>
@@ -234,7 +285,18 @@ const ShopProducts = () => {
                 <tr key={p.id}>
                   <td className="px-6 py-4 font-medium">{p.name}</td>
                   <td className="px-6 py-4">{p.category?.name || '-'}</td>
-                  <td className="px-6 py-4">KES {p.price}</td>
+                  <td className="px-6 py-4">KES {parseFloat(p.price).toLocaleString()}</td>
+                  <td className="px-6 py-4">
+                    {p.is_reseller_listing ? `KES ${parseFloat(p.distributor_price || 0).toLocaleString()}` : '-'}
+                  </td>
+                  <td className="px-6 py-4">
+                    {p.is_reseller_listing ? `KES ${parseFloat(p.commission_amount || 0).toLocaleString()}` : '-'}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${p.is_reseller_listing ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                      {p.is_reseller_listing ? 'Distributor' : 'School'}
+                    </span>
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${p.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                       {p.is_active ? 'Active' : 'Inactive'}
@@ -243,7 +305,7 @@ const ShopProducts = () => {
                 </tr>
               ))}
               {(schoolProducts || []).length === 0 && !spLoading && (
-                <tr><td colSpan="4" className="px-6 py-8 text-center text-gray-500">No products yet.</td></tr>
+                <tr><td colSpan="7" className="px-6 py-8 text-center text-gray-500">No products yet. Import from the marketplace.</td></tr>
               )}
             </tbody>
           </table>
@@ -308,6 +370,68 @@ const ShopProducts = () => {
               <button type="button" onClick={() => setShowCheckout(false)} className="px-4 py-2 border rounded">Cancel</button>
               <button type="submit" disabled={submitting || cart.length === 0} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
                 {submitting ? 'Placing Order...' : 'Place Order'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {importingProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <form onSubmit={handleImport} className="bg-white p-6 rounded shadow-md w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Import to Your Store</h2>
+            <div className="mb-4">
+              <p className="font-medium">{importingProduct.name}</p>
+              <p className="text-sm text-gray-500">Distributor price: KES {parseFloat(importingProduct.unit_price).toLocaleString()}</p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Markup Type</label>
+              <select
+                value={importMarkupType}
+                onChange={(e) => setImportMarkupType(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="percentage">Percentage (%)</option>
+                <option value="fixed">Fixed Amount (KES)</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">
+                Markup Value {importMarkupType === 'percentage' ? '(%)' : '(KES)'}
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={importMarkupValue}
+                onChange={(e) => setImportMarkupValue(e.target.value)}
+                required
+                className="w-full border rounded px-3 py-2"
+                placeholder={importMarkupType === 'percentage' ? 'e.g. 10 for 10%' : 'e.g. 50 for KES 50'}
+              />
+              {importMarkupValue && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Your selling price: KES {parseFloat(importMarkupValue || 0).toLocaleString()}
+                  {importMarkupType === 'percentage' && ` (${((parseFloat(importingProduct.unit_price) * (1 + parseFloat(importMarkupValue) / 100))).toLocaleString()})`}
+                </p>
+              )}
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Category (optional)</label>
+              <select
+                value={importCategoryId}
+                onChange={(e) => setImportCategoryId(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="">Use distributor category</option>
+                {categories?.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button type="button" onClick={() => { setImportingProduct(null); setImportMarkupValue(''); }} className="px-4 py-2 border rounded">Cancel</button>
+              <button type="submit" disabled={importSubmitting} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50">
+                {importSubmitting ? 'Importing...' : 'Import to Store'}
               </button>
             </div>
           </form>

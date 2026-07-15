@@ -53,6 +53,11 @@ const Requirements = () => {
     return map;
   }, [schoolProducts]);
 
+  const resellerProducts = useMemo(() => {
+    if (!schoolProducts) return [];
+    return schoolProducts.filter((p) => p.is_reseller_listing);
+  }, [schoolProducts]);
+
   const distributorProductMap = useMemo(() => {
     if (!distributorProducts) return {};
     const map = {};
@@ -353,16 +358,23 @@ const Requirements = () => {
             </div>
             {optionForm.source_type === 'school' && (
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Link School Product</label>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Link Product</label>
                 <select
                   value={optionForm.linked_product}
                   onChange={(e) => setOptionForm({ ...optionForm, linked_product: e.target.value })}
                   className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100"
                 >
                   <option value="">Select product</option>
-                  {schoolProducts?.map((p) => (
-                    <option key={p.id} value={p.id}>{p.name} - KES {p.price}</option>
-                  ))}
+                  <optgroup label="School Products">
+                    {schoolProducts?.filter((p) => !p.is_reseller_listing).map((p) => (
+                      <option key={p.id} value={p.id}>{p.name} - KES {p.price}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Reseller Products (Distributor)">
+                    {resellerProducts?.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name} - KES {p.price} (Commission: KES {p.commission_amount})</option>
+                    ))}
+                  </optgroup>
                 </select>
               </div>
             )}
