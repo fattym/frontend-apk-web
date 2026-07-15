@@ -39,12 +39,13 @@ class DashboardProvider with ChangeNotifier {
           'schemes': schemes,
         };
       } else {
-        // Trainer view (clubs & activities).
-        final clubs = await _getList('/clubs/clubs/');
-        final sessions = await _getList('/clubs/sessions/');
+        final announcements = await _getList('/messaging/announcements/');
+        final orders = await _getList('/shop/orders/my_orders/');
+        final requiredItems = await _getList('/requirements/public/');
         _data = {
-          'clubs': clubs,
-          'sessions': sessions,
+          'announcements': announcements,
+          'orders': orders,
+          'required_items': requiredItems,
         };
       }
     } catch (e) {

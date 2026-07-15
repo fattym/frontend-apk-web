@@ -30,6 +30,7 @@ const Layout = () => {
       <NavLink to="/shop/products" className={navLinkClass}>Shop Products</NavLink>
       <NavLink to="/shop/categories" className={navLinkClass}>Shop Categories</NavLink>
       <NavLink to="/shop/orders" className={navLinkClass}>Shop Orders</NavLink>
+      <NavLink to="/requirements" className={navLinkClass}>Required Items</NavLink>
       <NavLink to="/schools" className={navLinkClass}>Schools</NavLink>
       <NavLink to="/attendance" className={navLinkClass}>Attendance</NavLink>
       <NavLink to="/exams" className={navLinkClass}>Exams</NavLink>
@@ -56,6 +57,7 @@ const Layout = () => {
       <NavLink to="/" className={navLinkClass} end>Dashboard</NavLink>
       <NavLink to="/attendance" className={navLinkClass}>My Attendance</NavLink>
       <NavLink to="/assessments" className={navLinkClass}>My Assessments</NavLink>
+      <NavLink to="/parent/requirements" className={navLinkClass}>Required Items</NavLink>
     </>
   );
 

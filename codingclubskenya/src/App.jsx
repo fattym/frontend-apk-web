@@ -16,6 +16,8 @@ import SchemesOfWork from './pages/SchemesOfWork';
 import ShopProducts from './pages/ShopProducts';
 import ShopCategories from './pages/ShopCategories';
 import ShopOrders from './pages/ShopOrders';
+import Requirements from './pages/Requirements';
+import ParentRequirements from './pages/ParentRequirements';
 import Schools from './pages/Schools';
 import Assessments from './pages/Assessments';
 import TeacherAssignments from './pages/TeacherAssignments';
@@ -61,6 +63,8 @@ const AppRoutes = () => (
       <Route path="shop/products" element={<ShopProducts />} />
       <Route path="shop/categories" element={<ShopCategories />} />
       <Route path="shop/orders" element={<ShopOrders />} />
+      <Route path="requirements" element={<Requirements />} />
+      <Route path="parent/requirements" element={<ParentRequirements />} />
       <Route path="schools" element={<Schools />} />
       <Route path="assessments" element={<Assessments />} />
       <Route path="teacher-assignments" element={<TeacherAssignments />} />

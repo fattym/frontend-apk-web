@@ -4,7 +4,7 @@ import '../../../core/auth/auth_provider.dart';
 import '../providers/dashboard_provider.dart';
 import 'teacher_dashboard_page.dart';
 import 'student_dashboard_page.dart';
-import 'trainer_dashboard_page.dart';
+import 'parent_dashboard_page.dart';
 
 /// Renders the dashboard matching the logged-in user's role.
 class DashboardPage extends StatefulWidget {
@@ -27,6 +27,7 @@ class _DashboardPageState extends State<DashboardPage> {
     final role = context.watch<AuthProvider>().user?['role'] ?? '';
     if (role == 'STUDENT') return const StudentDashboardPage();
     if (role == 'TEACHER' || role == 'STAFF') return const TeacherDashboardPage();
-    return const TrainerDashboardPage();
+    if (role == 'PARENT') return const ParentDashboardPage();
+    return const ParentDashboardPage();
   }
 }

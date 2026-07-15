@@ -6,9 +6,7 @@ import 'features/shop/pages/shop_home_page.dart';
 import 'features/announcements/pages/announcements_page.dart';
 import 'features/orders/pages/orders_page.dart';
 import 'features/dashboards/pages/dashboard_page.dart';
-import 'features/dashboards/pages/teacher_dashboard_page.dart';
-import 'features/dashboards/pages/student_dashboard_page.dart';
-import 'features/dashboards/pages/trainer_dashboard_page.dart';
+import 'features/requirements/pages/parent_requirements_page.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/login',
@@ -29,9 +27,7 @@ final GoRouter router = GoRouter(
         GoRoute(path: '/announcements', builder: (context, state) => const AnnouncementsPage()),
         GoRoute(path: '/orders', builder: (context, state) => const OrdersPage()),
         GoRoute(path: '/dashboard', builder: (context, state) => const DashboardPage()),
-        GoRoute(path: '/dashboard/teacher', builder: (context, state) => const TeacherDashboardPage()),
-        GoRoute(path: '/dashboard/student', builder: (context, state) => const StudentDashboardPage()),
-        GoRoute(path: '/dashboard/trainer', builder: (context, state) => const TrainerDashboardPage()),
+        GoRoute(path: '/requirements', builder: (context, state) => const ParentRequirementsPage()),
       ],
     ),
   ],
@@ -100,7 +96,9 @@ class _LoginFormState extends State<LoginForm> {
                 _passwordController.text.trim(),
               );
               setState(() => _loading = false);
-              if (!success && mounted) {
+              if (success && mounted) {
+                context.go('/');
+              } else if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Login failed')));
               }
             },
@@ -118,21 +116,32 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final role = auth.user?['role'] ?? '';
+
+    final destinations = [
+      const NavigationDestination(icon: Icon(Icons.storefront), label: 'Shop'),
+      const NavigationDestination(icon: Icon(Icons.announcement), label: 'News'),
+      const NavigationDestination(icon: Icon(Icons.receipt_long), label: 'Orders'),
+      const NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+      if (role == 'PARENT')
+        const NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'Items'),
+    ];
+
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.storefront), label: 'Shop'),
-          NavigationDestination(icon: Icon(Icons.announcement), label: 'News'),
-          NavigationDestination(icon: Icon(Icons.receipt_long), label: 'Orders'),
-          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-        ],
+        destinations: destinations,
         onDestinationSelected: (index) {
-          switch (index) {
-            case 0: context.go('/'); break;
-            case 1: context.go('/announcements'); break;
-            case 2: context.go('/orders'); break;
-            case 3: context.go('/dashboard'); break;
+          final routes = ['/', '/announcements', '/orders', '/dashboard'];
+          if (role == 'PARENT') {
+            if (index < routes.length) {
+              context.go(routes[index]);
+            } else {
+              context.go('/requirements');
+            }
+          } else {
+            context.go(routes[index]);
           }
         },
       ),
