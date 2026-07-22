@@ -42,7 +42,8 @@ const Teachers = () => {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Emp ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">TSC No.</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">School</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
@@ -52,7 +53,8 @@ const Teachers = () => {
               <tr key={u.id}>
                 <td className="px-6 py-4 font-medium">{u.first_name} {u.last_name}</td>
                 <td className="px-6 py-4">{u.email}</td>
-                <td className="px-6 py-4">{u.phone || '-'}</td>
+                <td className="px-6 py-4">{u.teacher_profile?.employee_id || '-'}</td>
+                <td className="px-6 py-4">{u.tsc_number || '-'}</td>
                 <td className="px-6 py-4">{u.school?.name || '-'}</td>
                 <td className="px-6 py-4">
                   <button onClick={() => { setEditingUser(u); setShowUserForm(true); }} className="text-blue-600 hover:underline mr-3">Edit</button>

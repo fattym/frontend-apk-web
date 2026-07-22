@@ -15,6 +15,7 @@ class ParentDashboardPage extends StatelessWidget {
     final announcements = data['announcements'] as List<dynamic>? ?? [];
     final orders = data['orders'] as List<dynamic>? ?? [];
     final requiredItems = data['required_items'] as List<dynamic>? ?? [];
+    final teachers = data['teachers'] as List<dynamic>? ?? [];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Parent Dashboard')),
@@ -33,13 +34,38 @@ class ParentDashboardPage extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     childAspectRatio: 1.2,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
                     children: [
+                      StatCard(label: 'Teachers', value: '${teachers.length}', color: Colors.purple),
                       StatCard(label: 'Announcements', value: '${announcements.length}', color: Colors.blue),
                       StatCard(label: 'Orders', value: '${orders.length}', color: Colors.orange),
                       StatCard(label: 'Required Items', value: '${requiredItems.length}', color: Colors.green),
                     ],
                   ),
                   const SizedBox(height: 16),
+                  if (teachers.isNotEmpty) ...[
+                    const Text('Child\'s Teachers',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    ...teachers.map((t) => Card(
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              child: Text((t['teacher_name'] as String?)?.isNotEmpty == true ? (t['teacher_name'] as String)[0].toUpperCase() : 'T'),
+                            ),
+                            title: Text('${t['teacher_name'] ?? 'Unknown Teacher'}'),
+                            subtitle: Text('${t['learning_area_name'] ?? 'Class Teacher'} • ${t['stream_name'] ?? 'Unknown Class'}'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.message, color: Colors.blue),
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Messaging coming soon!')),
+                                );
+                              },
+                            ),
+                          ),
+                        )),
+                    const SizedBox(height: 16),
+                  ],
                   if (requiredItems.isNotEmpty) ...[
                     const Text('Required Items',
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),

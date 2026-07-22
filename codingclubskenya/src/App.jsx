@@ -21,6 +21,11 @@ import ParentRequirements from './pages/ParentRequirements';
 import Schools from './pages/Schools';
 import Assessments from './pages/Assessments';
 import TeacherAssignments from './pages/TeacherAssignments';
+import Courses from './pages/Courses';
+import CourseFlow from './pages/CourseFlow';
+import MyCourses from './pages/MyCourses';
+import CourseDetail from './pages/CourseDetail';
+import TopicDetail from './pages/TopicDetail';
 import LearnerGroups from './pages/LearnerGroups';
 import Clubs from './pages/Clubs';
 import Attendance from './pages/Attendance';
@@ -28,6 +33,10 @@ import Exams from './pages/Exams';
 import Fees from './pages/Fees';
 import Library from './pages/Library';
 import Messaging from './pages/Messaging';
+import Complaints from './pages/Complaints';
+import Events from './pages/Events';
+import Homework from './pages/Homework';
+import Reports from './pages/Reports';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -51,6 +60,9 @@ const AppRoutes = () => (
         <Layout />
       </ProtectedRoute>
     }>
+      <Route path="school-dashboard" element={<Dashboard />} />
+      <Route path="teacher-dashboard" element={<TeacherDashboard />} />
+      <Route path="student-dashboard" element={<StudentDashboard />} />
       <Route index element={<RoleBasedDashboard />} />
       <Route path="students" element={<Students />} />
       <Route path="parents" element={<Parents />} />
@@ -68,6 +80,11 @@ const AppRoutes = () => (
       <Route path="schools" element={<Schools />} />
       <Route path="assessments" element={<Assessments />} />
       <Route path="teacher-assignments" element={<TeacherAssignments />} />
+      <Route path="courses" element={<Courses />} />
+      <Route path="course-flow" element={<CourseFlow />} />
+      <Route path="my-courses" element={<MyCourses />} />
+      <Route path="my-courses/:id" element={<CourseDetail />} />
+      <Route path="topics/:id" element={<TopicDetail />} />
       <Route path="learner-groups" element={<LearnerGroups />} />
       <Route path="clubs" element={<Clubs />} />
       <Route path="attendance" element={<Attendance />} />
@@ -75,6 +92,10 @@ const AppRoutes = () => (
       <Route path="fees" element={<Fees />} />
       <Route path="library" element={<Library />} />
       <Route path="messaging" element={<Messaging />} />
+      <Route path="complaints" element={<Complaints />} />
+      <Route path="events" element={<Events />} />
+      <Route path="homework" element={<Homework />} />
+      <Route path="reports" element={<Reports />} />
     </Route>
   </Routes>
 );

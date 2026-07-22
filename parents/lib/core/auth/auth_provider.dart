@@ -49,6 +49,25 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> studentLogin(String studentId, String pinCode) async {
+    try {
+      final response = await apiClient.dio.post('/auth/student-login/', data: {
+        'student_id': studentId,
+        'pin_code': pinCode,
+      });
+      final access = response.data['access'];
+      final refresh = response.data['refresh'];
+      final user = response.data['user'];
+      await secureStorage.write(key: 'access_token', value: access);
+      await secureStorage.write(key: 'refresh_token', value: refresh);
+      _user = user;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     await secureStorage.deleteAll();
     _user = null;

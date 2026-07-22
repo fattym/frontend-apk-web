@@ -16,6 +16,8 @@ const STATS = [
   { key: 'announcements', label: 'Announcements', endpoint: '/api/messaging/announcements/', link: '/messaging', accent: 'text-orange-600' },
   { key: 'clubs', label: 'Clubs', endpoint: '/api/clubs/clubs/', link: '/clubs', accent: 'text-emerald-600' },
   { key: 'teacherAssignments', label: 'Teacher Assignments', endpoint: '/api/academics/teacher-assignments/', link: '/teacher-assignments', accent: 'text-sky-600' },
+  { key: 'complaints', label: 'Open Complaints', endpoint: '/api/complaints/complaints/?status=Pending', link: '/complaints', accent: 'text-rose-600' },
+  { key: 'events', label: 'Events', endpoint: '/api/events/events/', link: '/events', accent: 'text-fuchsia-600' },
 ];
 
 const QUICK_LINKS = [
@@ -28,6 +30,8 @@ const QUICK_LINKS = [
   ['/library', 'Library'],
   ['/shop/products', 'Shop'],
   ['/messaging', 'Messaging'],
+  ['/complaints', 'Complaints'],
+  ['/events', 'Events'],
   ['/schools', 'Schools'],
 ];
 
@@ -35,6 +39,8 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [counts, setCounts] = useState({});
   const [loading, setLoading] = useState(true);
+  const [recent, setRecent] = useState({ complaints: [], events: [] });
+  const [ov, setOv] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -46,6 +52,20 @@ const Dashboard = () => {
       STATS.forEach((s, i) => { map[s.key] = vals[i]; });
       setCounts(map);
       setLoading(false);
+    });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      api.get('/api/complaints/complaints/?limit=5').then((r) => r.data.results || r.data).catch(() => []),
+      api.get('/api/events/events/?limit=5').then((r) => r.data.results || r.data).catch(() => []),
+      api.get('/api/reports/overview/').then((r) => r.data).catch(() => null),
+    ]).then(([complaints, events, overview]) => {
+      if (!active) return;
+      setRecent({ complaints: complaints.slice(0, 5), events: events.slice(0, 5) });
+      setOv(overview);
     });
     return () => { active = false; };
   }, []);
@@ -64,6 +84,31 @@ const Dashboard = () => {
         ))}
       </div>
 
+      {ov && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white p-5 rounded shadow">
+            <h3 className="text-gray-500 text-xs uppercase tracking-wide">Attendance</h3>
+            <p className="text-2xl font-bold text-sky-600">{ov.attendance.present_pct}%</p>
+            <p className="text-xs text-gray-400">{ov.attendance.present} present / {ov.attendance.total} records</p>
+          </div>
+          <div className="bg-white p-5 rounded shadow">
+            <h3 className="text-gray-500 text-xs uppercase tracking-wide">Fee Collection</h3>
+            <p className="text-2xl font-bold text-red-600">{ov.fee_collection.rate}%</p>
+            <p className="text-xs text-gray-400">{ov.fee_collection.overdue} overdue · Ksh {ov.fee_collection.collected}</p>
+          </div>
+          <div className="bg-white p-5 rounded shadow">
+            <h3 className="text-gray-500 text-xs uppercase tracking-wide">Avg Exam Score</h3>
+            <p className="text-2xl font-bold text-amber-600">{ov.performance.avg_exam_pct}%</p>
+            <p className="text-xs text-gray-400">{ov.performance.assessments_me_ee} ME/EE assessments</p>
+          </div>
+          <div className="bg-white p-5 rounded shadow">
+            <h3 className="text-gray-500 text-xs uppercase tracking-wide">Homework</h3>
+            <p className="text-2xl font-bold text-fuchsia-600">{ov.homeworks}</p>
+            <p className="text-xs text-gray-400">{ov.events} events scheduled</p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded shadow p-6">
         <h2 className="text-xl font-semibold mb-3">Quick Links</h2>
         <div className="flex flex-wrap gap-2">
@@ -72,6 +117,40 @@ const Dashboard = () => {
               {label}
             </Link>
           ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded shadow p-6">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-xl font-semibold">Recent Complaints</h2>
+            <Link to="/complaints" className="text-sm text-blue-600 hover:underline">View all →</Link>
+          </div>
+          <div className="divide-y">
+            {recent.complaints.map((c) => (
+              <Link key={c.id} to="/complaints" className="py-2 flex justify-between gap-3 hover:text-blue-600">
+                <span className="truncate">{c.title}</span>
+                <span className="text-xs text-gray-400 whitespace-nowrap">{c.status}</span>
+              </Link>
+            ))}
+            {recent.complaints.length === 0 && <p className="py-2 text-sm text-gray-500">No complaints yet.</p>}
+          </div>
+        </div>
+
+        <div className="bg-white rounded shadow p-6">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-xl font-semibold">Upcoming Events</h2>
+            <Link to="/events" className="text-sm text-blue-600 hover:underline">View all →</Link>
+          </div>
+          <div className="divide-y">
+            {recent.events.map((ev) => (
+              <Link key={ev.id} to="/events" className="py-2 flex justify-between gap-3 hover:text-blue-600">
+                <span className="truncate">{ev.name}</span>
+                <span className="text-xs text-gray-400 whitespace-nowrap">{ev.start_date}</span>
+              </Link>
+            ))}
+            {recent.events.length === 0 && <p className="py-2 text-sm text-gray-500">No events scheduled.</p>}
+          </div>
         </div>
       </div>
     </div>

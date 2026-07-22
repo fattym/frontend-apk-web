@@ -24,28 +24,34 @@ class DashboardProvider with ChangeNotifier {
         final attendance = await _getList('/attendance/attendance-records/');
         final assessments = await _getList('/assessment/assessments/');
         final reports = await _getList('/exams/report-cards/');
+        final courses = await _getList('/courses/courses/');
         _data = {
           'attendance': attendance,
           'assessments': assessments,
           'reports': reports,
+          'courses': courses,
         };
       } else if (role == 'TEACHER' || role == 'STAFF') {
         final assignments = await _getList('/academics/teacher-assignments/');
         final assessments = await _getList('/assessment/assessments/');
         final schemes = await _getList('/curriculum/schemes/');
+        final courses = await _getList('/courses/courses/');
         _data = {
           'assignments': assignments,
           'assessments': assessments,
           'schemes': schemes,
+          'courses': courses,
         };
       } else {
         final announcements = await _getList('/messaging/announcements/');
         final orders = await _getList('/shop/orders/my_orders/');
         final requiredItems = await _getList('/requirements/public/');
+        final teachers = await _getList('/academics/teacher-assignments/my_teachers/');
         _data = {
           'announcements': announcements,
           'orders': orders,
           'required_items': requiredItems,
+          'teachers': teachers,
         };
       }
     } catch (e) {

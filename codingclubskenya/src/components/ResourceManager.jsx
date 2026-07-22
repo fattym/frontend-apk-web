@@ -76,7 +76,7 @@ const renderInput = (field, value, onChange, disabled) => {
   );
 };
 
-const ResourceManager = ({ title, endpoint, columns, fields, defaultValues = {} }) => {
+const ResourceManager = ({ title, endpoint, columns, fields, defaultValues = {}, customActions }) => {
   const { data, loading, error, refresh } = useApiList(endpoint);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -159,6 +159,9 @@ const ResourceManager = ({ title, endpoint, columns, fields, defaultValues = {} 
                     <td key={c.key} className="px-4 py-3">{item[c.key] ?? '-'}</td>
                   ))}
                   <td className="px-4 py-3 whitespace-nowrap">
+                    {customActions?.map((act, i) => (
+                      <button key={i} onClick={() => act.onClick(item)} className="text-purple-600 hover:underline mr-3">{act.label}</button>
+                    ))}
                     <button onClick={() => openEdit(item)} className="text-blue-600 hover:underline mr-3">Edit</button>
                     <button onClick={() => handleDelete(item)} className="text-red-600 hover:underline">Delete</button>
                   </td>
