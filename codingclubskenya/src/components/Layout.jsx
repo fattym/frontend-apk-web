@@ -1,5 +1,33 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Workflow,
+  School,
+  BookOpen,
+  ClipboardList,
+  FileCheck,
+  UserCheck,
+  CalendarCheck,
+  NotebookPen,
+  Users,
+  Dumbbell,
+  MessageSquareWarning,
+  CalendarDays,
+  UserPlus,
+  FileText,
+  ShoppingBag,
+  Tag,
+  ShoppingCart,
+  FileSearch,
+  CreditCard,
+  BookMarked,
+  Mail,
+  BarChart3,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const Layout = () => {
@@ -31,24 +59,24 @@ const Layout = () => {
         {
           title: 'Teaching',
           items: [
-            [homePath, 'Dashboard'],
-            ['/course-flow', 'Course Flow'],
-            ['/classes', 'My Classes'],
-            ['/courses', 'Course Studio'],
-            ['/schemes-of-work', 'Schemes of Work'],
-            ['/assessments', 'Assessments'],
-            ['/teacher-assignments', 'Teacher Assignments'],
-            ['/attendance', 'Attendance'],
-            ['/homework', 'Homework'],
+            [homePath, 'Dashboard', LayoutDashboard],
+            ['/course-flow', 'Course Flow', Workflow],
+            ['/classes', 'My Classes', School],
+            ['/courses', 'Course Studio', BookOpen],
+            ['/schemes-of-work', 'Schemes of Work', ClipboardList],
+            ['/assessments', 'Assessments', FileCheck],
+            ['/teacher-assignments', 'Teacher Assignments', UserCheck],
+            ['/attendance', 'Attendance', CalendarCheck],
+            ['/homework', 'Homework', NotebookPen],
           ],
         },
         {
           title: 'Activities',
           items: [
-            ['/learner-groups', 'Learner Groups'],
-            ['/clubs', 'Clubs & Activities'],
-            ['/complaints', 'Complaints'],
-            ['/events', 'Events'],
+            ['/learner-groups', 'Learner Groups', Users],
+            ['/clubs', 'Clubs & Activities', Dumbbell],
+            ['/complaints', 'Complaints', MessageSquareWarning],
+            ['/events', 'Events', CalendarDays],
           ],
         },
       ]
@@ -57,14 +85,14 @@ const Layout = () => {
           {
             title: 'Learner',
             items: [
-              [homePath, 'Dashboard'],
-              ['/my-courses', 'My Courses'],
-              ['/attendance', 'My Attendance'],
-              ['/assessments', 'My Assessments'],
-              ['/parent/requirements', 'Required Items'],
-              ['/homework', 'Homework'],
-              ['/complaints', 'My Complaints'],
-              ['/events', 'Events'],
+              [homePath, 'Dashboard', LayoutDashboard],
+              ['/my-courses', 'My Courses', BookOpen],
+              ['/attendance', 'My Attendance', CalendarCheck],
+              ['/assessments', 'My Assessments', FileCheck],
+              ['/parent/requirements', 'Required Items', ClipboardList],
+              ['/homework', 'Homework', NotebookPen],
+              ['/complaints', 'My Complaints', MessageSquareWarning],
+              ['/events', 'Events', CalendarDays],
             ],
           },
         ]
@@ -72,35 +100,35 @@ const Layout = () => {
           {
             title: 'Academics',
             items: [
-              [homePath, 'Dashboard'],
-              ['/course-flow', 'Course Flow'],
-              ['/students', 'Students'],
-              ['/parents', 'Parents'],
-              ['/teachers', 'Teachers'],
-              ['/classes', 'Classes'],
-              ['/learning-areas', 'Learning Areas'],
-              ['/enrollments', 'Enrollments'],
-              ['/reference-documents', 'Reference Docs'],
-              ['/schemes-of-work', 'Schemes of Work'],
-              ['/assessments', 'Assessments'],
+              [homePath, 'Dashboard', LayoutDashboard],
+              ['/course-flow', 'Course Flow', Workflow],
+              ['/students', 'Students', Users],
+              ['/parents', 'Parents', Users],
+              ['/teachers', 'Teachers', UserCheck],
+              ['/classes', 'Classes', School],
+              ['/learning-areas', 'Learning Areas', BookOpen],
+              ['/enrollments', 'Enrollments', UserPlus],
+              ['/reference-documents', 'Reference Docs', FileText],
+              ['/schemes-of-work', 'Schemes of Work', ClipboardList],
+              ['/assessments', 'Assessments', FileCheck],
             ],
           },
           {
             title: 'Operations',
             items: [
-              ['/shop/products', 'Shop Products'],
-              ['/shop/categories', 'Shop Categories'],
-              ['/shop/orders', 'Shop Orders'],
-              ['/requirements', 'Required Items'],
-              ['/schools', 'Schools'],
-              ['/attendance', 'Attendance'],
-              ['/exams', 'Exams'],
-              ['/fees', 'Fees'],
-              ['/library', 'Library'],
-              ['/messaging', 'Messages'],
-              ['/complaints', 'Complaints'],
-              ['/events', 'Events'],
-              ['/reports', 'Reports'],
+              ['/shop/products', 'Shop Products', ShoppingBag],
+              ['/shop/categories', 'Shop Categories', Tag],
+              ['/shop/orders', 'Shop Orders', ShoppingCart],
+              ['/requirements', 'Required Items', ClipboardList],
+              ['/schools', 'Schools', School],
+              ['/attendance', 'Attendance', CalendarCheck],
+              ['/exams', 'Exams', FileSearch],
+              ['/fees', 'Fees', CreditCard],
+              ['/library', 'Library', BookMarked],
+              ['/messaging', 'Messages', Mail],
+              ['/complaints', 'Complaints', MessageSquareWarning],
+              ['/events', 'Events', CalendarDays],
+              ['/reports', 'Reports', BarChart3],
             ],
           },
         ];
@@ -124,11 +152,11 @@ const Layout = () => {
               className="rounded-lg border border-red-900/40 p-1.5 text-red-200 hover:bg-red-900/40 hover:text-white"
               aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`h-4 w-4 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}>
-                <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0L10 5.94l.72-.72a.75.75 0 1 1 1.06 1.06l-1.5 1.5a.75.75 0 0 1-1.06 0l-1.5-1.5a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-                <path fillRule="evenodd" d="M4.22 9.22a.75.75 0 0 1 1.06 0L6 9.94l.72-.72a.75.75 0 1 1 1.06 1.06l-1.5 1.5a.75.75 0 0 1-1.06 0l-1.5-1.5a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-                <path fillRule="evenodd" d="M10.22 13.22a.75.75 0 0 1 1.06 0L12 13.94l.72-.72a.75.75 0 1 1 1.06 1.06l-1.5-1.5a.75.75 0 0 1-1.06 0l-1.5 1.5a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-              </svg>
+              {collapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
             </button>
           </div>
           {!collapsed && (
@@ -146,25 +174,28 @@ const Layout = () => {
                   {group.title}
                 </p>
               )}
-              <div className="space-y-1">
-                {group.items.map(([to, label]) => (
-                  <NavLink
-                    key={to}
-                    to={to}
-                    className={navLinkClass}
-                    end={to === homePath}
-                    title={collapsed ? label : undefined}
-                  >
-                    {collapsed ? (
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-900/40 text-xs font-semibold text-white">
-                        {label.charAt(0)}
-                      </span>
-                    ) : (
-                      <span>{label}</span>
-                    )}
-                  </NavLink>
-                ))}
-              </div>
+               <div className="space-y-1">
+                 {group.items.map(([to, label, Icon]) => (
+                   <NavLink
+                     key={to}
+                     to={to}
+                     className={navLinkClass}
+                     end={to === homePath}
+                     title={collapsed ? label : undefined}
+                   >
+                     {collapsed ? (
+                       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-900/50 text-white">
+                         <Icon className="h-4 w-4" />
+                       </span>
+                     ) : (
+                       <span className="flex items-center gap-3">
+                         <Icon className="h-4 w-4 shrink-0" />
+                         <span>{label}</span>
+                       </span>
+                     )}
+                   </NavLink>
+                 ))}
+               </div>
             </section>
           ))}
         </nav>
@@ -181,7 +212,7 @@ const Layout = () => {
             className={`mt-3 w-full rounded-xl bg-white px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-red-100 ${collapsed ? 'flex items-center justify-center' : ''}`}
             title={collapsed ? 'Logout' : undefined}
           >
-            {collapsed ? '↪' : 'Logout'}
+            {collapsed ? <LogOut className="h-4 w-4" /> : 'Logout'}
           </button>
         </div>
       </aside>
