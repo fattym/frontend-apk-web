@@ -15,8 +15,8 @@ const Layout = () => {
   const navLinkClass = ({ isActive }) =>
     `flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
       isActive
-        ? 'bg-white text-slate-900 shadow-sm'
-        : 'text-slate-300 hover:bg-white/10 hover:text-white'
+        ? 'bg-red-900/40 text-white shadow-sm'
+        : 'text-red-100/80 hover:bg-red-900/30 hover:text-white'
     }`;
 
   const role = user?.role;
@@ -107,21 +107,21 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      <aside className={`flex flex-col bg-slate-950 text-white transition-all duration-300 ease-in-out ${collapsed ? 'w-full lg:w-16' : 'w-full lg:w-80 xl:w-96'} lg:min-h-screen`}>
-        <div className="border-b border-white/10 px-4 py-5 lg:px-6 lg:py-6">
+      <aside className={`flex flex-col bg-[#1A0503] text-white transition-all duration-300 ease-in-out ${collapsed ? 'w-full lg:w-16' : 'w-full lg:w-80 xl:w-96'} lg:min-h-screen`}>
+        <div className="border-b border-red-900/40 px-4 py-5 lg:px-6 lg:py-6">
           <div className="flex items-center justify-between gap-2">
             {!collapsed && (
               <div>
                 <p className="text-xs uppercase tracking-[0.28em] text-red-300">School Suite</p>
                 <h1 className="mt-2 text-2xl font-semibold">EduGuide Schools</h1>
-                <p className="mt-2 text-sm text-slate-300 hidden xl:block">
+                <p className="mt-2 text-sm text-red-200/70 hidden xl:block">
                   CBC learning, attendance, schemes, and classroom flow in one place.
                 </p>
               </div>
             )}
             <button
               onClick={() => setCollapsed((v) => !v)}
-              className="rounded-lg border border-white/10 p-1.5 text-slate-300 hover:bg-white/10 hover:text-white"
+              className="rounded-lg border border-red-900/40 p-1.5 text-red-200 hover:bg-red-900/40 hover:text-white"
               aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`h-4 w-4 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}>
@@ -142,7 +142,7 @@ const Layout = () => {
           {navGroups.map((group) => (
             <section key={group.title}>
               {!collapsed && (
-                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-500">
+                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-red-400/80">
                   {group.title}
                 </p>
               )}
@@ -156,7 +156,7 @@ const Layout = () => {
                     title={collapsed ? label : undefined}
                   >
                     {collapsed ? (
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-xs font-semibold text-white">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-900/40 text-xs font-semibold text-white">
                         {label.charAt(0)}
                       </span>
                     ) : (
@@ -169,16 +169,16 @@ const Layout = () => {
           ))}
         </nav>
 
-        <div className="border-t border-white/10 px-3 py-4 lg:px-6 lg:py-5">
+        <div className="border-t border-red-900/40 px-3 py-4 lg:px-6 lg:py-5">
           {!collapsed && (
             <>
               <p className="text-sm font-medium text-white">{user?.first_name || user?.email}</p>
-              <p className="text-xs text-slate-400">{user?.email}</p>
+              <p className="text-xs text-red-200/70">{user?.email}</p>
             </>
           )}
           <button
             onClick={handleLogout}
-            className={`mt-3 w-full rounded-xl bg-white px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-red-50 ${collapsed ? 'flex items-center justify-center' : ''}`}
+            className={`mt-3 w-full rounded-xl bg-white px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-red-100 ${collapsed ? 'flex items-center justify-center' : ''}`}
             title={collapsed ? 'Logout' : undefined}
           >
             {collapsed ? '↪' : 'Logout'}
