@@ -9,23 +9,26 @@ const StudentDashboard = () => {
   const [reportCards, setReportCards] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [attRes, assessRes, rcRes, assignRes, postsRes] = await Promise.all([
+        const [attRes, assessRes, rcRes, assignRes, postsRes, notifRes] = await Promise.all([
           api.get('/api/attendance/attendance-records/'),
           api.get('/api/assessment/assessments/'),
           api.get('/api/exams/report-cards/'),
           api.get('/api/courses/assignments/'),
           api.get('/api/courses/posts/'),
+          api.get('/api/attendance/attendance-notifications/'),
         ]);
-        setAttendance(attRes.data.results || attRes.data);
+        setAttendance(attRes.data.results || attRes.data || []);
         setAssessments(assessRes.data.results || assessRes.data);
         setReportCards(rcRes.data.results || rcRes.data);
         setAssignments(assignRes.data.results || assignRes.data);
         setPosts(postsRes.data.results || postsRes.data);
+        setNotifications(notifRes.data.results || notifRes.data || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -37,6 +40,10 @@ const StudentDashboard = () => {
 
   const presentCount = attendance.filter(a => a.status === 'PRESENT').length;
   const absentCount = attendance.filter(a => a.status === 'ABSENT').length;
+  const lateCount = attendance.filter(a => a.status === 'LATE').length;
+  const excusedCount = attendance.filter(a => a.status === 'EXCUSED' || a.status === 'SICK_LEAVE' || a.status === 'AUTHORIZED_ABSENCE').length;
+  const totalAttendance = attendance.length || 1;
+  const attendancePct = Math.round((presentCount / totalAttendance) * 100);
   const meCount = assessments.filter(a => a.level_achieved === 'ME').length;
   const eeCount = assessments.filter(a => a.level_achieved === 'EE').length;
 
@@ -62,11 +69,23 @@ const StudentDashboard = () => {
               <p className="text-xs uppercase tracking-[0.22em] text-rose-700">Absent</p>
               <p className="mt-1 text-2xl font-semibold text-rose-900">{absentCount}</p>
             </div>
+            <div className="rounded-2xl bg-amber-50 px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.22em] text-amber-700">Late</p>
+              <p className="mt-1 text-2xl font-semibold text-amber-900">{lateCount}</p>
+            </div>
+            <div className="rounded-2xl bg-blue-50 px-4 py-3">
+              <p className="text-xs uppercase tracking-[0.22em] text-blue-700">Excused</p>
+              <p className="mt-1 text-2xl font-semibold text-blue-900">{excusedCount}</p>
+            </div>
           </div>
         </div>
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="glass-card rounded-2xl p-6">
+          <h3 className="text-xs uppercase tracking-[0.22em] text-slate-500">Attendance Rate</h3>
+          <p className="mt-2 text-3xl font-semibold text-slate-900">{attendancePct}%</p>
+        </div>
         <div className="glass-card rounded-2xl p-6">
           <h3 className="text-xs uppercase tracking-[0.22em] text-slate-500">Meeting expectations</h3>
           <p className="mt-2 text-3xl font-semibold text-slate-900">{meCount}</p>
@@ -79,11 +98,18 @@ const StudentDashboard = () => {
           <h3 className="text-xs uppercase tracking-[0.22em] text-slate-500">Report cards</h3>
           <p className="mt-2 text-3xl font-semibold text-slate-900">{reportCards.length}</p>
         </div>
-        <div className="glass-card rounded-2xl p-6">
-          <h3 className="text-xs uppercase tracking-[0.22em] text-slate-500">Assignments</h3>
-          <p className="mt-2 text-3xl font-semibold text-slate-900">{assignments.length}</p>
-        </div>
       </div>
+
+      {notifications.filter(n => !n.is_read).length > 0 && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+          <h3 className="text-sm font-semibold text-amber-800">Attendance Alerts</h3>
+          <div className="mt-2 space-y-2">
+            {notifications.filter(n => !n.is_read).slice(0, 5).map(n => (
+              <div key={n.id} className="text-sm text-amber-900">{n.message}</div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="glass-card overflow-hidden rounded-[2rem]">
@@ -135,6 +161,7 @@ const StudentDashboard = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Class</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Note</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
@@ -147,10 +174,11 @@ const StudentDashboard = () => {
                         {a.status}
                       </span>
                     </td>
+                    <td className="px-6 py-4 text-sm text-slate-500">{a.note || '-'}</td>
                   </tr>
                 ))}
                 {attendance.length === 0 && (
-                  <tr><td colSpan="3" className="px-6 py-8 text-center text-sm text-slate-500">No attendance records.</td></tr>
+                  <tr><td colSpan="4" className="px-6 py-8 text-center text-sm text-slate-500">No attendance records.</td></tr>
                 )}
               </tbody>
             </table>

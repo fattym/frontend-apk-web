@@ -26,6 +26,7 @@ const TeacherDashboard = () => {
   const [homeworks, setHomeworks] = useState([]);
   const [complaints, setComplaints] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [attendanceStats, setAttendanceStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showGenerate, setShowGenerate] = useState(false);
   const [selectedScheme, setSelectedScheme] = useState(null);
@@ -46,7 +47,7 @@ const TeacherDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [assignRes, timeRes, assessRes, schemesRes, docsRes, hwRes, compRes, coursesRes] = await Promise.all([
+        const [assignRes, timeRes, assessRes, schemesRes, docsRes, hwRes, compRes, coursesRes, attRes] = await Promise.all([
           api.get('/api/academics/teacher-assignments/'),
           api.get('/api/academics/timetable/'),
           api.get('/api/assessment/assessments/'),
@@ -55,6 +56,7 @@ const TeacherDashboard = () => {
           api.get('/api/homework/homeworks/'),
           api.get('/api/complaints/complaints/'),
           api.get('/api/courses/courses/'),
+          api.get('/api/attendance/attendance-records/stats/'),
         ]);
         setAssignments(assignRes.data.results || assignRes.data);
         setTimetable(timeRes.data.results || timeRes.data);
@@ -64,13 +66,14 @@ const TeacherDashboard = () => {
         setHomeworks(hwRes.data.results || hwRes.data);
         setComplaints(compRes.data.results || compRes.data);
         setCourses(coursesRes.data.results || coursesRes.data);
+        setAttendanceStats(attRes.data);
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    fetch();
   }, []);
 
   useEffect(() => {
@@ -246,6 +249,15 @@ const TeacherDashboard = () => {
         <div className="bg-white p-6 rounded shadow">
           <h3 className="text-gray-500 text-sm">Classes Taught</h3>
           <p className="text-3xl font-bold text-blue-600">{assignments.length}</p>
+        </div>
+        <div className="bg-white p-6 rounded shadow">
+          <h3 className="text-gray-500 text-sm">Attendance Rate</h3>
+          <p className="text-3xl font-bold text-teal-600">{attendanceStats ? `${attendanceStats.attendance_pct || Math.round((attendanceStats.present / (attendanceStats.total || 1)) * 100)}%` : '--'}</p>
+          <p className="text-xs text-gray-500 mt-1">{attendanceStats ? `${attendanceStats.present || 0} present / ${attendanceStats.total || 0} records` : ''}</p>
+        </div>
+        <div className="bg-white p-6 rounded shadow">
+          <h3 className="text-gray-500 text-sm">Absences</h3>
+          <p className="text-3xl font-bold text-rose-600">{attendanceStats?.absent || 0}</p>
         </div>
         <div className="bg-white p-6 rounded shadow">
           <h3 className="text-gray-500 text-sm">Timetable Slots</h3>
