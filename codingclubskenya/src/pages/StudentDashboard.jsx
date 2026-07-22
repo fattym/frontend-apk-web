@@ -52,7 +52,7 @@ const StudentDashboard = () => {
   return (
     <div className="space-y-6">
       <section className="glass-card rounded-[2rem] p-6 sm:p-8">
-        <p className="text-xs uppercase tracking-[0.24em] text-teal-700">Learner dashboard</p>
+        <p className="text-xs uppercase tracking-[0.24em] text-red-700">Learner dashboard</p>
         <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Student Dashboard</h1>

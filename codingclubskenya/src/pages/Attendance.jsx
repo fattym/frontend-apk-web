@@ -248,7 +248,7 @@ const Attendance = () => {
         <h1 className="text-3xl font-bold text-slate-900">Attendance</h1>
         <div className="flex flex-wrap gap-2">
           {tab !== 'bulk' && (
-            <button onClick={() => setTab('bulk')} className="rounded-lg bg-teal-600 px-4 py-2 text-sm text-white hover:bg-teal-700">Bulk Mark</button>
+            <button onClick={() => setTab('bulk')} className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700">Bulk Mark</button>
           )}
           {tab === 'records' && records.length > 0 && (
             <button onClick={exportCSV} className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50">Export CSV</button>
@@ -296,7 +296,7 @@ const Attendance = () => {
                 { label: 'Absent', value: stats.absent, cls: 'bg-rose-50 text-rose-800' },
                 { label: 'Late', value: stats.late, cls: 'bg-amber-50 text-amber-800' },
                 { label: 'Excused', value: stats.excused, cls: 'bg-blue-50 text-blue-800' },
-                { label: 'Attendance %', value: `${stats.total ? Math.round((stats.present / stats.total) * 100) : 0}%`, cls: 'bg-teal-50 text-teal-800' },
+                { label: 'Attendance %', value: `${stats.total ? Math.round((stats.present / stats.total) * 100) : 0}%`, cls: 'bg-red-50 text-red-800' },
               ].map(s => (
                 <div key={s.label} className={`rounded-2xl px-4 py-3 ${s.cls}`}>
                   <p className="text-xs uppercase tracking-[0.2em]">{s.label}</p>
@@ -349,7 +349,7 @@ const Attendance = () => {
       {tab === 'summaries' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button onClick={regenerateSummaries} disabled={saving} className="rounded-lg bg-teal-600 px-4 py-2 text-sm text-white hover:bg-teal-700 disabled:opacity-50">Regenerate Summaries</button>
+            <button onClick={regenerateSummaries} disabled={saving} className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-50">Regenerate Summaries</button>
           </div>
           <div className="overflow-x-auto rounded-2xl border border-white/70 bg-white shadow-sm">
             <table className="min-w-full">
@@ -427,7 +427,7 @@ const Attendance = () => {
           )}
           {bulkStream && Object.keys(bulkData).length > 0 && (
             <div className="flex justify-end">
-              <button onClick={handleBulkSubmit} disabled={saving} className="rounded-lg bg-teal-600 px-6 py-2 text-sm text-white hover:bg-teal-700 disabled:opacity-50">{saving ? 'Saving...' : 'Save Attendance'}</button>
+              <button onClick={handleBulkSubmit} disabled={saving} className="rounded-lg bg-red-600 px-6 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-50">{saving ? 'Saving...' : 'Save Attendance'}</button>
             </div>
           )}
         </div>

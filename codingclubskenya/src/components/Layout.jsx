@@ -112,7 +112,7 @@ const Layout = () => {
           <div className="flex items-center justify-between gap-2">
             {!collapsed && (
               <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-teal-300">School Suite</p>
+                <p className="text-xs uppercase tracking-[0.28em] text-red-300">School Suite</p>
                 <h1 className="mt-2 text-2xl font-semibold">EduGuide Schools</h1>
                 <p className="mt-2 text-sm text-slate-300 hidden xl:block">
                   CBC learning, attendance, schemes, and classroom flow in one place.
@@ -132,7 +132,7 @@ const Layout = () => {
             </button>
           </div>
           {!collapsed && (
-            <span className="mt-3 inline-block rounded-full border border-teal-400/30 bg-teal-400/10 px-3 py-1 text-xs text-teal-200">
+            <span className="mt-3 inline-block rounded-full border border-red-400/30 bg-red-400/10 px-3 py-1 text-xs text-red-200">
               {role || 'USER'}
             </span>
           )}
@@ -178,7 +178,7 @@ const Layout = () => {
           )}
           <button
             onClick={handleLogout}
-            className={`mt-3 w-full rounded-xl bg-white px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-teal-50 ${collapsed ? 'flex items-center justify-center' : ''}`}
+            className={`mt-3 w-full rounded-xl bg-white px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-red-50 ${collapsed ? 'flex items-center justify-center' : ''}`}
             title={collapsed ? 'Logout' : undefined}
           >
             {collapsed ? '↪' : 'Logout'}
@@ -196,7 +196,7 @@ const Layout = () => {
               </p>
             </div>
             <div className="hidden items-center gap-2 sm:flex">
-              <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-800">CBC ready</span>
+              <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-800">CBC ready</span>
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">Multi-tenant</span>
             </div>
           </div>

@@ -473,9 +473,9 @@ const CourseStudio = () => {
       <section className="glass-card overflow-hidden rounded-[2rem] bg-slate-950 text-white">
         <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
           <div className="relative p-8 sm:p-10">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(45,212,191,0.16),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(96,165,250,0.16),transparent_28%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(228,59,26,0.14),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(15,118,110,0.12),transparent_28%)]" />
             <div className="relative">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-teal-100">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-red-100">
                 <Sparkles className="h-3.5 w-3.5" />
                 CBC Classroom Studio
               </span>
@@ -489,7 +489,7 @@ const CourseStudio = () => {
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   onClick={openNew}
-                  className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-teal-50"
+                   className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-red-50"
                 >
                   <Plus className="h-4 w-4" />
                   New Course
@@ -514,9 +514,9 @@ const CourseStudio = () => {
                 </div>
               ))}
             </div>
-            <div className="mt-6 rounded-2xl border border-teal-400/20 bg-teal-400/10 p-4 text-sm text-teal-50">
+            <div className="mt-6 rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-50">
               <p className="font-medium">CBC ready</p>
-              <p className="mt-1 text-teal-50/80">Topics come from schemes of work. Lessons and posts stay tied to the active course.</p>
+              <p className="mt-1 text-red-50/80">Topics come from schemes of work. Lessons and posts stay tied to the active course.</p>
             </div>
           </div>
         </div>
@@ -556,7 +556,7 @@ const CourseStudio = () => {
                   onClick={() => openCourse(course.id)}
                   className={`w-full rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lg ${
                     activeCourse?.id === course.id
-                      ? 'border-teal-300 bg-teal-50'
+                      ? 'border-red-300 bg-red-50'
                       : 'border-slate-200 bg-white'
                   }`}
                 >
@@ -585,7 +585,7 @@ const CourseStudio = () => {
               <div className="border-b border-slate-200 bg-white/60 px-5 py-4">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.24em] text-teal-700">Course editor</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-red-700">Course editor</p>
                     <h2 className="mt-1 text-2xl font-semibold text-slate-900">{activeCourse.title || 'Untitled course'}</h2>
                     <p className="mt-1 text-sm text-slate-500">
                       {activeCourse.learning_area?.name || activeCourse.learning_area || 'Learning area'} · {activeCourse.grade_name || 'No grade'} · {activeCourse.teacher_name || 'No teacher'}
@@ -633,7 +633,7 @@ const CourseStudio = () => {
                     <div className="md:col-span-2">
                       <label className="mb-1 block text-sm font-medium text-slate-700">Title</label>
                       <input
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-red-400"
                         value={activeCourse.title || ''}
                         onChange={(e) => setActive({ ...activeCourse, title: e.target.value })}
                         placeholder="e.g. Grade 4 Agriculture & Nutrition"
@@ -642,7 +642,7 @@ const CourseStudio = () => {
                     <div>
                       <label className="mb-1 block text-sm font-medium text-slate-700">Learning Area</label>
                       <select
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-red-400"
                         value={typeof activeCourse.learning_area === 'object' ? activeCourse.learning_area?.id || '' : activeCourse.learning_area || ''}
                         onChange={(e) => setActive({ ...activeCourse, learning_area: e.target.value ? Number(e.target.value) : '' })}
                       >
@@ -657,7 +657,7 @@ const CourseStudio = () => {
                     <div>
                       <label className="mb-1 block text-sm font-medium text-slate-700">Grade</label>
                       <select
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-red-400"
                         value={typeof activeCourse.grade === 'object' ? activeCourse.grade?.id || '' : activeCourse.grade || ''}
                         onChange={(e) => setActive({ ...activeCourse, grade: e.target.value ? Number(e.target.value) : '' })}
                       >
@@ -672,7 +672,7 @@ const CourseStudio = () => {
                     <div>
                       <label className="mb-1 block text-sm font-medium text-slate-700">Stream</label>
                       <input
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-red-400"
                         value={typeof activeCourse.stream === 'object' ? activeCourse.stream?.id || '' : activeCourse.stream || ''}
                         onChange={(e) => setActive({ ...activeCourse, stream: e.target.value ? Number(e.target.value) : '' })}
                         placeholder="Stream id or leave blank"
@@ -681,7 +681,7 @@ const CourseStudio = () => {
                     <div>
                       <label className="mb-1 block text-sm font-medium text-slate-700">Term</label>
                       <input
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-red-400"
                         value={typeof activeCourse.term === 'object' ? activeCourse.term?.id || '' : activeCourse.term || ''}
                         onChange={(e) => setActive({ ...activeCourse, term: e.target.value ? Number(e.target.value) : '' })}
                         placeholder="Term id or leave blank"
@@ -690,7 +690,7 @@ const CourseStudio = () => {
                     <div>
                       <label className="mb-1 block text-sm font-medium text-slate-700">Delivery Mode</label>
                       <select
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-red-400"
                         value={activeCourse.delivery_mode || 'blended'}
                         onChange={(e) => setActive({ ...activeCourse, delivery_mode: e.target.value })}
                       >
@@ -703,7 +703,7 @@ const CourseStudio = () => {
                       <label className="mb-1 block text-sm font-medium text-slate-700">Available From</label>
                       <input
                         type="datetime-local"
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-red-400"
                         value={activeCourse.available_from ? String(activeCourse.available_from).slice(0, 16) : ''}
                         onChange={(e) => setActive({ ...activeCourse, available_from: e.target.value })}
                       />
@@ -711,7 +711,7 @@ const CourseStudio = () => {
                     <div>
                       <label className="mb-1 block text-sm font-medium text-slate-700">Section</label>
                       <input
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-red-400"
                         value={activeCourse.section || ''}
                         onChange={(e) => setActive({ ...activeCourse, section: e.target.value })}
                       />
@@ -719,7 +719,7 @@ const CourseStudio = () => {
                     <div>
                       <label className="mb-1 block text-sm font-medium text-slate-700">Room</label>
                       <input
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 outline-none focus:border-red-400"
                         value={activeCourse.room || ''}
                         onChange={(e) => setActive({ ...activeCourse, room: e.target.value })}
                       />
@@ -728,7 +728,7 @@ const CourseStudio = () => {
                       <label className="mb-1 block text-sm font-medium text-slate-700">Description</label>
                       <textarea
                         rows="4"
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-teal-400"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-red-400"
                         value={activeCourse.description || ''}
                         onChange={(e) => setActive({ ...activeCourse, description: e.target.value })}
                         placeholder="Course summary"
@@ -769,7 +769,7 @@ const CourseStudio = () => {
                   <div className="space-y-6">
                     <div>
                       <div className="mb-3 flex items-center gap-2">
-                        <School className="h-4 w-4 text-teal-700" />
+                        <School className="h-4 w-4 text-red-700" />
                         <h3 className="text-sm font-semibold text-slate-900">Core Competencies</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -781,7 +781,7 @@ const CourseStudio = () => {
                               type="button"
                               onClick={() => toggleMultiValue('core_competencies', item.id)}
                               className={`rounded-full border px-3 py-2 text-sm transition ${
-                                activeFlag ? 'border-teal-300 bg-teal-50 text-teal-800' : 'border-slate-200 bg-white text-slate-600'
+                                activeFlag ? 'border-red-300 bg-red-50 text-red-800' : 'border-slate-200 bg-white text-slate-600'
                               }`}
                             >
                               {item.name}
@@ -793,7 +793,7 @@ const CourseStudio = () => {
 
                     <div>
                       <div className="mb-3 flex items-center gap-2">
-                        <BookOpen className="h-4 w-4 text-teal-700" />
+                        <BookOpen className="h-4 w-4 text-red-700" />
                         <h3 className="text-sm font-semibold text-slate-900">Values</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -817,7 +817,7 @@ const CourseStudio = () => {
 
                     <div>
                       <div className="mb-3 flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4 text-teal-700" />
+                        <MessageSquare className="h-4 w-4 text-red-700" />
                         <h3 className="text-sm font-semibold text-slate-900">PCIs</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -850,7 +850,7 @@ const CourseStudio = () => {
                     <div className="rounded-2xl bg-slate-950 p-5 text-white">
                       <div className="flex flex-wrap items-center justify-between gap-4">
                         <div>
-                          <p className="text-xs uppercase tracking-[0.24em] text-teal-200">Scheme linkage</p>
+                          <p className="text-xs uppercase tracking-[0.24em] text-red-200">Scheme linkage</p>
                           <h3 className="mt-1 text-xl font-semibold">Generate topics from CBC Scheme of Work</h3>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -870,7 +870,7 @@ const CourseStudio = () => {
                             type="button"
                             onClick={generateTopicsFromScheme}
                             disabled={saving}
-                            className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-teal-50 disabled:opacity-50"
+                            className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-red-50 disabled:opacity-50"
                           >
                             <Sparkles className="h-4 w-4" />
                             Generate Topics
@@ -900,7 +900,7 @@ const CourseStudio = () => {
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <input
-                                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400"
+                                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-red-400"
                                 value={topic.title || ''}
                                 onChange={(e) => setTopics((prev) => prev.map((item) => (item.id === topic.id ? { ...item, title: e.target.value } : item)))}
                               />
@@ -920,14 +920,14 @@ const CourseStudio = () => {
                           <div className="mt-3 grid gap-3 md:grid-cols-3">
                             <input
                               type="number"
-                              className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400"
+                              className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-red-400"
                               value={topic.week || 0}
                               onChange={(e) => setTopics((prev) => prev.map((item) => (item.id === topic.id ? { ...item, week: Number(e.target.value) } : item)))}
                               placeholder="Week"
                             />
                             <input
                               type="number"
-                              className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400"
+                              className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-red-400"
                               value={topic.order || 0}
                               onChange={(e) => setTopics((prev) => prev.map((item) => (item.id === topic.id ? { ...item, order: Number(e.target.value) } : item)))}
                               placeholder="Order"
@@ -943,7 +943,7 @@ const CourseStudio = () => {
 
                           <textarea
                             rows="3"
-                            className="mt-3 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400"
+                            className="mt-3 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-red-400"
                             value={topic.learning_outcomes || ''}
                             onChange={(e) => setTopics((prev) => prev.map((item) => (item.id === topic.id ? { ...item, learning_outcomes: e.target.value } : item)))}
                             placeholder="CBC learning outcomes"
@@ -954,7 +954,7 @@ const CourseStudio = () => {
 
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                       <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
-                        <Layers3 className="h-4 w-4 text-teal-700" />
+                        <Layers3 className="h-4 w-4 text-red-700" />
                         Lessons
                       </div>
                       <div className="mt-3 space-y-3">
@@ -987,7 +987,7 @@ const CourseStudio = () => {
                             <div className="flex flex-wrap items-start justify-between gap-3">
                               <div className="min-w-0 flex-1">
                                 <input
-                                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400"
+                                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-red-400"
                                   value={lesson.title || ''}
                                   onChange={(e) => setActive({
                                     ...activeCourse,
@@ -1016,7 +1016,7 @@ const CourseStudio = () => {
                             <div className="mt-3 grid gap-3 md:grid-cols-2">
                               <textarea
                                 rows="3"
-                                className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400"
+                                className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-red-400"
                                 value={lesson.objectives || ''}
                                 onChange={(e) => setActive({
                                   ...activeCourse,
@@ -1026,7 +1026,7 @@ const CourseStudio = () => {
                               />
                               <textarea
                                 rows="3"
-                                className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-400"
+                                className="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-red-400"
                                 value={lesson.learning_activities || ''}
                                 onChange={(e) => setActive({
                                   ...activeCourse,
@@ -1061,7 +1061,7 @@ const CourseStudio = () => {
                   <div className="space-y-6">
                     <div className="flex flex-wrap items-center gap-3">
                       <select
-                        className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-teal-400"
+                        className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-red-400"
                         value={enrollGradeId}
                         onChange={(e) => setEnrollGradeId(e.target.value)}
                       >
@@ -1081,7 +1081,7 @@ const CourseStudio = () => {
 
                     <div className="rounded-2xl border border-slate-200 bg-white p-4">
                       <div className="mb-3 flex items-center gap-2">
-                        <Users className="h-4 w-4 text-teal-700" />
+                        <Users className="h-4 w-4 text-red-700" />
                         <h3 className="text-sm font-semibold text-slate-900">Enrolled learners ({activeStudents.length})</h3>
                       </div>
                       <div className="space-y-2">
@@ -1110,11 +1110,11 @@ const CourseStudio = () => {
 
                     <div className="rounded-2xl border border-slate-200 bg-white p-4">
                       <div className="mb-3 flex items-center gap-2">
-                        <School className="h-4 w-4 text-teal-700" />
+                        <School className="h-4 w-4 text-red-700" />
                         <h3 className="text-sm font-semibold text-slate-900">Search students</h3>
                       </div>
                       <input
-                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 outline-none focus:border-teal-400"
+                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 outline-none focus:border-red-400"
                         value={studentSearch}
                         onChange={(e) => setStudentSearch(e.target.value)}
                         placeholder="Search by name or email"
@@ -1150,7 +1150,7 @@ const CourseStudio = () => {
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="rounded-2xl border border-slate-200 bg-white p-4">
                         <div className="mb-3 flex items-center gap-2">
-                          <MessageSquare className="h-4 w-4 text-teal-700" />
+                          <MessageSquare className="h-4 w-4 text-red-700" />
                           <h3 className="text-sm font-semibold text-slate-900">Class posts</h3>
                         </div>
                         <div className="space-y-3">
@@ -1173,7 +1173,7 @@ const CourseStudio = () => {
 
                       <div className="rounded-2xl border border-slate-200 bg-white p-4">
                         <div className="mb-3 flex items-center gap-2">
-                          <BookOpen className="h-4 w-4 text-teal-700" />
+                          <BookOpen className="h-4 w-4 text-red-700" />
                           <h3 className="text-sm font-semibold text-slate-900">Assignments</h3>
                         </div>
                         <div className="space-y-3">
@@ -1220,11 +1220,11 @@ const CourseStudio = () => {
 
       <div className="flex items-center justify-between rounded-2xl border border-dashed border-slate-300 bg-white/70 px-4 py-3 text-sm text-slate-500">
         <span className="inline-flex items-center gap-2">
-          <CalendarDays className="h-4 w-4 text-teal-700" />
+          <CalendarDays className="h-4 w-4 text-red-700" />
           CBC classroom workspace
         </span>
         <span className="inline-flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4 text-teal-700" />
+          <CheckCircle2 className="h-4 w-4 text-red-700" />
           Scheme-driven topics and published learner feed
         </span>
       </div>

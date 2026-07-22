@@ -8,7 +8,7 @@ const STATS = [
   { key: 'teachers', label: 'Teachers', endpoint: '/api/auth/users/?role=TEACHER', link: '/teachers', accent: 'text-green-600' },
   { key: 'parents', label: 'Parents', endpoint: '/api/auth/users/?role=PARENT', link: '/parents', accent: 'text-purple-600' },
   { key: 'streams', label: 'Classes', endpoint: '/api/academics/streams/', link: '/classes', accent: 'text-indigo-600' },
-  { key: 'learningAreas', label: 'Learning Areas', endpoint: '/api/academics/learning-areas/', link: '/learning-areas', accent: 'text-teal-600' },
+  { key: 'learningAreas', label: 'Learning Areas', endpoint: '/api/academics/learning-areas/', link: '/learning-areas', accent: 'text-red-600' },
   { key: 'assessments', label: 'Assessments', endpoint: '/api/assessment/assessments/', link: '/assessments', accent: 'text-pink-600' },
   { key: 'exams', label: 'Exams', endpoint: '/api/exams/exams/', link: '/exams', accent: 'text-amber-600' },
   { key: 'invoices', label: 'Fee Invoices', endpoint: '/api/fees/invoices/', link: '/fees', accent: 'text-red-600' },

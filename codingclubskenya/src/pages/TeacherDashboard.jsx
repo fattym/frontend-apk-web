@@ -252,7 +252,7 @@ const TeacherDashboard = () => {
         </div>
         <div className="bg-white p-6 rounded shadow">
           <h3 className="text-gray-500 text-sm">Attendance Rate</h3>
-          <p className="text-3xl font-bold text-teal-600">{attendanceStats ? `${attendanceStats.attendance_pct || Math.round((attendanceStats.present / (attendanceStats.total || 1)) * 100)}%` : '--'}</p>
+          <p className="text-3xl font-bold text-red-600">{attendanceStats ? `${attendanceStats.attendance_pct || Math.round((attendanceStats.present / (attendanceStats.total || 1)) * 100)}%` : '--'}</p>
           <p className="text-xs text-gray-500 mt-1">{attendanceStats ? `${attendanceStats.present || 0} present / ${attendanceStats.total || 0} records` : ''}</p>
         </div>
         <div className="bg-white p-6 rounded shadow">

@@ -22,7 +22,7 @@ const MyCoursesPage = () => {
   return (
     <div className="space-y-6">
       <section className="glass-card rounded-[2rem] p-6 sm:p-8">
-        <p className="text-xs uppercase tracking-[0.24em] text-teal-700">Learner space</p>
+        <p className="text-xs uppercase tracking-[0.24em] text-red-700">Learner space</p>
         <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">My Courses</h1>
@@ -32,7 +32,7 @@ const MyCoursesPage = () => {
           </div>
           <button
             onClick={() => navigate('/course-flow')}
-            className="inline-flex items-center justify-center rounded-xl border border-teal-200 bg-teal-50 px-4 py-2 text-sm font-medium text-teal-800 transition hover:bg-teal-100"
+            className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-800 transition hover:bg-red-100"
           >
             View course flow
           </button>
@@ -67,7 +67,7 @@ const MyCoursesPage = () => {
                 }`}>
                   {(c.status || 'published').replace('_', ' ')}
                 </span>
-                <span className="text-sm font-medium text-teal-700">Open →</span>
+                <span className="text-sm font-medium text-red-700">Open →</span>
               </div>
             </div>
           ))}

@@ -6,18 +6,22 @@
   --surface: rgba(255, 255, 255, 0.82);
   --surface-strong: #ffffff;
   --border-soft: rgba(15, 23, 42, 0.08);
-  --text-strong: #0f172a;
+  --text-strong: #1A1D20;
   --text-muted: #64748b;
-  --brand: #0f766e;
-  --brand-strong: #115e59;
-  --brand-soft: #ccfbf1;
+  --brand: #E43B1A;
+  --brand-strong: #C22B0E;
+  --brand-soft: #fef2f2;
+  --brand-glow: rgba(228, 59, 26, 0.12);
+  --accent-teal: #0f766e;
+  --accent-teal-strong: #115e59;
+  --accent-teal-soft: #ccfbf1;
 }
 
 html {
   min-height: 100%;
   background:
-    radial-gradient(circle at top left, rgba(20, 184, 166, 0.14), transparent 34%),
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 28%),
+    radial-gradient(circle at top left, rgba(228, 59, 26, 0.10), transparent 34%),
+    radial-gradient(circle at top right, rgba(15, 118, 110, 0.10), transparent 28%),
     linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
 }
 
@@ -34,8 +38,8 @@ body {
 }
 
 ::selection {
-  background: rgba(15, 118, 110, 0.18);
-  color: #083344;
+  background: rgba(228, 59, 26, 0.18);
+  color: #1A1D20;
 }
 
 .glass-card {
@@ -51,4 +55,16 @@ body {
 
 .text-balance {
   text-wrap: balance;
+}
+
+.brand-gradient {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
+}
+
+.brand-border {
+  border-color: rgba(228, 59, 26, 0.25);
+}
+
+.brand-glow {
+  box-shadow: 0 0 0 4px var(--brand-glow);
 }

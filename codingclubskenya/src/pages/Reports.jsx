@@ -82,7 +82,7 @@ const Reports = () => {
         <Card label="Students" value={ov?.students ?? 0} accent="text-blue-600" />
         <Card label="Teachers" value={ov?.teachers ?? 0} accent="text-green-600" />
         <Card label="Classes" value={ov?.classes ?? 0} accent="text-indigo-600" />
-        <Card label="Subjects" value={ov?.subjects ?? 0} accent="text-teal-600" />
+        <Card label="Subjects" value={ov?.subjects ?? 0} accent="text-red-600" />
         <Card label="Attendance" value={`${ov?.attendance?.present_pct ?? 0}%`} accent="text-sky-600" />
         <Card label="Fee Collected" value={`${ov?.fee_collection?.rate ?? 0}%`} accent="text-red-600" />
         <Card label="Avg Exam %" value={ov?.performance?.avg_exam_pct ?? 0} accent="text-amber-600" />

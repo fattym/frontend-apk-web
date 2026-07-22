@@ -132,9 +132,9 @@ const CourseFlow = () => {
       <section className="glass-card overflow-hidden rounded-[2rem] bg-slate-950 text-white">
         <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
           <div className="relative p-8 sm:p-10">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(45,212,191,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(96,165,250,0.16),transparent_28%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(228,59,26,0.16),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(15,118,110,0.12),transparent_28%)]" />
             <div className="relative max-w-3xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-teal-100">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-red-100">
                 <Sparkles className="h-3.5 w-3.5" />
                 CBC course flow
               </span>
@@ -149,7 +149,7 @@ const CourseFlow = () => {
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   onClick={() => navigate('/courses')}
-                  className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-teal-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-red-50"
                 >
                   Open Course Studio <ArrowRight className="h-4 w-4" />
                 </button>
@@ -180,9 +180,9 @@ const CourseFlow = () => {
               ))}
             </div>
 
-            <div className="mt-6 rounded-2xl border border-teal-400/20 bg-teal-400/10 p-4 text-sm text-teal-50">
+            <div className="mt-6 rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-50">
               <p className="font-medium">Visibility rule</p>
-              <p className="mt-1 text-teal-50/80">
+              <p className="mt-1 text-red-50/80">
                 Draft courses and unpublished topics stay hidden. Only the published classroom feed reaches learners.
               </p>
             </div>
@@ -202,7 +202,7 @@ const CourseFlow = () => {
           return (
             <article key={step.title} className="glass-card rounded-2xl p-5">
               <div className="flex items-center justify-between">
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-50 text-teal-700">
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-red-50 text-red-700">
                   <Icon className="h-5 w-5" />
                 </span>
                 <span className="text-xs font-medium text-slate-400">0{index + 1}</span>
@@ -316,7 +316,7 @@ const CourseFlow = () => {
                       {activeCourse.grade_name || 'Grade not set'}
                     </p>
                   </div>
-                  <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
+                  <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
                     Published feed
                   </span>
                 </div>
@@ -345,15 +345,15 @@ const CourseFlow = () => {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-teal-200 bg-teal-50 p-4">
-                    <p className="flex items-center gap-2 text-sm font-medium text-teal-900">
+                  <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+                    <p className="flex items-center gap-2 text-sm font-medium text-red-900">
                       <CheckCircle2 className="h-4 w-4" />
                       Visibility rules
                     </p>
-                    <ul className="mt-3 space-y-2 text-sm leading-6 text-teal-950/80">
+                    <ul className="mt-3 space-y-2 text-sm leading-6 text-red-950/80">
                       {VISIBILITY_RULES.map((rule) => (
                         <li key={rule} className="flex items-start gap-2">
-                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-teal-600" />
+                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-red-600" />
                           <span>{rule}</span>
                         </li>
                       ))}
