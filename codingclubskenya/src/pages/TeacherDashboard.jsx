@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import AITeacherAssist from '../components/AITeacherAssist';
 
 const TeacherDashboard = () => {
   const { user } = useAuth();
@@ -596,6 +597,7 @@ const TeacherDashboard = () => {
           </div>
         </div>
       )}
+      <AITeacherAssist />
     </div>
   );
 };

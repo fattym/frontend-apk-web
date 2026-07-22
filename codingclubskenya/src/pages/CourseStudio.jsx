@@ -18,6 +18,7 @@ import {
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import Tabs from '../components/Tabs';
+import AITeacherAssist from '../components/AITeacherAssist';
 
 const unwrap = (data) => data?.results || data || [];
 
@@ -1227,6 +1228,7 @@ const CourseStudio = () => {
           Scheme-driven topics and published learner feed
         </span>
       </div>
+      <AITeacherAssist />
     </div>
   );
 };

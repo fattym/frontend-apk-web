@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import useApiList from '../hooks/useApiList';
+import AITeacherAssist from '../components/AITeacherAssist';
 
 const STANDARD_FIELDS = [
   { key: 'week_number', label: 'Week Number' },
@@ -455,6 +456,7 @@ const SchemesOfWork = () => {
           </div>
         </div>
       )}
+      <AITeacherAssist />
     </div>
   );
 };
