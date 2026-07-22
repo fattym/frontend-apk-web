@@ -73,7 +73,7 @@ const TeacherDashboard = () => {
         setLoading(false);
       }
     };
-    fetch();
+    fetchData();
   }, []);
 
   useEffect(() => {

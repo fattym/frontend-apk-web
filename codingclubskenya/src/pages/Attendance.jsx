@@ -40,21 +40,29 @@ const Attendance = () => {
       setLoading(true);
       setError('');
       try {
-        const [streamsRes, studentsRes] = await Promise.all([
-          api.get('/api/attendance/class-list/'),
-          api.get('/api/auth/users/students/'),
+        const [streamsRes] = await Promise.all([
+          api.get('/api/attendance/attendance-records/class_list/'),
         ]);
-        const s = (studentsRes.data.results || studentsRes.data || []).map(st => ({ id: st.id, name: `${st.first_name || ''} ${st.last_name || ''}`.trim() || st.email }));
-        setStudents(s);
         setStreams(streamsRes.data.results || streamsRes.data || []);
       } catch (err) {
-        setError('Failed to load streams/students');
+        setError('Failed to load streams');
       } finally {
         setLoading(false);
       }
     };
     boot();
   }, []);
+
+  const loadStudentsForStream = async (streamId) => {
+    try {
+      const res = await api.get('/api/attendance/attendance-records/students_for_stream/', { params: { stream: streamId } });
+      const students = (res.data.results || res.data || []).map(st => ({ id: st.id, name: st.name || `${st.first_name || ''} ${st.last_name || ''}`.trim() || st.email }));
+      setStudents(students);
+    } catch (err) {
+      console.error('Failed to load students for stream:', err);
+      setStudents([]);
+    }
+  };
 
   const loadRecords = async () => {
     setLoading(true);
@@ -132,17 +140,14 @@ const Attendance = () => {
 
   useEffect(() => {
     if (bulkStream) {
-      const studentsInStream = students.filter(s => {
-        const streamObj = streams.find(st => st.id == bulkStream);
-        return streamObj && (s.grade || '').toLowerCase() === (streamObj.grade || '').toLowerCase();
-      });
+      loadStudentsForStream(bulkStream);
       const initial = {};
-      studentsInStream.forEach(st => {
+      students.forEach(st => {
         initial[st.id] = { student: st.id, status: 'PRESENT', note: '' };
       });
       setBulkData(initial);
     }
-  }, [bulkStream, students, streams]);
+  }, [bulkStream, students]);
 
   const handleBulkSubmit = async () => {
     if (!bulkDate || !bulkStream) {
