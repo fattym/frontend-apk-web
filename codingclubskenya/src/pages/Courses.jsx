@@ -23,7 +23,7 @@ import api from "../services/api";
 const STATUS_STYLES = {
   draft: "bg-slate-100 text-slate-700 border-slate-200",
   submitted_for_review: "bg-amber-50 text-amber-800 border-amber-200",
-  published: "bg-emerald-50 text-emerald-800 border-emerald-200",
+  published: "bg-rose-50 text-rose-800 border-rose-200",
 };
 
 const MODE_LABELS = {
@@ -995,7 +995,7 @@ const CoursesPage = () => {
     return (
       <div className="flex min-h-[60vh] items-center justify-center rounded-3xl bg-white/70 p-10 shadow-sm">
         <div className="text-center">
-          <div className="mx-auto mb-3 h-12 w-12 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600" />
+          <div className="mx-auto mb-3 h-12 w-12 animate-spin rounded-full border-4 border-red-200 border-t-red-600" />
           <p className="text-sm font-medium text-slate-600">
             Loading course studio...
           </p>
@@ -1006,11 +1006,11 @@ const CoursesPage = () => {
 
   return (
     <div className="space-y-5">
-      <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white shadow-xl">
+      <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-gradient-to-br from-slate-950 via-slate-900 to-red-950 text-white shadow-xl">
         <div className="grid gap-6 px-5 py-6 lg:grid-cols-[1.4fr_0.9fr] lg:px-7">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-200">
+              <span className="rounded-full border border-red-900/40 bg-red-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-red-200">
                 CBC course studio
               </span>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-200">
@@ -1031,7 +1031,7 @@ const CoursesPage = () => {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={createNewCourse}
-                className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400"
+                className="inline-flex items-center gap-2 rounded-2xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-400"
               >
                 <Plus className="h-4 w-4" />
                 New course
@@ -1050,7 +1050,7 @@ const CoursesPage = () => {
                     <button
                       onClick={publishCourse}
                       disabled={saving}
-                      className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-50 disabled:opacity-50"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-rose-50 disabled:opacity-50"
                     >
                       <Shield className="h-4 w-4" />
                       Publish
@@ -1101,7 +1101,7 @@ const CoursesPage = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search courses..."
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-red-400 focus:bg-white"
               />
             </div>
           </div>
@@ -1137,7 +1137,7 @@ const CoursesPage = () => {
                     onClick={() => openCourse(course)}
                     className={`w-full rounded-[1.75rem] border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
                       isActive
-                        ? "border-emerald-400 ring-2 ring-emerald-100"
+                        ? "border-red-400 ring-2 ring-red-100"
                         : "border-slate-200"
                     }`}
                   >
@@ -1156,7 +1156,7 @@ const CoursesPage = () => {
                         </p>
                       </div>
                       <ChevronRight
-                        className={`mt-1 h-4 w-4 ${isActive ? "text-emerald-600" : "text-slate-300"}`}
+                        className={`mt-1 h-4 w-4 ${isActive ? "text-red-600" : "text-slate-300"}`}
                       />
                     </div>
 
@@ -1207,7 +1207,7 @@ const CoursesPage = () => {
                         </span>
                       )}
                       {active.delivery_mode && (
-                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-800">
+                        <span className="rounded-full bg-rose-50 px-3 py-1 text-[11px] font-semibold text-rose-800">
                           {MODE_LABELS[active.delivery_mode] ||
                             active.delivery_mode}
                         </span>
@@ -1326,7 +1326,7 @@ const CoursesPage = () => {
                       <button
                         onClick={saveCourse}
                         disabled={saving}
-                        className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                        className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
                       >
                         <Save className="h-4 w-4" />
                         Save changes
@@ -1434,7 +1434,7 @@ const CoursesPage = () => {
                         onChange={(e) =>
                           updateActive({ description: e.target.value })
                         }
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                         placeholder="Describe the CBC course goals and learning flow."
                       />
                     </div>
@@ -1462,14 +1462,14 @@ const CoursesPage = () => {
                           }
                           className={`flex items-start gap-3 rounded-2xl border p-4 text-left transition ${
                             active[item.field]
-                              ? "border-emerald-400 bg-emerald-50"
+                              ? "border-red-400 bg-rose-50"
                               : "border-slate-200 bg-slate-50 hover:bg-slate-100"
                           }`}
                         >
                           <span
                             className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border ${
                               active[item.field]
-                                ? "border-emerald-600 bg-emerald-600 text-white"
+                                ? "border-red-600 bg-red-600 text-white"
                                 : "border-slate-300 bg-white"
                             }`}
                           >
@@ -1493,7 +1493,7 @@ const CoursesPage = () => {
                   <section className="space-y-4">
                     <InfoPanel
                       title="CBC flow"
-                      icon={<Sparkles className="h-4 w-4 text-emerald-500" />}
+                      icon={<Sparkles className="h-4 w-4 text-red-500" />}
                       body="Course -> Scheme of Work -> Weekly Topic -> Lesson -> Post/Assignment. This keeps the course aligned to KICD structure while still feeling like Google Classroom."
                     />
 
@@ -1597,7 +1597,7 @@ const CoursesPage = () => {
                         <button
                           onClick={saveTopic}
                           disabled={saving}
-                          className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                          className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
                         >
                           <Plus className="h-4 w-4" />
                           {topicDraft.id ? "Update topic" : "Save topic"}
@@ -1660,7 +1660,7 @@ const CoursesPage = () => {
                             learning_outcomes: e.target.value,
                           }))
                         }
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                         placeholder="Paste the weekly CBC learning outcomes here."
                       />
                     </div>
@@ -1734,7 +1734,7 @@ const CoursesPage = () => {
                                       </button>
                                       <button
                                         onClick={() => publishTopic(topic.id)}
-                                        className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-emerald-700 shadow-sm"
+                                        className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-red-700 shadow-sm"
                                       >
                                         Publish
                                       </button>
@@ -1843,7 +1843,7 @@ const CoursesPage = () => {
                                     <span
                                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                                         lesson.is_published
-                                          ? "bg-emerald-50 text-emerald-700"
+                                          ? "bg-rose-50 text-red-700"
                                           : "bg-amber-50 text-amber-700"
                                       }`}
                                     >
@@ -1877,7 +1877,7 @@ const CoursesPage = () => {
                                     className={`rounded-2xl px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${
                                       lesson.is_published
                                         ? "bg-white text-slate-700"
-                                        : "bg-emerald-600 text-white"
+                                        : "bg-red-600 text-white"
                                     }`}
                                   >
                                     {lesson.is_published
@@ -2018,7 +2018,7 @@ const CoursesPage = () => {
                                         objectives: e.target.value,
                                       })
                                     }
-                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                                     placeholder="By the end of the lesson, learners should..."
                                   />
                                 </div>
@@ -2034,7 +2034,7 @@ const CoursesPage = () => {
                                         learning_activities: e.target.value,
                                       })
                                     }
-                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                                     placeholder="Warm-up, guided practice, group work..."
                                   />
                                 </div>
@@ -2050,7 +2050,7 @@ const CoursesPage = () => {
                                         resources: e.target.value,
                                       })
                                     }
-                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                                     placeholder="Books, charts, equipment, worksheets..."
                                   />
                                 </div>
@@ -2066,7 +2066,7 @@ const CoursesPage = () => {
                                         assessment: e.target.value,
                                       })
                                     }
-                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                                     placeholder="Observation, oral questions, worksheet..."
                                   />
                                 </div>
@@ -2085,7 +2085,7 @@ const CoursesPage = () => {
                                         remarks: e.target.value,
                                       })
                                     }
-                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                                     placeholder="Teacher reflections or follow-up notes."
                                   />
                                 </div>
@@ -2101,7 +2101,7 @@ const CoursesPage = () => {
                                         content: e.target.value,
                                       })
                                     }
-                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                                     placeholder="Notes, instructions, or a short lesson script."
                                   />
                                 </div>
@@ -2192,7 +2192,7 @@ const CoursesPage = () => {
                             content: e.target.value,
                           }))
                         }
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                         placeholder="Write notes, announcement details, or a class question."
                       />
                     </div>
@@ -2217,7 +2217,7 @@ const CoursesPage = () => {
                           className="rounded-[1.75rem] border border-slate-200 bg-white p-4 shadow-sm"
                         >
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                            <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-red-700">
                               {post.post_type}
                             </span>
                             <span className="text-xs text-slate-500">
@@ -2259,7 +2259,7 @@ const CoursesPage = () => {
                       <button
                         onClick={saveAssignment}
                         disabled={saving}
-                        className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                        className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
                       >
                         <Plus className="h-4 w-4" />
                         Add assignment
@@ -2320,7 +2320,7 @@ const CoursesPage = () => {
                             instructions: e.target.value,
                           }))
                         }
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                         placeholder="Tell learners what to do, what to submit, and how to be assessed."
                       />
                     </div>
@@ -2364,7 +2364,7 @@ const CoursesPage = () => {
                                 {assignment.topic.title}
                               </span>
                             )}
-                            <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
+                            <span className="rounded-full bg-rose-50 px-3 py-1 text-red-700">
                               {assignment.submission_count || 0} submissions
                             </span>
                           </div>
@@ -2396,7 +2396,7 @@ const CoursesPage = () => {
                       <select
                         value={enrollGradeId}
                         onChange={(e) => setEnrollGradeId(e.target.value)}
-                        className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:border-emerald-400 focus:bg-white"
+                        className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:border-red-400 focus:bg-white"
                       >
                         <option value="">Enroll by grade</option>
                         {grades.map((grade) => (
@@ -2467,7 +2467,7 @@ const CoursesPage = () => {
                         value={studentSearch}
                         onChange={(e) => setStudentSearch(e.target.value)}
                         placeholder="Search by name or email"
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-red-400 focus:bg-white"
                       />
                     </div>
 
@@ -2498,7 +2498,7 @@ const CoursesPage = () => {
                               className={`rounded-full px-3 py-2 text-xs font-semibold ${
                                 enrolled
                                   ? "bg-rose-50 text-rose-700"
-                                  : "bg-emerald-600 text-white"
+                                  : "bg-red-600 text-white"
                               }`}
                             >
                               {enrolled ? "Remove" : "Add"}
@@ -2538,9 +2538,9 @@ const CoursesPage = () => {
               CBC notes
             </h3>
             <div className="mt-4 space-y-3 text-sm text-slate-600">
-              <div className="rounded-2xl bg-emerald-50 p-4">
-                <p className="font-semibold text-emerald-800">Learning flow</p>
-                <p className="mt-1 text-sm leading-6 text-emerald-900/80">
+              <div className="rounded-2xl bg-rose-50 p-4">
+                <p className="font-semibold text-rose-800">Learning flow</p>
+                <p className="mt-1 text-sm leading-6 text-red-900/80">
                   The backend already supports course, topic, lesson, post,
                   assignment, and scheme generation.
                 </p>
@@ -2565,7 +2565,7 @@ const CoursesPage = () => {
                   Import weekly CBC topics from a saved scheme.
                 </p>
               </div>
-              <Sparkles className="h-5 w-5 text-emerald-500" />
+              <Sparkles className="h-5 w-5 text-red-500" />
             </div>
             <div className="mt-4">
               <button
@@ -2641,7 +2641,7 @@ const CoursesPage = () => {
                 <button
                   onClick={generateTopicsFromScheme}
                   disabled={saving}
-                  className="flex-1 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                  className="flex-1 rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
                 >
                   Generate topics
                 </button>
@@ -2672,7 +2672,7 @@ const Field = ({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       disabled={disabled}
-      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white disabled:cursor-not-allowed disabled:bg-slate-100"
+      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-red-400 focus:bg-white disabled:cursor-not-allowed disabled:bg-slate-100"
     />
   </div>
 );
@@ -2691,7 +2691,7 @@ const SelectField = ({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white"
+      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-red-400 focus:bg-white"
     >
       <option value="">{placeholder}</option>
       {options.map((option) => (
@@ -2719,7 +2719,7 @@ const ActionButton = ({ icon, label, onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-800 transition hover:border-emerald-300 hover:bg-emerald-50"
+    className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-800 transition hover:border-red-300 hover:bg-rose-50"
   >
     <span className="flex items-center gap-2">
       {icon}
@@ -2748,14 +2748,14 @@ const CbcPanel = ({ title, items, selected = [], onToggle }) => (
             onClick={() => onToggle(item.id)}
             className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition ${
               active
-                ? "border-emerald-400 bg-emerald-50"
+                ? "border-red-400 bg-rose-50"
                 : "border-slate-200 bg-slate-50 hover:bg-slate-100"
             }`}
           >
             <span
               className={`flex h-5 w-5 items-center justify-center rounded-full border ${
                 active
-                  ? "border-emerald-600 bg-emerald-600 text-white"
+                  ? "border-red-600 bg-red-600 text-white"
                   : "border-slate-300 bg-white"
               }`}
             >
