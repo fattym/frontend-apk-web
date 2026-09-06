@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,7 +15,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "axios": "^1.18.1",
-    "lucide-react": "^1.25.0",
+    "lucide-react": "^1.7.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1"
