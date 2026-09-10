@@ -31,6 +31,7 @@ import Clubs from './pages/Clubs';
 import Attendance from './pages/Attendance';
 import Exams from './pages/Exams';
 import Fees from './pages/Fees';
+import Timetable from './pages/Timetable';
 import Library from './pages/Library';
 import Messaging from './pages/Messaging';
 import Complaints from './pages/Complaints';
@@ -90,6 +91,7 @@ const AppRoutes = () => (
       <Route path="attendance" element={<Attendance />} />
       <Route path="exams" element={<Exams />} />
       <Route path="fees" element={<Fees />} />
+      <Route path="timetable" element={<Timetable />} />
       <Route path="library" element={<Library />} />
       <Route path="messaging" element={<Messaging />} />
       <Route path="complaints" element={<Complaints />} />

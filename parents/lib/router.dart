@@ -10,6 +10,8 @@ import 'features/courses/pages/courses_list_page.dart';
 import 'features/courses/pages/course_viewer_page.dart';
 import 'features/courses/pages/topic_detail_page.dart';
 import 'features/requirements/pages/parent_requirements_page.dart';
+import 'features/timetable/pages/timetable_page.dart';
+import 'features/exams/pages/exam_results_page.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/login',
@@ -32,6 +34,8 @@ final GoRouter router = GoRouter(
         GoRoute(path: '/dashboard', builder: (context, state) => const DashboardPage()),
         GoRoute(path: '/requirements', builder: (context, state) => const ParentRequirementsPage()),
         GoRoute(path: '/courses', builder: (context, state) => const CoursesListPage()),
+        GoRoute(path: '/timetable', builder: (context, state) => const TimetablePage()),
+        GoRoute(path: '/exam-results', builder: (context, state) => const ExamResultsPage()),
         GoRoute(
           path: '/courses/:id',
           builder: (context, state) => CourseViewerPage(courseId: int.parse(state.pathParameters['id']!)),
@@ -169,6 +173,7 @@ class MainShell extends StatelessWidget {
       const NavigationDestination(icon: Icon(Icons.receipt_long), label: 'Orders'),
       const NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
       const NavigationDestination(icon: Icon(Icons.menu_book), label: 'Courses'),
+      const NavigationDestination(icon: Icon(Icons.schedule), label: 'Timetable'),
       if (role == 'PARENT')
         const NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'Items'),
     ];
@@ -178,7 +183,7 @@ class MainShell extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         destinations: destinations,
         onDestinationSelected: (index) {
-          final routes = ['/', '/announcements', '/orders', '/dashboard', '/courses'];
+          final routes = ['/', '/announcements', '/orders', '/dashboard', '/courses', '/timetable'];
           if (role == 'PARENT') {
             if (index < routes.length) {
               context.go(routes[index]);

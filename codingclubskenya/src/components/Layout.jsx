@@ -27,6 +27,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Calendar,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -111,6 +112,7 @@ const Layout = () => {
               ['/reference-documents', 'Reference Docs', FileText],
               ['/schemes-of-work', 'Schemes of Work', ClipboardList],
               ['/assessments', 'Assessments', FileCheck],
+              ['/timetable', 'Timetable', Calendar],
             ],
           },
           {
