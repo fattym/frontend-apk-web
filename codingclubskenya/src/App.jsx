@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import Homepage from './pages/Homepage';
 import Dashboard from './pages/Dashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
@@ -46,17 +47,11 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-const RoleBasedDashboard = () => {
-  const { user } = useAuth();
-  if (user?.role === 'TEACHER') return <TeacherDashboard />;
-  if (user?.role === 'STUDENT') return <StudentDashboard />;
-  return <Dashboard />;
-};
-
 const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
-    <Route path="/" element={
+    <Route index element={<Homepage />} />
+    <Route element={
       <ProtectedRoute>
         <Layout />
       </ProtectedRoute>
@@ -64,7 +59,6 @@ const AppRoutes = () => (
       <Route path="school-dashboard" element={<Dashboard />} />
       <Route path="teacher-dashboard" element={<TeacherDashboard />} />
       <Route path="student-dashboard" element={<StudentDashboard />} />
-      <Route index element={<RoleBasedDashboard />} />
       <Route path="students" element={<Students />} />
       <Route path="parents" element={<Parents />} />
       <Route path="teachers" element={<Teachers />} />
