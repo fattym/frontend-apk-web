@@ -103,7 +103,7 @@ const AppRoutes = () => (
 );
 
 const App = () => (
-  <BrowserRouter>
+  <BrowserRouter basename="/schoolsystems">
     <AuthProvider>
       <AppRoutes />
     </AuthProvider>
