@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/auth/auth_provider.dart';
+import 'core/theme/clay_badge.dart';
+import 'core/theme/clay_button.dart';
+import 'core/theme/clay_states.dart';
+import 'core/theme/theme_tokens.dart';
 import 'features/shop/pages/shop_home_page.dart';
 import 'features/announcements/pages/announcements_page.dart';
 import 'features/orders/pages/orders_page.dart';
@@ -13,6 +17,11 @@ import 'features/courses/pages/topic_detail_page.dart';
 import 'features/requirements/pages/parent_requirements_page.dart';
 import 'features/timetable/pages/timetable_page.dart';
 import 'features/exams/pages/exam_results_page.dart';
+import 'core/theme/clay_states.dart';
+import 'core/theme/theme_tokens.dart';
+import 'core/theme/clay_button.dart';
+import 'core/theme/clay_input.dart';
+import 'core/theme/theme_tokens.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/login',
@@ -60,18 +69,40 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: kNavy,
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const FlutterLogo(size: 100),
-              const SizedBox(height: 24),
-              const Text('EduGuide Schools', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 32),
-              const LoginForm(),
-            ],
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Padding(
+            padding: const EdgeInsets.all(kSpacing24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: kSpacing32),
+                Text(
+                  'EduGuide Schools',
+                  style: TextStyle(
+                    fontFamily: 'Baloo 2',
+                    fontSize: kType31,
+                    fontWeight: FontWeight.w700,
+                    color: kWhite,
+                  ),
+                ),
+                const SizedBox(height: kSpacing8),
+                Text(
+                  'School Suite — CBC learning, attendance, and classroom flow',
+                  style: TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontSize: kType14,
+                    color: kWhite.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: kSpacing48),
+                const LoginForm(),
+                const SizedBox(height: kSpacing48),
+              ],
+            ),
           ),
         ),
       ),
@@ -93,69 +124,121 @@ class _LoginFormState extends State<LoginForm> {
   final _pinController = TextEditingController();
   bool _loading = false;
   String _mode = 'email';
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _studentIdController.dispose();
+    _pinController.dispose();
+    super.dispose();
+  }
+
+  void _clearError() {
+    setState(() => _errorMessage = null);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SegmentedButton<String>(
-          segments: const [
-            ButtonSegment(value: 'email', label: Text('Teacher / Staff')),
-            ButtonSegment(value: 'student', label: Text('Student')),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(kSpacing24),
+      decoration: BoxDecoration(
+        color: kWhite,
+        borderRadius: BorderRadius.circular(kRadiusLg),
+        boxShadow: kClayRaisedShadows,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SegmentedButton<String>(
+            segments: const [
+              ButtonSegment(value: 'email', label: Text('Teacher / Staff')),
+              ButtonSegment(value: 'student', label: Text('Student')),
+            ],
+            selected: {_mode},
+            onSelectionChanged: (Set<String> newSelection) {
+              setState(() {
+                _mode = newSelection.first;
+                _clearError();
+              });
+            },
+          ),
+          const SizedBox(height: kSpacing24),
+          if (_mode == 'email') ...[
+            ClayInput(
+              controller: _emailController,
+              hintText: 'Email',
+              keyboardType: TextInputType.emailAddress,
+            ),
+            const SizedBox(height: kSpacing16),
+            ClayInput(
+              controller: _passwordController,
+              hintText: 'Password',
+              obscureText: true,
+            ),
+          ] else ...[
+            ClayInput(
+              controller: _studentIdController,
+              hintText: 'Student ID / Admission Number',
+            ),
+            const SizedBox(height: kSpacing16),
+            ClayInput(
+              controller: _pinController,
+              hintText: 'PIN Code',
+              obscureText: true,
+            ),
           ],
-          selected: {_mode},
-          onSelectionChanged: (Set<String> newSelection) {
-            setState(() {
-              _mode = newSelection.first;
-            });
-          },
-        ),
-        const SizedBox(height: 24),
-        if (_mode == 'email') ...[
-          TextField(
-            controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
-            obscureText: true,
-          ),
-        ] else ...[
-          TextField(
-            controller: _studentIdController,
-            decoration: const InputDecoration(labelText: 'Student ID / Admission Number', border: OutlineInputBorder()),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _pinController,
-            decoration: const InputDecoration(labelText: 'PIN Code', border: OutlineInputBorder()),
-            obscureText: true,
+          if (_errorMessage != null) ...[
+            const SizedBox(height: kSpacing12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(kSpacing12),
+              decoration: BoxDecoration(
+                color: kDanger.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(kRadiusSm),
+              ),
+              child: Text(
+                _errorMessage!,
+                style: TextStyle(
+                  color: kDanger,
+                  fontSize: kType14,
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: kSpacing24),
+          ClayButton(
+            onPressed: _loading
+                ? null
+                : () async {
+                    setState(() => _loading = true);
+                    final auth = context.read<AuthProvider>();
+                    final error = await (_mode == 'email'
+                        ? auth.login(_emailController.text.trim(), _passwordController.text.trim())
+                        : auth.studentLogin(_studentIdController.text.trim(), _pinController.text.trim()));
+                    if (mounted) {
+                      setState(() {
+                        _loading = false;
+                        _errorMessage = error;
+                      });
+                      if (error == null) {
+                        context.go('/');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(error), backgroundColor: kDanger),
+                        );
+                      }
+                    }
+                  },
+            label: _loading ? 'Signing in…' : 'Login',
+            clayState: ClayState.raised,
           ),
         ],
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: _loading ? null : () async {
-              setState(() => _loading = true);
-              final auth = context.read<AuthProvider>();
-              final success = await (_mode == 'email'
-                  ? auth.login(_emailController.text.trim(), _passwordController.text.trim())
-                  : auth.studentLogin(_studentIdController.text.trim(), _pinController.text.trim()));
-              setState(() => _loading = false);
-              if (success && mounted) {
-                context.go('/');
-              } else if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Login failed')));
-              }
-            },
-            child: _loading ? const CircularProgressIndicator() : const Text('Login'),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -196,6 +279,9 @@ class MainShell extends StatelessWidget {
             context.go(routes[index]);
           }
         },
+        backgroundColor: kNavy,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
       ),
     );
   }

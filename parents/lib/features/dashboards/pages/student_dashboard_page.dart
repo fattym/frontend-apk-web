@@ -5,6 +5,7 @@ import '../../../core/auth/auth_provider.dart';
 import '../../courses/providers/course_provider.dart';
 import '../providers/dashboard_provider.dart';
 import '../widgets/stat_card.dart';
+import '../../../core/theme/theme_tokens.dart';
 
 class StudentDashboardPage extends StatefulWidget {
   const StudentDashboardPage({super.key});
@@ -91,10 +92,10 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
                   physics: const NeverScrollableScrollPhysics(),
                   childAspectRatio: 1.08,
                   children: [
-                    StatCard(label: 'Present Days', value: '$present', color: const Color(0xFF059669)),
-                    StatCard(label: 'Absent Days', value: '$absent', color: const Color(0xFFDC2626)),
-                    StatCard(label: 'Meeting', value: '$me', color: const Color(0xFF2563EB)),
-                    StatCard(label: 'Exceeding', value: '$ee', color: const Color(0xFF7C3AED)),
+StatCard(label: 'Present Days', value: '$present', color: kSuccess),
+                      StatCard(label: 'Absent Days', value: '$absent', color: kDanger),
+                      StatCard(label: 'Meeting', value: '$me', color: kInfo),
+                      StatCard(label: 'Exceeding', value: '$ee', color: kNavy),
                   ],
                 );
               },
@@ -488,7 +489,7 @@ class _CourseTile extends StatelessWidget {
 
   String _label(dynamic value, {String fallback = ''}) {
     final text = value?.toString() ?? fallback;
-    return text.replaceAll('_', ' ').trim().toUpperCase();
+    return text.replaceAll('_', ' ').trim();
   }
 }
 
@@ -562,7 +563,7 @@ class _FeaturedCourseCard extends StatelessWidget {
                 children: [
                   _Pill(label: '${lessons.length} lessons', color: const Color(0xFF0F766E)),
                   _Pill(label: '${enrolled.length} learners', color: const Color(0xFF7C3AED)),
-                  _Pill(label: _display(course['delivery_mode']).toUpperCase(), color: const Color(0xFF334155)),
+                  _Pill(label: _display(course['delivery_mode']), color: const Color(0xFF334155)),
                 ],
               ),
             ],

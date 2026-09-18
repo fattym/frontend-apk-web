@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/auth/auth_provider.dart';
+import '../../../core/theme/theme_tokens.dart';
 import '../providers/dashboard_provider.dart';
 import '../widgets/stat_card.dart';
 
@@ -32,8 +33,8 @@ class TrainerDashboardPage extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     childAspectRatio: 1.2,
                     children: [
-                      StatCard(label: 'Clubs', value: '${clubs.length}', color: Colors.green),
-                      StatCard(label: 'Sessions Logged', value: '${sessions.length}', color: Colors.teal),
+                      StatCard(label: 'Clubs', value: '${clubs.length}', color: kNavy),
+                      StatCard(label: 'Sessions Logged', value: '${sessions.length}', color: kInfo),
                     ],
                   ),
                   const SizedBox(height: 16),

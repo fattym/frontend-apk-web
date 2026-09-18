@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../core/auth/auth_provider.dart';
+import '../../../core/theme/theme_tokens.dart';
 import '../providers/dashboard_provider.dart';
 import '../widgets/stat_card.dart';
 
@@ -37,10 +38,10 @@ class ParentDashboardPage extends StatelessWidget {
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
                     children: [
-                      StatCard(label: 'Teachers', value: '${teachers.length}', color: Colors.purple),
-                      StatCard(label: 'Announcements', value: '${announcements.length}', color: Colors.blue),
-                      StatCard(label: 'Orders', value: '${orders.length}', color: Colors.orange),
-                      StatCard(label: 'Required Items', value: '${requiredItems.length}', color: Colors.green),
+                      StatCard(label: 'Teachers', value: '${teachers.length}', color: kNavy),
+                      StatCard(label: 'Announcements', value: '${announcements.length}', color: kInfo),
+                      StatCard(label: 'Orders', value: '${orders.length}', color: kWarning),
+                      StatCard(label: 'Required Items', value: '${requiredItems.length}', color: kSuccess),
                     ],
                   ),
                   const SizedBox(height: 16),
