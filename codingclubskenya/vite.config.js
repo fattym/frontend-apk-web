@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/schoolsystems/',
+  base: '/schoolsystem/',
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
