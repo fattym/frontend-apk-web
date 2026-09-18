@@ -37,6 +37,7 @@ import Complaints from './pages/Complaints';
 import Events from './pages/Events';
 import Homework from './pages/Homework';
 import Reports from './pages/Reports';
+import LandingPage from './pages/LandingPage';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -45,17 +46,18 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-const RoleBasedDashboard = () => {
-  const { user } = useAuth();
-  if (user?.role === 'TEACHER') return <TeacherDashboard />;
-  if (user?.role === 'STUDENT') return <StudentDashboard />;
-  return <Dashboard />;
+const Home = () => {
+  const { user, loading, getDashboardRoute } = useAuth();
+  if (loading) return <div className="p-6">Loading...</div>;
+  if (!user) return <LandingPage />;
+  return <Navigate to={getDashboardRoute(user.role)} replace />;
 };
 
 const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
-    <Route path="/" element={
+    <Route path="/" element={<Home />} />
+    <Route element={
       <ProtectedRoute>
         <Layout />
       </ProtectedRoute>
@@ -63,7 +65,6 @@ const AppRoutes = () => (
       <Route path="school-dashboard" element={<Dashboard />} />
       <Route path="teacher-dashboard" element={<TeacherDashboard />} />
       <Route path="student-dashboard" element={<StudentDashboard />} />
-      <Route index element={<RoleBasedDashboard />} />
       <Route path="students" element={<Students />} />
       <Route path="parents" element={<Parents />} />
       <Route path="teachers" element={<Teachers />} />
