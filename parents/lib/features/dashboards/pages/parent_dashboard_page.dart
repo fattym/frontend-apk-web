@@ -1,121 +1,208 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../core/auth/auth_provider.dart';
 import '../../../core/theme/theme_tokens.dart';
+import '../../../core/theme/clay_card.dart';
 import '../providers/dashboard_provider.dart';
-import '../widgets/stat_card.dart';
+import '../providers/teacher_nav_drawer.dart';
 
-class ParentDashboardPage extends StatelessWidget {
+// ═══════════════════════════════════════════════════════════════
+// PARENT DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+
+class ParentDashboardPage extends StatefulWidget {
   const ParentDashboardPage({super.key});
+
+  @override
+  State<ParentDashboardPage> createState() => _ParentDashboardPageState();
+}
+
+class _ParentDashboardPageState extends State<ParentDashboardPage> {
+  int _selectedNavIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DashboardProvider>();
-    final data = provider.data;
-    final announcements = data['announcements'] as List<dynamic>? ?? [];
-    final orders = data['orders'] as List<dynamic>? ?? [];
-    final requiredItems = data['required_items'] as List<dynamic>? ?? [];
-    final teachers = data['teachers'] as List<dynamic>? ?? [];
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Parent Dashboard')),
+      appBar: AppBar(
+        backgroundColor: kWhite,
+        elevation: 0,
+        title: Text(
+          'Parent Dashboard',
+          style: TextStyle(
+            fontFamily: 'Baloo 2',
+            fontSize: kType21,
+            fontWeight: FontWeight.w700,
+            color: kNavy,
+          ),
+        ),
+        centerTitle: true,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu, color: kNavy),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications, color: kNavy),
+            onPressed: () {},
+          ),
+          const SizedBox(width: kSpacing8),
+        ],
+      ),
+      drawer: TeacherNavDrawer(
+        currentIndex: _selectedNavIndex,
+        onTap: (index) {
+          setState(() => _selectedNavIndex = index);
+          Navigator.of(context).pop();
+        },
+      ),
       body: provider.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: () async {
-                final role = context.read<AuthProvider>().user?['role'] ?? 'PARENT';
-                await provider.fetchDashboard(role);
-              },
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    childAspectRatio: 1.2,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
+          : provider.hasError
+              ? Center(child: Text('Error: ${provider.errorMessage}'))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(kSpacing16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      StatCard(label: 'Teachers', value: '${teachers.length}', color: kNavy),
-                      StatCard(label: 'Announcements', value: '${announcements.length}', color: kInfo),
-                      StatCard(label: 'Orders', value: '${orders.length}', color: kWarning),
-                      StatCard(label: 'Required Items', value: '${requiredItems.length}', color: kSuccess),
+                      ClayContainer(
+                        borderRadius: kRadius16,
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(kSpacing20),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [kSecondary, kSecondarySoft],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(kRadius16),
+                          ),
+                          child: Row(
+                            children: [
+                              const CircleAvatar(
+                                radius: 28,
+                                backgroundColor: kWhite,
+                                child: Icon(Icons.family_restroom, color: kSecondary, size: 28),
+                              ),
+                              const SizedBox(width: kSpacing16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Welcome, Parent!',
+                                      style: TextStyle(
+                                        fontFamily: 'Baloo 2',
+                                        fontSize: kType18,
+                                        fontWeight: FontWeight.w700,
+                                        color: kWhite,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Track your child\'s academic progress.',
+                                      style: TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontSize: kType14,
+                                        color: kWhite.withValues(alpha: 0.9),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: kSpacing24),
+                      Text(
+                        'My Children',
+                        style: TextStyle(
+                          fontFamily: 'Baloo 2',
+                          fontSize: kType18,
+                          fontWeight: FontWeight.w700,
+                          color: kNavy,
+                        ),
+                      ),
+                      const SizedBox(height: kSpacing8),
+                      if (provider.students.isEmpty)
+                        ClayContainer(
+                          borderRadius: kRadius12,
+                          child: const Padding(
+                            padding: EdgeInsets.all(kSpacing16),
+                            child: Center(
+                              child: Text('No children registered yet.', style: TextStyle(color: kGray600)),
+                            ),
+                          ),
+                        )
+                      else
+                        ...provider.students.map((s) => ClayContainer(
+                              borderRadius: kRadius12,
+                              child: Padding(
+                                padding: const EdgeInsets.all(kSpacing12),
+                                child: Row(
+                                  children: [
+CircleAvatar(
+                                          radius: 18,
+                                          backgroundColor: kSecondary.withValues(alpha: 0.1),
+                                      child: Icon(Icons.person, color: kSecondary, size: 18),
+                                    ),
+                                    const SizedBox(width: kSpacing12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            s['name'] ?? 'Unknown',
+                                            style: TextStyle(
+                                              fontFamily: 'Plus Jakarta Sans',
+                                              fontSize: kType14,
+                                              fontWeight: FontWeight.w700,
+                                              color: kNavy,
+                                            ),
+                                          ),
+                                          Text(
+                                            s['grade'] ?? '',
+                                            style: TextStyle(
+                                              fontFamily: 'Plus Jakarta Sans',
+                                              fontSize: kType12,
+                                              color: kGray600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )),
+                      const SizedBox(height: kSpacing24),
+                      Text(
+                        'Recent Activity',
+                        style: TextStyle(
+                          fontFamily: 'Baloo 2',
+                          fontSize: kType18,
+                          fontWeight: FontWeight.w700,
+                          color: kNavy,
+                        ),
+                      ),
+                      const SizedBox(height: kSpacing8),
+                      ClayContainer(
+                        borderRadius: kRadius12,
+                        child: const Padding(
+                          padding: EdgeInsets.all(kSpacing16),
+                          child: Text(
+                            'No recent activity.',
+                            style: TextStyle(color: kGray600),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: kSpacing24),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  if (teachers.isNotEmpty) ...[
-                    const Text('Child\'s Teachers',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    ...teachers.map((t) => Card(
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              child: Text((t['teacher_name'] as String?)?.isNotEmpty == true ? (t['teacher_name'] as String)[0].toUpperCase() : 'T'),
-                            ),
-                            title: Text('${t['teacher_name'] ?? 'Unknown Teacher'}'),
-                            subtitle: Text('${t['learning_area_name'] ?? 'Class Teacher'} • ${t['stream_name'] ?? 'Unknown Class'}'),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.message, color: Colors.blue),
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Messaging coming soon!')),
-                                );
-                              },
-                            ),
-                          ),
-                        )),
-                    const SizedBox(height: 16),
-                  ],
-                  if (requiredItems.isNotEmpty) ...[
-                    const Text('Required Items',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    ...requiredItems.take(5).map((item) => Card(
-                          child: ListTile(
-                            title: Text(_display(item['name'])),
-                            subtitle: Text('${_display(item['class_level'])} • ${_display(item['term'])}'),
-                            trailing: item['is_published'] == true
-                                ? const Icon(Icons.visibility, color: Colors.green)
-                                : const Icon(Icons.visibility_off, color: Colors.grey),
-                          ),
-                        )),
-                    const SizedBox(height: 8),
-                    FilledButton.icon(
-                      onPressed: () => context.go('/requirements'),
-                      icon: const Icon(Icons.shopping_cart),
-                      label: const Text('View All Required Items'),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  const Text('Recent Announcements',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  ...announcements.take(5).map((a) => Card(
-                        child: ListTile(
-                          title: Text(_display(a['title'])),
-                          subtitle: Text(_display(a['content']), maxLines: 2, overflow: TextOverflow.ellipsis),
-                          trailing: a['is_published'] == true
-                              ? const Icon(Icons.visibility, color: Colors.green)
-                              : const Icon(Icons.visibility_off, color: Colors.grey),
-                        ),
-                      )),
-                  const SizedBox(height: 16),
-                  const Text('My Orders',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  ...orders.take(5).map((o) => Card(
-                        child: ListTile(
-                          title: Text('Order #${o['id']}'),
-                          subtitle: Text('Status: ${o['status']?.toString().replaceAll('_', ' ') ?? ''}'),
-                          trailing: Text('KES ${o['total_amount']}'),
-                        ),
-                      )),
-                ],
-              ),
-            ),
+                ),
     );
-  }
-
-  String _display(dynamic value) {
-    if (value is Map) return value['name']?.toString() ?? value['description']?.toString() ?? '';
-    return value?.toString() ?? '';
   }
 }

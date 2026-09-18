@@ -11,6 +11,19 @@ import 'features/announcements/pages/announcements_page.dart';
 import 'features/orders/pages/orders_page.dart';
 import 'features/dashboards/pages/dashboard_page.dart';
 import 'features/dashboards/pages/trainer_dashboard_page.dart';
+import 'features/dashboards/providers/teacher_nav_drawer.dart';
+import 'features/teacher/pages/course_flow_page.dart';
+import 'features/teacher/pages/my_classes_page.dart';
+import 'features/teacher/pages/course_studio_page.dart';
+import 'features/teacher/pages/schemes_of_work_page.dart';
+import 'features/teacher/pages/assessments_page.dart';
+import 'features/teacher/pages/teacher_assignments_page.dart';
+import 'features/teacher/pages/attendance_page.dart';
+import 'features/teacher/pages/homework_page.dart';
+import 'features/teacher/pages/learner_groups_page.dart';
+import 'features/teacher/pages/clubs_activities_page.dart';
+import 'features/teacher/pages/complaints_page.dart';
+import 'features/teacher/pages/events_page.dart';
 import 'features/courses/pages/courses_list_page.dart';
 import 'features/courses/pages/course_viewer_page.dart';
 import 'features/courses/pages/topic_detail_page.dart';
@@ -47,6 +60,18 @@ final GoRouter router = GoRouter(
         GoRoute(path: '/courses', builder: (context, state) => const CoursesListPage()),
         GoRoute(path: '/timetable', builder: (context, state) => const TimetablePage()),
         GoRoute(path: '/exam-results', builder: (context, state) => const ExamResultsPage()),
+        GoRoute(path: '/course-flow', builder: (context, state) => const CourseFlowPage()),
+        GoRoute(path: '/my-classes', builder: (context, state) => const MyClassesPage()),
+        GoRoute(path: '/course-studio', builder: (context, state) => const CourseStudioPage()),
+        GoRoute(path: '/schemes-of-work', builder: (context, state) => const SchemesOfWorkPage()),
+        GoRoute(path: '/assessments', builder: (context, state) => const AssessmentsPage()),
+        GoRoute(path: '/teacher-assignments', builder: (context, state) => const TeacherAssignmentsPage()),
+        GoRoute(path: '/attendance', builder: (context, state) => const AttendancePage()),
+        GoRoute(path: '/homework', builder: (context, state) => const HomeworkPage()),
+        GoRoute(path: '/learner-groups', builder: (context, state) => const LearnerGroupsPage()),
+        GoRoute(path: '/clubs-activities', builder: (context, state) => const ClubsActivitiesPage()),
+        GoRoute(path: '/complaints', builder: (context, state) => const ComplaintsPage()),
+        GoRoute(path: '/events', builder: (context, state) => const EventsPage()),
         GoRoute(
           path: '/courses/:id',
           builder: (context, state) => CourseViewerPage(courseId: int.parse(state.pathParameters['id']!)),
@@ -252,6 +277,8 @@ class MainShell extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
     final role = auth.user?['role'] ?? '';
 
+    final isTeacher = role == 'TEACHER' || role == 'STAFF';
+
     final destinations = [
       const NavigationDestination(icon: Icon(Icons.storefront), label: 'Shop'),
       const NavigationDestination(icon: Icon(Icons.announcement), label: 'News'),
@@ -262,6 +289,58 @@ class MainShell extends StatelessWidget {
       if (role == 'PARENT')
         const NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'Items'),
     ];
+
+    if (isTeacher) {
+      return Scaffold(
+        body: child,
+        drawer: TeacherNavDrawer(
+          currentIndex: 0,
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                context.go('/dashboard');
+                break;
+              case 1:
+                context.go('/course-flow');
+                break;
+              case 2:
+                context.go('/my-classes');
+                break;
+              case 3:
+                context.go('/course-studio');
+                break;
+              case 4:
+                context.go('/schemes-of-work');
+                break;
+              case 5:
+                context.go('/assessments');
+                break;
+              case 6:
+                context.go('/teacher-assignments');
+                break;
+              case 7:
+                context.go('/attendance');
+                break;
+              case 8:
+                context.go('/homework');
+                break;
+              case 9:
+                context.go('/learner-groups');
+                break;
+              case 10:
+                context.go('/clubs-activities');
+                break;
+              case 11:
+                context.go('/complaints');
+                break;
+              case 12:
+                context.go('/events');
+                break;
+            }
+          },
+        ),
+      );
+    }
 
     return Scaffold(
       body: child,

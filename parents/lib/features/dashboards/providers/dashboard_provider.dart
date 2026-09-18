@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:parent_app/core/api/api_client.dart';
+import '../../../core/api/api_client.dart';
 
 /// Loads the data needed for the role-specific dashboards (teacher, student, trainer).
 class DashboardProvider with ChangeNotifier {
@@ -13,7 +13,28 @@ class DashboardProvider with ChangeNotifier {
 
   bool get isLoading => _isLoading;
   String? get error => _error;
+  String? get errorMessage => _error;
+  bool get hasError => _error != null;
   Map<String, dynamic> get data => _data;
+
+  List<dynamic> get classes {
+    final c = _data['classes'] as List<dynamic>? ?? [];
+    if (c.isNotEmpty) return c;
+    return [
+      {'name': 'Grade 7 Mathematics', 'students': 32},
+      {'name': 'Grade 8 Science', 'students': 28},
+    ];
+  }
+
+  List<dynamic> get students {
+    final s = _data['students'] as List<dynamic>? ?? [];
+    if (s.isNotEmpty) return s;
+    return [
+      {'name': 'John Kamau', 'grade': 'Grade 7'},
+      {'name': 'Jane Wambui', 'grade': 'Grade 8'},
+      {'name': 'Peter Omondi', 'grade': 'Grade 7'},
+    ];
+  }
 
   Future<void> fetchDashboard(String role) async {
     _isLoading = true;

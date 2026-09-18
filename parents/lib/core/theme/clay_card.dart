@@ -100,6 +100,31 @@ class ClayCard extends StatelessWidget {
 // Flush state only — no shadow, zebra tint via kClayFlushBgShift.
 // For list rows, table rows, reference doc lists (10+ repeats).
 
+// ═══════════════════════════════════════════════════════════════
+// CLAY CONTAINER — Inset clay (PRD §4)
+// ═══════════════════════════════════════════════════════════════
+// Generic inset clay container for panels and content blocks.
+// INSET clay, radius-lg. No shadow.
+
+class ClayContainer extends StatelessWidget {
+  final Widget child;
+  final double borderRadius;
+
+  const ClayContainer({
+    super.key,
+    required this.child,
+    this.borderRadius = kRadiusLg,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: clayInsetDecoration(surface: kWhite, borderRadius: borderRadius),
+      child: child,
+    );
+  }
+}
+
 class ClayRow extends StatelessWidget {
   final Widget child;
   final VoidCallback? onTap;

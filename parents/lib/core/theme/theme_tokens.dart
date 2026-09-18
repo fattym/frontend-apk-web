@@ -19,6 +19,19 @@ const Color kSuccess = Color(0xFF2F8F5B);
 const Color kWarning = Color(0xFFC98A00);
 const Color kDanger = Color(0xFFB3261E);
 const Color kInfo = Color(0xFF3E5C8A);
+const Color kAmber = Color(0xFFFFB020);
+
+// ── Additional brand colors (PRD §5.1) ──────────────────────────
+const Color kPrimary = Color(0xFF0F766E);
+const Color kSecondary = Color(0xFF1B4D5C);
+const Color kTeal = Color(0xFF0D9488);
+const Color kAccentSoft = Color(0xFFFED7AA);
+const Color kSecondarySoft = Color(0xFFCCFBF1);
+const Color kTealSoft = Color(0xFF99F6E4);
+
+// ── Gray scale (PRD §5.1) ────────────────────────────────────────
+const Color kGray400 = Color(0xFF9CA3AF);
+const Color kGray600 = Color(0xFF4B5563);
 
 // ── Derived navy shades (programmatic: lighten/darken navy) ────
 // navy-100 (lightest) → navy-900 (darkest)
@@ -41,6 +54,8 @@ const double kRadiusSm = 12.0;
 const double kRadiusMd = 20.0;
 const double kRadiusLg = 28.0;
 const double kRadiusFull = 999.0;
+const double kRadius12 = 12.0;
+const double kRadius16 = 16.0;
 
 // ── Spacing tokens (PRD §5.4) ───────────────────────────────────
 const double kSpacing4 = 4.0;
@@ -58,11 +73,13 @@ const double kSpacing20 = 20.0;
 const double kSpacing14 = 14.0;
 const double kSpacing18 = 18.0;
 
-// Type scale steps: 12 / 14 / 16 / 20 / 25 / 31 / 39 / 49
+// Type scale steps: 12 / 14 / 16 / 18 / 20 / 21 / 25 / 31 / 39 / 49
 const double kType12 = 12.0;
 const double kType14 = 14.0;
 const double kType16 = 16.0;
+const double kType18 = 18.0;
 const double kType20 = 20.0;
+const double kType21 = 21.0;
 const double kType25 = 25.0;
 const double kType31 = 31.0;
 const double kType39 = 39.0;
