@@ -6,6 +6,7 @@ import 'features/shop/pages/shop_home_page.dart';
 import 'features/announcements/pages/announcements_page.dart';
 import 'features/orders/pages/orders_page.dart';
 import 'features/dashboards/pages/dashboard_page.dart';
+import 'features/dashboards/pages/trainer_dashboard_page.dart';
 import 'features/courses/pages/courses_list_page.dart';
 import 'features/courses/pages/course_viewer_page.dart';
 import 'features/courses/pages/topic_detail_page.dart';
@@ -32,6 +33,7 @@ final GoRouter router = GoRouter(
         GoRoute(path: '/announcements', builder: (context, state) => const AnnouncementsPage()),
         GoRoute(path: '/orders', builder: (context, state) => const OrdersPage()),
         GoRoute(path: '/dashboard', builder: (context, state) => const DashboardPage()),
+        GoRoute(path: '/dashboard/trainer', builder: (context, state) => const TrainerDashboardPage()),
         GoRoute(path: '/requirements', builder: (context, state) => const ParentRequirementsPage()),
         GoRoute(path: '/courses', builder: (context, state) => const CoursesListPage()),
         GoRoute(path: '/timetable', builder: (context, state) => const TimetablePage()),

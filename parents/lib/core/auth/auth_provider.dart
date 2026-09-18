@@ -38,10 +38,13 @@ class AuthProvider with ChangeNotifier {
       });
       final access = response.data['access'];
       final refresh = response.data['refresh'];
-      final user = response.data['user'];
       await secureStorage.write(key: 'access_token', value: access);
       await secureStorage.write(key: 'refresh_token', value: refresh);
-      _user = user;
+      if (response.data['user'] != null) {
+        _user = response.data['user'];
+      } else {
+        _user = await _fetchUserProfile();
+      }
       notifyListeners();
       return true;
     } catch (e) {
@@ -57,14 +60,26 @@ class AuthProvider with ChangeNotifier {
       });
       final access = response.data['access'];
       final refresh = response.data['refresh'];
-      final user = response.data['user'];
       await secureStorage.write(key: 'access_token', value: access);
       await secureStorage.write(key: 'refresh_token', value: refresh);
-      _user = user;
+      if (response.data['user'] != null) {
+        _user = response.data['user'];
+      } else {
+        _user = await _fetchUserProfile();
+      }
       notifyListeners();
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> _fetchUserProfile() async {
+    try {
+      final response = await apiClient.dio.get('/auth/users/me/');
+      return response.data as Map<String, dynamic>?;
+    } catch (e) {
+      return null;
     }
   }
 

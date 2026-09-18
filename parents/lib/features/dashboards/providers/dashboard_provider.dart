@@ -46,7 +46,7 @@ class DashboardProvider with ChangeNotifier {
         final announcements = await _getList('/messaging/announcements/');
         final orders = await _getList('/shop/orders/my_orders/');
         final requiredItems = await _getList('/requirements/public/');
-        final teachers = await _getList('/academics/teacher-assignments/my_teachers/');
+        final teachers = await _getSingleAsList('/academics/teacher-assignments/my_teachers/');
         _data = {
           'announcements': announcements,
           'orders': orders,
@@ -66,5 +66,12 @@ class DashboardProvider with ChangeNotifier {
     final response = await apiClient.dio.get(path);
     if (response.data is List) return response.data as List<dynamic>;
     return (response.data['results'] as List?) ?? [];
+  }
+
+  Future<List<dynamic>> _getSingleAsList(String path) async {
+    final response = await apiClient.dio.get(path);
+    if (response.data == null) return [];
+    if (response.data is List) return response.data as List<dynamic>;
+    return [response.data];
   }
 }

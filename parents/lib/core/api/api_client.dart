@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://localhost:8000/api';
+  static const String baseUrl = 'https://codingclubskenya.com/api';
   final Dio dio;
   final FlutterSecureStorage secureStorage;
 
@@ -15,6 +15,11 @@ class ApiClient {
         final token = await secureStorage.read(key: 'access_token');
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
+        }
+        // Dio replaces the base URL path when the request path starts with '/',
+        // causing the /api prefix to be dropped. Prepend /api to preserve it.
+        if (!options.path.startsWith('http') && !options.path.startsWith('/api')) {
+          options.path = '/api${options.path}';
         }
         return handler.next(options);
       },

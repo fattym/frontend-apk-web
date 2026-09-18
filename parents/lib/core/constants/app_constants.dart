@@ -1,4 +1,4 @@
 class AppConstants {
   static const String appName = 'EduGuide Schools';
-  static const String apiBaseUrl = 'http://localhost:8000/api';
+  static const String apiBaseUrl = 'https://codingclubskenya.com/api';
 }
