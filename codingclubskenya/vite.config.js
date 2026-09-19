@@ -3,13 +3,14 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  base: '/schoolsystems/',
+  base: '/learningpack/',
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      '/api': {
+      '/learningpack/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/learningpack/, ''),
       },
     },
   },
