@@ -13,12 +13,15 @@ class RequirementsProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> fetchRequiredItems() async {
+  Future<void> fetchRequiredItems({int? schoolId}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
     try {
-      final response = await apiClient.dio.get('/requirements/public/');
+      final url = schoolId != null
+          ? '/requirements/public/?school_id=$schoolId'
+          : '/requirements/public/';
+      final response = await apiClient.dio.get(url);
       _requiredItems = response.data is List ? response.data : response.data['results'] ?? [];
     } catch (e) {
       _error = e.toString();

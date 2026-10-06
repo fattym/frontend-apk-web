@@ -43,8 +43,8 @@ const Layout = () => {
   const navLinkClass = ({ isActive }) =>
     `flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
       isActive
-        ? 'bg-red-900/40 text-white shadow-sm'
-        : 'text-red-100/80 hover:bg-red-900/30 hover:text-white'
+        ? 'bg-brand-orange text-white shadow-sm'
+        : 'text-white/70 hover:bg-brand-orange/20 hover:text-white'
     }`;
 
   const role = user?.role;
@@ -52,7 +52,9 @@ const Layout = () => {
     ? '/teacher-dashboard'
     : role === 'STUDENT'
       ? '/student-dashboard'
-      : '/school-dashboard';
+      : role === 'PARENT'
+        ? '/parent-dashboard'
+        : '/school-dashboard';
 
   const navGroups = role === 'TEACHER'
     ? [
@@ -84,19 +86,35 @@ const Layout = () => {
       ? [
           {
             title: 'Learner',
-            items: [
-              [homePath, 'Dashboard', LayoutDashboard],
-              ['/my-courses', 'My Courses', BookOpen],
-              ['/attendance', 'My Attendance', CalendarCheck],
-              ['/assessments', 'My Assessments', FileCheck],
-              ['/parent/requirements', 'Required Items', ClipboardList],
-              ['/homework', 'Homework', NotebookPen],
-              ['/complaints', 'My Complaints', MessageSquareWarning],
-              ['/events', 'Events', CalendarDays],
-            ],
-          },
-        ]
-      : [
+              items: [
+                [homePath, 'Dashboard', LayoutDashboard],
+                ['/my-courses', 'My Courses', BookOpen],
+                ['/attendance', 'My Attendance', CalendarCheck],
+                ['/assessments', 'My Assessments', FileCheck],
+                ['/parent/requirements', 'Required Items', ClipboardList],
+                ['/homework', 'Homework', NotebookPen],
+                ['/complaints', 'My Complaints', MessageSquareWarning],
+                ['/events', 'Events', CalendarDays],
+              ],
+            },
+          ]
+        : role === 'PARENT'
+          ? [
+              {
+                title: 'Parent',
+                items: [
+                  [homePath, 'Dashboard', LayoutDashboard],
+                  ['/parent-report-cards', 'Report Cards', FileText],
+                  ['/homework', 'Assignments', ClipboardList],
+                  ['/parent/requirements', 'Required Items', ClipboardList],
+                  ['/attendance', 'Children Attendance', CalendarCheck],
+                  ['/messaging', 'Messages', Mail],
+                  ['/complaints', 'Complaints', MessageSquareWarning],
+                  ['/events', 'Events', CalendarDays],
+                ],
+              },
+            ]
+          : [
           {
             title: 'Academics',
             items: [
@@ -135,21 +153,21 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      <aside className={`flex flex-col bg-[#1A0503] text-white transition-all duration-300 ease-in-out ${collapsed ? 'w-full lg:w-16' : 'w-full lg:w-80 xl:w-96'} lg:min-h-screen`}>
-        <div className="border-b border-red-900/40 px-4 py-5 lg:px-6 lg:py-6">
+      <aside className={`flex flex-col bg-brand-navy text-white transition-all duration-300 ease-in-out ${collapsed ? 'w-full lg:w-16' : 'w-full lg:w-80 xl:w-96'} lg:min-h-screen`}>
+        <div className="border-b border-white/10 px-4 py-5 lg:px-6 lg:py-6">
           <div className="flex items-center justify-between gap-2">
             {!collapsed && (
               <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-red-300">School Suite</p>
+                <p className="text-xs uppercase tracking-[0.28em] text-white/70">School Suite</p>
                 <h1 className="mt-2 text-2xl font-semibold">EduGuide Schools</h1>
-                <p className="mt-2 text-sm text-red-200/70 hidden xl:block">
+                <p className="mt-2 text-sm text-white/60 hidden xl:block">
                   CBC learning, attendance, schemes, and classroom flow in one place.
                 </p>
               </div>
             )}
             <button
               onClick={() => setCollapsed((v) => !v)}
-              className="rounded-lg border border-red-900/40 p-1.5 text-red-200 hover:bg-red-900/40 hover:text-white"
+              className="rounded-lg border border-white/20 p-1.5 text-white/60 hover:bg-brand-orange/20 hover:text-white"
               aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               {collapsed ? (
@@ -160,7 +178,7 @@ const Layout = () => {
             </button>
           </div>
           {!collapsed && (
-            <span className="mt-3 inline-block rounded-full border border-red-400/30 bg-red-400/10 px-3 py-1 text-xs text-red-200">
+            <span className="mt-3 inline-block rounded-full border border-brand-orange/30 bg-brand-orange/15 px-3 py-1 text-xs text-brand-orange">
               {role || 'USER'}
             </span>
           )}
@@ -170,7 +188,7 @@ const Layout = () => {
           {navGroups.map((group) => (
             <section key={group.title}>
               {!collapsed && (
-                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-red-400/80">
+                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/70">
                   {group.title}
                 </p>
               )}
@@ -184,7 +202,7 @@ const Layout = () => {
                      title={collapsed ? label : undefined}
                    >
                      {collapsed ? (
-                       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-900/50 text-white">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-orange/30 text-white">
                          <Icon className="h-4 w-4" />
                        </span>
                      ) : (
@@ -200,16 +218,16 @@ const Layout = () => {
           ))}
         </nav>
 
-        <div className="border-t border-red-900/40 px-3 py-4 lg:px-6 lg:py-5">
+        <div className="border-t border-white/10 px-3 py-4 lg:px-6 lg:py-5">
           {!collapsed && (
             <>
               <p className="text-sm font-medium text-white">{user?.first_name || user?.email}</p>
-              <p className="text-xs text-red-200/70">{user?.email}</p>
+              <p className="text-xs text-white/60">{user?.email}</p>
             </>
           )}
           <button
             onClick={handleLogout}
-            className={`mt-3 w-full rounded-xl bg-white px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-red-100 ${collapsed ? 'flex items-center justify-center' : ''}`}
+            className={`mt-3 w-full rounded-xl bg-white px-4 py-2 text-sm font-medium text-brand-navy transition hover:bg-brand-grayLight ${collapsed ? 'flex items-center justify-center' : ''}`}
             title={collapsed ? 'Logout' : undefined}
           >
             {collapsed ? <LogOut className="h-4 w-4" /> : 'Logout'}
@@ -221,14 +239,14 @@ const Layout = () => {
         <div className="mx-auto flex min-h-screen w-full max-w-[1600px] flex-col px-4 py-4 sm:px-6 lg:px-8">
           <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">
             <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Current session</p>
-              <p className="text-sm font-medium text-slate-800">
+              <p className="text-xs uppercase tracking-[0.22em] text-brand-navy/60">Current session</p>
+              <p className="text-sm font-medium text-brand-navy">
                 {user?.first_name || user?.email} · {role?.toLowerCase() || 'guest'}
               </p>
             </div>
             <div className="hidden items-center gap-2 sm:flex">
-              <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-800">CBC ready</span>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">Multi-tenant</span>
+              <span className="rounded-full bg-brand-orange/10 px-3 py-1 text-xs font-medium text-brand-navy">CBC ready</span>
+              <span className="rounded-full bg-brand-grayLight px-3 py-1 text-xs font-medium text-brand-navy">Multi-tenant</span>
             </div>
           </div>
           <div className="flex-1 overflow-auto pb-4">

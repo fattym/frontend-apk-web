@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/auth/auth_provider.dart';
 import 'features/shop/pages/shop_home_page.dart';
+import 'features/shop/pages/cart_page.dart';
 import 'features/announcements/pages/announcements_page.dart';
 import 'features/orders/pages/orders_page.dart';
 import 'features/dashboards/pages/dashboard_page.dart';
@@ -26,7 +27,8 @@ final GoRouter router = GoRouter(
     ShellRoute(
       builder: (context, state, child) => MainShell(child: child),
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const ShopHomePage()),
+         GoRoute(path: '/', builder: (context, state) => const ShopHomePage()),
+         GoRoute(path: '/cart', builder: (context, state) => const CartPage()),
         GoRoute(path: '/announcements', builder: (context, state) => const AnnouncementsPage()),
         GoRoute(path: '/orders', builder: (context, state) => const OrdersPage()),
         GoRoute(path: '/dashboard', builder: (context, state) => const DashboardPage()),
@@ -173,7 +175,7 @@ class MainShell extends StatelessWidget {
         const NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'Items'),
     ];
 
-    return Scaffold(
+     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
         destinations: destinations,

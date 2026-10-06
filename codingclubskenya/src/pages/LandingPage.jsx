@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const roleContent = {
   school: {
@@ -97,12 +98,12 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen, onNavigate }) => (
       </div>
 
       <div className="hidden md:flex items-center space-x-4">
-        <a
-          href="#demo"
+        <Link
+          to="/login"
           className="px-5 py-2.5 rounded-xl text-sm font-semibold text-brand-navy hover:bg-brand-grayLight transition-colors"
         >
           Log In
-        </a>
+        </Link>
         <a
           href="#demo"
           className="px-6 py-2.5 text-sm font-bold text-white bg-brand-orange hover:bg-brand-orangeHover clay-button transition-all"
@@ -151,9 +152,9 @@ const Navbar = ({ mobileMenuOpen, setMobileMenuOpen, onNavigate }) => (
         Get Started
       </a>
       <div className="pt-2 flex flex-col space-y-3">
-        <a href="#demo" className="w-full text-center px-5 py-2.5 rounded-xl font-semibold text-brand-navy bg-brand-grayLight">
+        <Link to="/login" className="w-full text-center px-5 py-2.5 rounded-xl font-semibold text-brand-navy bg-brand-grayLight">
           Log In
-        </a>
+        </Link>
         <a href="#demo" className="w-full text-center px-6 py-2.5 font-bold text-white bg-brand-orange clay-button">
           Request Demo
         </a>

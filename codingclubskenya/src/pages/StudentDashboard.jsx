@@ -52,11 +52,11 @@ const StudentDashboard = () => {
   return (
     <div className="space-y-6">
       <section className="glass-card rounded-[2rem] p-6 sm:p-8">
-        <p className="text-xs uppercase tracking-[0.24em] text-red-700">Learner dashboard</p>
+        <p className="text-xs uppercase tracking-[0.24em] text-brand-orange">Learner dashboard</p>
         <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Student Dashboard</h1>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
+            <h1 className="text-3xl font-semibold tracking-tight text-brand-navy sm:text-4xl">Student Dashboard</h1>
+            <p className="mt-3 text-sm leading-6 text-brand-navy/70">
               Welcome, {user?.first_name} {user?.last_name}. Track attendance, competency growth, assignments, and recent class posts.
             </p>
           </div>
@@ -83,20 +83,20 @@ const StudentDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="glass-card rounded-2xl p-6">
-          <h3 className="text-xs uppercase tracking-[0.22em] text-slate-500">Attendance Rate</h3>
-          <p className="mt-2 text-3xl font-semibold text-slate-900">{attendancePct}%</p>
+          <h3 className="text-xs uppercase tracking-[0.22em] text-brand-navy/60">Attendance Rate</h3>
+          <p className="mt-2 text-3xl font-semibold text-brand-navy">{attendancePct}%</p>
         </div>
         <div className="glass-card rounded-2xl p-6">
-          <h3 className="text-xs uppercase tracking-[0.22em] text-slate-500">Meeting expectations</h3>
-          <p className="mt-2 text-3xl font-semibold text-slate-900">{meCount}</p>
+          <h3 className="text-xs uppercase tracking-[0.22em] text-brand-navy/60">Meeting expectations</h3>
+          <p className="mt-2 text-3xl font-semibold text-brand-navy">{meCount}</p>
         </div>
         <div className="glass-card rounded-2xl p-6">
-          <h3 className="text-xs uppercase tracking-[0.22em] text-slate-500">Exceeding expectations</h3>
-          <p className="mt-2 text-3xl font-semibold text-slate-900">{eeCount}</p>
+          <h3 className="text-xs uppercase tracking-[0.22em] text-brand-navy/60">Exceeding expectations</h3>
+          <p className="mt-2 text-3xl font-semibold text-brand-navy">{eeCount}</p>
         </div>
         <div className="glass-card rounded-2xl p-6">
-          <h3 className="text-xs uppercase tracking-[0.22em] text-slate-500">Report cards</h3>
-          <p className="mt-2 text-3xl font-semibold text-slate-900">{reportCards.length}</p>
+          <h3 className="text-xs uppercase tracking-[0.22em] text-brand-navy/60">Report cards</h3>
+          <p className="mt-2 text-3xl font-semibold text-brand-navy">{reportCards.length}</p>
         </div>
       </div>
 
@@ -113,16 +113,16 @@ const StudentDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="glass-card overflow-hidden rounded-[2rem]">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="text-xl font-semibold text-slate-900">Upcoming Assignments</h2>
+          <div className="border-b border-brand-navy/10 px-6 py-4">
+            <h2 className="text-xl font-semibold text-brand-navy">Upcoming Assignments</h2>
           </div>
           <div className="p-6">
-            {assignments.length === 0 && <p className="text-sm text-slate-500">No assignments yet.</p>}
+            {assignments.length === 0 && <p className="text-sm text-brand-navy/60">No assignments yet.</p>}
             <div className="space-y-3">
               {assignments.slice(0, 5).map((a) => (
-                <div key={a.id} className="rounded-2xl border border-slate-200 bg-white/70 p-3">
-                  <p className="font-medium text-slate-900">{a.title}</p>
-                  <p className="text-xs text-slate-500">{a.course?.title || a.course} · Due: {a.due_date ? new Date(a.due_date).toLocaleDateString() : 'No deadline'}</p>
+                <div key={a.id} className="rounded-2xl border border-brand-navy/10 bg-white/70 p-3">
+                  <p className="font-medium text-brand-navy">{a.title}</p>
+                  <p className="text-xs text-brand-navy/60">{a.course?.title || a.course} · Due: {a.due_date ? new Date(a.due_date).toLocaleDateString() : 'No deadline'}</p>
                 </div>
               ))}
             </div>
@@ -130,18 +130,18 @@ const StudentDashboard = () => {
         </div>
 
         <div className="glass-card overflow-hidden rounded-[2rem]">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="text-xl font-semibold text-slate-900">Recent Announcements</h2>
+          <div className="border-b border-brand-navy/10 px-6 py-4">
+            <h2 className="text-xl font-semibold text-brand-navy">Recent Announcements</h2>
           </div>
           <div className="p-6">
-            {posts.length === 0 && <p className="text-sm text-slate-500">No announcements yet.</p>}
+            {posts.length === 0 && <p className="text-sm text-brand-navy/60">No announcements yet.</p>}
             <div className="space-y-3">
               {posts.slice(0, 5).map((p) => (
-                <div key={p.id} className="rounded-2xl border border-slate-200 bg-white/70 p-3">
+                <div key={p.id} className="rounded-2xl border border-brand-navy/10 bg-white/70 p-3">
                   <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${p.post_type === 'announcement' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'}`}>
                     {p.post_type}
                   </span>
-                  <p className="mt-2 text-sm text-slate-700 line-clamp-2">{p.content}</p>
+                  <p className="mt-2 text-sm text-brand-navy/80 line-clamp-2">{p.content}</p>
                 </div>
               ))}
             </div>
@@ -151,34 +151,34 @@ const StudentDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="glass-card overflow-hidden rounded-[2rem]">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="text-xl font-semibold text-slate-900">Recent Attendance</h2>
+          <div className="border-b border-brand-navy/10 px-6 py-4">
+            <h2 className="text-xl font-semibold text-brand-navy">Recent Attendance</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">
-              <thead className="bg-slate-50">
+              <thead className="bg-brand-grayLight/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Class</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Note</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-brand-navy/60">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-brand-navy/60">Class</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-brand-navy/60">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-brand-navy/60">Note</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-brand-navy/10">
                 {attendance.slice(0, 10).map((a) => (
                   <tr key={a.id}>
-                    <td className="px-6 py-4 text-sm text-slate-700">{a.date}</td>
-                    <td className="px-6 py-4 text-sm text-slate-700">{a.stream?.name || a.stream}</td>
+                    <td className="px-6 py-4 text-sm text-brand-navy/80">{a.date}</td>
+                    <td className="px-6 py-4 text-sm text-brand-navy/80">{a.stream?.name || a.stream}</td>
                     <td className="px-6 py-4">
                       <span className={`rounded-full px-2 py-1 text-xs font-medium ${a.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800' : a.status === 'ABSENT' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}`}>
                         {a.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500">{a.note || '-'}</td>
+                    <td className="px-6 py-4 text-sm text-brand-navy/60">{a.note || '-'}</td>
                   </tr>
                 ))}
                 {attendance.length === 0 && (
-                  <tr><td colSpan="4" className="px-6 py-8 text-center text-sm text-slate-500">No attendance records.</td></tr>
+                  <tr><td colSpan="4" className="px-6 py-8 text-center text-sm text-brand-navy/60">No attendance records.</td></tr>
                 )}
               </tbody>
             </table>
@@ -186,32 +186,32 @@ const StudentDashboard = () => {
         </div>
 
         <div className="glass-card overflow-hidden rounded-[2rem]">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="text-xl font-semibold text-slate-900">Recent Competency Assessments</h2>
+          <div className="border-b border-brand-navy/10 px-6 py-4">
+            <h2 className="text-xl font-semibold text-brand-navy">Recent Competency Assessments</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">
-              <thead className="bg-slate-50">
+              <thead className="bg-brand-grayLight/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Outcome</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Level</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-500">Term</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-brand-navy/60">Outcome</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-brand-navy/60">Level</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-brand-navy/60">Term</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-brand-navy/10">
                 {assessments.slice(0, 10).map((a) => (
                   <tr key={a.id}>
-                    <td className="max-w-xs truncate px-6 py-4 text-sm text-slate-700">{a.outcome?.description || a.outcome}</td>
+                    <td className="max-w-xs truncate px-6 py-4 text-sm text-brand-navy/80">{a.outcome?.description || a.outcome}</td>
                     <td className="px-6 py-4">
                       <span className={`rounded-full px-2 py-1 text-xs font-medium ${a.level_achieved === 'EE' ? 'bg-blue-100 text-blue-800' : a.level_achieved === 'ME' ? 'bg-emerald-100 text-emerald-800' : a.level_achieved === 'AE' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}`}>
                         {a.level_achieved}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-700">{a.term?.name || a.term}</td>
+                    <td className="px-6 py-4 text-sm text-brand-navy/80">{a.term?.name || a.term}</td>
                   </tr>
                 ))}
                 {assessments.length === 0 && (
-                  <tr><td colSpan="3" className="px-6 py-8 text-center text-sm text-slate-500">No assessments yet.</td></tr>
+                  <tr><td colSpan="3" className="px-6 py-8 text-center text-sm text-brand-navy/60">No assessments yet.</td></tr>
                 )}
               </tbody>
             </table>

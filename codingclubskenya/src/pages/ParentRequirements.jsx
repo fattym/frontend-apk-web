@@ -1,24 +1,42 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../services/api';
 
 const ParentRequirements = () => {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
+  const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(true);
   const [learnerId, setLearnerId] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
 
   useEffect(() => {
+    const fetchChildren = async () => {
+      try {
+        const res = await api.get('/api/auth/parent-learner-links/');
+        const links = res.data.results || res.data || [];
+        setChildren(links);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    if (user?.role === 'PARENT') {
+      fetchChildren();
+    }
+  }, [user]);
+
+  useEffect(() => {
     const fetchItems = async () => {
       setLoading(true);
       try {
-        const url = learnerId 
-          ? `/api/requirements/public/learner/${learnerId}/`
-          : '/api/requirements/public/';
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Failed to fetch');
-        const data = await res.json();
-        setItems(data.results || data);
+        const schoolId = user?.school;
+        let url = `/api/requirements/public/?school_id=${schoolId}`;
+        if (learnerId) {
+          url = `/api/requirements/public/learner/${learnerId}/?school_id=${schoolId}`;
+        }
+        const res = await api.get(url);
+        const data = res.data.results || res.data;
+        setItems(data || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -26,11 +44,9 @@ const ParentRequirements = () => {
       }
     };
     fetchItems();
-  }, [learnerId]);
+  }, [learnerId, user?.school]);
 
-  const filteredItems = learnerId ? items?.filter((item) => 
-    item.class_level?.id && item.class_level.enrollments?.some((e) => e.student?.id === parseInt(learnerId, 10) && e.is_active)
-  ) : items;
+  const filteredItems = learnerId ? items : items;
 
   const toggleSelection = (itemId, optionId) => {
     setSelectedItems((prev) => {
@@ -58,26 +74,30 @@ const ParentRequirements = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Required Items</h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">Items your child needs for the term</p>
+        <h1 className="text-3xl font-bold text-brand-navy">Required Items</h1>
+        <p className="text-brand-navy/70 mt-1">Book list and items your child needs for the term</p>
       </div>
 
       {user?.role === 'PARENT' && (
-        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 p-4">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Select Child</label>
+        <div className="glass-card rounded-2xl p-4">
+          <label className="block text-sm font-medium text-brand-navy/60 mb-1">Select Child</label>
           <select
             value={learnerId}
             onChange={(e) => setLearnerId(e.target.value)}
-            className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100"
+            className="w-full px-3 py-2 border border-brand-navy/10 rounded-xl text-brand-navy focus:outline-none focus:border-brand-orange"
           >
             <option value="">All children / Show all</option>
-            {/* In a real app, populate with parent's linked learners */}
+            {children.map((link) => (
+              <option key={link.id} value={link.learner?.id}>
+                {link.learner?.first_name} {link.learner?.last_name} ({link.relationship})
+              </option>
+            ))}
           </select>
         </div>
       )}
 
       {(!filteredItems || filteredItems.length === 0) && (
-        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 text-center text-zinc-500">
+        <div className="glass-card rounded-2xl p-6 text-center text-brand-navy/60">
           No required items published yet.
         </div>
       )}
@@ -86,26 +106,26 @@ const ParentRequirements = () => {
         {(filteredItems || []).map((item) => {
           const selectedOption = getSelectedOption(item);
           return (
-            <div key={item.id} className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800 p-6">
+            <div key={item.id} className="glass-card rounded-2xl p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{item.name}</h3>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {item.class_level?.name} • {item.term?.name} • {item.is_mandatory ? 'Mandatory' : 'Optional'}
+                  <h3 className="text-lg font-semibold text-brand-navy">{item.name}</h3>
+                  <p className="text-sm text-brand-navy/60">
+                    {item.class_level_name} • {item.term_name} • {item.is_mandatory ? 'Mandatory' : 'Optional'}
                   </p>
                   {item.description && (
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">{item.description}</p>
+                    <p className="text-sm text-brand-navy/70 mt-1">{item.description}</p>
                   )}
                 </div>
                 {selectedOption && (
                   <div className="text-right">
-                    <p className="text-sm text-green-600 dark:text-green-400">Selected</p>
-                    <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">KES {parseFloat(selectedOption.price).toLocaleString()}</p>
+                    <p className="text-sm text-emerald-700">Selected</p>
+                    <p className="text-lg font-bold text-brand-navy">KES {parseFloat(selectedOption.price).toLocaleString()}</p>
                   </div>
                 )}
               </div>
 
-              {item.options.length > 0 && (
+              {item.options && item.options.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {item.options.map((option) => {
                     const isSelected = selectedOption?.id === option.id;
@@ -113,29 +133,29 @@ const ParentRequirements = () => {
                       <div
                         key={option.id}
                         onClick={() => toggleSelection(item.id, option.id)}
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                        className={`p-4 rounded-xl border-2 cursor-pointer transition-colors ${
                           isSelected
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                            : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
+                            ? 'border-brand-orange bg-brand-orange/10'
+                            : 'border-brand-navy/10 hover:border-brand-navy/20'
                         }`}
                       >
                         <div className="flex justify-between items-start mb-2">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded ${option.source_type === 'school' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded ${option.source_type === 'school' ? 'bg-brand-navy/10 text-brand-navy' : 'bg-accent-teal/10 text-accent-teal-strong'}`}>
                             {option.source_type === 'school' ? '🏫 School' : '🏢 Distributor'}
                           </span>
                           {option.is_recommended && (
-                            <span className="text-xs text-green-600 dark:text-green-400">✅ Recommended</span>
+                            <span className="text-xs text-emerald-700">✅ Recommended</span>
                           )}
                         </div>
-                        <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">KES {parseFloat(option.price).toLocaleString()}</p>
+                        <p className="text-xl font-bold text-brand-navy mb-1">KES {parseFloat(option.price).toLocaleString()}</p>
                         {option.location && (
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">📍 {option.location}</p>
+                          <p className="text-sm text-brand-navy/60">📍 {option.location}</p>
                         )}
                         {option.delivery_available && (
-                          <p className="text-sm text-blue-600 dark:text-blue-400">🚚 Delivery Available</p>
+                          <p className="text-sm text-brand-navy">🚚 Delivery Available</p>
                         )}
                         {isSelected && (
-                          <div className="mt-2 text-sm text-blue-600 dark:text-blue-400 font-medium">
+                          <div className="mt-2 text-sm text-brand-orange font-medium">
                             ✓ Selected
                           </div>
                         )}

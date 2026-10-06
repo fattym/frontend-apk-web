@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'core/auth/auth_provider.dart';
 import 'core/api/api_client.dart';
 import 'features/shop/providers/shop_provider.dart';
+import 'features/shop/providers/cart_provider.dart';
 import 'features/announcements/providers/announcements_provider.dart';
 import 'features/dashboards/providers/dashboard_provider.dart';
 import 'features/requirements/providers/requirements_provider.dart';
@@ -78,6 +79,7 @@ void main() {
             ),
           ),
           ChangeNotifierProvider(create: (ctx) => ShopProvider(apiClient: ctx.read<ApiClient>())),
+          ChangeNotifierProvider(create: (_) => CartProvider()),
           ChangeNotifierProvider(create: (ctx) => AnnouncementsProvider(apiClient: ctx.read<ApiClient>())),
           ChangeNotifierProvider(create: (ctx) => DashboardProvider(apiClient: ctx.read<ApiClient>())),
           ChangeNotifierProvider(create: (ctx) => RequirementsProvider(apiClient: ctx.read<ApiClient>())),

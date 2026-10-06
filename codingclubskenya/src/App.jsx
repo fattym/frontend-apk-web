@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
+import ParentDashboard from './pages/ParentDashboard';
+import ParentReportCards from './pages/ParentReportCards';
 import Teachers from './pages/Teachers';
 import Students from './pages/Students';
 import Parents from './pages/Parents';
@@ -65,6 +67,8 @@ const AppRoutes = () => (
       <Route path="school-dashboard" element={<Dashboard />} />
       <Route path="teacher-dashboard" element={<TeacherDashboard />} />
       <Route path="student-dashboard" element={<StudentDashboard />} />
+      <Route path="parent-dashboard" element={<ParentDashboard />} />
+      <Route path="parent-report-cards" element={<ParentReportCards />} />
       <Route path="students" element={<Students />} />
       <Route path="parents" element={<Parents />} />
       <Route path="teachers" element={<Teachers />} />

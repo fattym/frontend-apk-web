@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/shop_provider.dart';
+import '../providers/cart_provider.dart';
 
 class ShopHomePage extends StatefulWidget {
   const ShopHomePage({super.key});
@@ -23,7 +25,36 @@ class _ShopHomePageState extends State<ShopHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('School Shop'), backgroundColor: Theme.of(context).colorScheme.inversePrimary),
+      appBar: AppBar(
+        title: const Text('School Shop'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: Stack(
+              children: [
+                const Icon(Icons.shopping_cart),
+                if (context.watch<CartProvider>().itemCount > 0)
+                  Positioned(
+                    top: 2,
+                    right: 2,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
+                      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                      child: Text(
+                        context.watch<CartProvider>().totalQuantity.toString(),
+                        style: const TextStyle(color: Colors.white, fontSize: 10),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            onPressed: () => context.go('/cart'),
+            tooltip: 'View Cart',
+          ),
+        ],
+      ),
       body: Consumer<ShopProvider>(
         builder: (context, shop, child) {
           if (shop.isLoading) {
@@ -79,6 +110,20 @@ class ProductCard extends StatelessWidget {
                 Text(product['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Text('KES ${product['effective_price'] ?? product['price']}', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      context.read<CartProvider>().addItem(product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('${product['name'] ?? 'Item'} added to cart')),
+                      );
+                    },
+                    icon: const Icon(Icons.shopping_cart, size: 16),
+                    label: const Text('Add to Cart'),
+                  ),
+                ),
               ],
             ),
           ),
