@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs location access to show school bus positions on the map.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs location access to report bus positions and show bus locations.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs location access to report your bus position to parents.</string>
 </dict>
 </plist>

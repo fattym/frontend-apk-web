@@ -12,6 +12,7 @@ import 'features/courses/providers/course_provider.dart';
 import 'features/timetable/providers/timetable_provider.dart';
 import 'features/exams/providers/exam_results_provider.dart';
 import 'features/messaging/providers/chat_provider.dart';
+import 'features/transport/providers/transport_provider.dart';
 import 'router.dart';
 import 'core/theme/app_theme.dart';
 
@@ -22,6 +23,7 @@ class ParentApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'EduGuide Schools',
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       routerConfig: router,
     );
@@ -52,6 +54,12 @@ void main() {
         ChangeNotifierProvider(create: (ctx) => CourseProvider(apiClient: ctx.read<ApiClient>())),
         ChangeNotifierProvider(create: (ctx) => TimetableProvider(apiClient: ctx.read<ApiClient>())),
         ChangeNotifierProvider(create: (ctx) => ExamResultsProvider(apiClient: ctx.read<ApiClient>())),
+        ChangeNotifierProvider(
+          create: (ctx) => TransportProvider(
+            apiClient: ctx.read<ApiClient>(),
+            authProvider: ctx.read<AuthProvider>(),
+          ),
+        ),
         ChangeNotifierProvider(create: (ctx) => ChatProvider(apiClient: ctx.read<ApiClient>())),
       ],
       child: const ParentApp(),

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/auth/auth_provider.dart';
-import 'core/theme/clay_badge.dart';
 import 'core/theme/clay_button.dart';
+import 'core/theme/clay_input.dart';
 import 'core/theme/clay_states.dart';
 import 'core/theme/theme_tokens.dart';
 import 'features/shop/pages/shop_home_page.dart';
@@ -34,19 +34,32 @@ import 'features/exams/pages/exam_results_page.dart';
 import 'features/messaging/pages/chat_page.dart';
 import 'features/messaging/pages/conversation_detail_page.dart';
 import 'features/messaging/pages/new_chat_page.dart';
+import 'features/onboarding/welcome_page.dart';
+import 'features/onboarding/onboarding_page.dart';
+import 'features/transport/pages/bus_tracker_page.dart';
 
 final GoRouter router = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/welcome',
   redirect: (context, state) {
     final auth = context.read<AuthProvider>();
     final isLoggedIn = auth.isAuthenticated;
-    final isLoginRoute = state.matchedLocation == '/login';
-    if (!isLoggedIn && !isLoginRoute) return '/login';
-    if (isLoggedIn && isLoginRoute) return '/';
+    final isGuestRoute = state.matchedLocation == '/login' || state.matchedLocation == '/welcome' || state.matchedLocation == '/onboarding' || state.matchedLocation == '/role-selection';
+    if (!isLoggedIn && !isGuestRoute) return '/login';
+    if (isLoggedIn && isGuestRoute) {
+      if (auth.user?['role'] == 'DRIVER') return '/bus-tracker';
+      return '/';
+    }
     return null;
   },
   routes: [
-    GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+    GoRoute(path: '/welcome', builder: (context, state) => const WelcomePage()),
+    GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingPage()),
+    GoRoute(path: '/role-selection', builder: (context, state) => const RoleSelectionPage()),
+    GoRoute(path: '/login', builder: (context, state) {
+      final role = state.extra as String? ?? 'email';
+      return LoginPage(role: role);
+    }),
+    GoRoute(path: '/bus-tracker', builder: (context, state) => const BusTrackerPage()),
     ShellRoute(
       builder: (context, state, child) => MainShell(child: child),
       routes: [
@@ -97,7 +110,8 @@ final GoRouter router = GoRouter(
 );
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  final String role;
+  const LoginPage({super.key, this.role = 'email'});
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +138,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 const SizedBox(height: kSpacing8),
                 Text(
-                  'School Suite — CBC learning, attendance, and classroom flow',
+                  'Login as ${_roleLabel(role)}',
                   style: TextStyle(
                     fontFamily: 'Plus Jakarta Sans',
                     fontSize: kType14,
@@ -132,8 +146,18 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: kSpacing48),
-                const LoginForm(),
+                LoginForm(role: role),
                 const SizedBox(height: kSpacing48),
+                TextButton(
+                  onPressed: () => context.go('/role-selection'),
+                  child: Text(
+                    'Choose a different role',
+                    style: TextStyle(
+                      color: kWhite.withValues(alpha: 0.7),
+                      fontFamily: 'Plus Jakarta Sans',
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -144,7 +168,8 @@ class LoginPage extends StatelessWidget {
 }
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+  final String role;
+  const LoginForm({super.key, required this.role});
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -156,7 +181,6 @@ class _LoginFormState extends State<LoginForm> {
   final _studentIdController = TextEditingController();
   final _pinController = TextEditingController();
   bool _loading = false;
-  String _mode = 'email';
   String? _errorMessage;
 
   @override
@@ -168,12 +192,9 @@ class _LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
-  void _clearError() {
-    setState(() => _errorMessage = null);
-  }
-
   @override
   Widget build(BuildContext context) {
+    final isEmailMode = widget.role == 'email' || widget.role == 'parent' || widget.role == 'driver';
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(kSpacing24),
@@ -185,21 +206,7 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(value: 'email', label: Text('Teacher / Staff')),
-              ButtonSegment(value: 'student', label: Text('Student')),
-            ],
-            selected: {_mode},
-            onSelectionChanged: (Set<String> newSelection) {
-              setState(() {
-                _mode = newSelection.first;
-                _clearError();
-              });
-            },
-          ),
-          const SizedBox(height: kSpacing24),
-          if (_mode == 'email') ...[
+          if (isEmailMode) ...[
             ClayInput(
               controller: _emailController,
               hintText: 'Email',
@@ -250,7 +257,7 @@ class _LoginFormState extends State<LoginForm> {
                 : () async {
                     setState(() => _loading = true);
                     final auth = context.read<AuthProvider>();
-                    final error = await (_mode == 'email'
+                    final error = await (isEmailMode
                         ? auth.login(_emailController.text.trim(), _passwordController.text.trim())
                         : auth.studentLogin(_studentIdController.text.trim(), _pinController.text.trim()));
                     if (mounted) {
@@ -276,6 +283,141 @@ class _LoginFormState extends State<LoginForm> {
   }
 }
 
+class RoleSelectionPage extends StatelessWidget {
+  const RoleSelectionPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: kNavy,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(kSpacing32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: kAccent.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.school, color: kAccent, size: 48),
+                  ),
+                  const SizedBox(height: kSpacing32),
+                  Text(
+                    'Select Your Role',
+                    style: TextStyle(
+                      fontFamily: 'Baloo 2',
+                      fontSize: kType31,
+                      fontWeight: FontWeight.w700,
+                      color: kWhite,
+                    ),
+                  ),
+                  const SizedBox(height: kSpacing8),
+                  Text(
+                    'Choose your role to continue',
+                    style: TextStyle(
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontSize: kType14,
+                      color: kWhite.withValues(alpha: 0.7),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: kSpacing48),
+                  _RoleButton(
+                    icon: Icons.school,
+                    label: 'Teacher / Staff',
+                    color: kSecondary,
+                    onTap: () => context.push('/login', extra: 'email'),
+                  ),
+                  const SizedBox(height: kSpacing16),
+                  _RoleButton(
+                    icon: Icons.person,
+                    label: 'Parent',
+                    color: kInfo,
+                    onTap: () => context.push('/login', extra: 'parent'),
+                  ),
+                  const SizedBox(height: kSpacing16),
+                  _RoleButton(
+                    icon: Icons.directions_bus,
+                    label: 'Driver',
+                    color: kAccent,
+                    onTap: () => context.push('/login', extra: 'driver'),
+                  ),
+                  const SizedBox(height: kSpacing16),
+                  _RoleButton(
+                    icon: Icons.menu_book,
+                    label: 'Student',
+                    color: kTeal,
+                    onTap: () => context.push('/login', extra: 'student'),
+                  ),
+                  const SizedBox(height: kSpacing32),
+                  TextButton(
+                    onPressed: () => context.go('/welcome'),
+                    child: Text(
+                      'Back to Welcome',
+                      style: TextStyle(
+                        color: kWhite.withValues(alpha: 0.7),
+                        fontFamily: 'Plus Jakarta Sans',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+String _roleLabel(String role) {
+  switch (role) {
+    case 'email':
+      return 'Teacher / Staff';
+    case 'parent':
+      return 'Parent';
+    case 'driver':
+      return 'Driver';
+    case 'student':
+      return 'Student';
+    default:
+      return 'User';
+  }
+}
+
+class _RoleButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _RoleButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ClayButton(
+        onPressed: onTap,
+        label: label,
+        clayState: ClayState.raised,
+      ),
+    );
+  }
+}
+
+
 class MainShell extends StatelessWidget {
   final Widget child;
   const MainShell({super.key, required this.child});
@@ -286,18 +428,40 @@ class MainShell extends StatelessWidget {
     final role = auth.user?['role'] ?? '';
 
     final isTeacher = role == 'TEACHER' || role == 'STAFF';
+    final isDriver = role == 'DRIVER';
 
-    final destinations = [
-      const NavigationDestination(icon: Icon(Icons.storefront), label: 'Shop'),
-      const NavigationDestination(icon: Icon(Icons.announcement), label: 'News'),
-      const NavigationDestination(icon: Icon(Icons.receipt_long), label: 'Orders'),
-      const NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-      const NavigationDestination(icon: Icon(Icons.menu_book), label: 'Courses'),
-      const NavigationDestination(icon: Icon(Icons.schedule), label: 'Timetable'),
-      const NavigationDestination(icon: Icon(Icons.message), label: 'Messages'),
-      if (role == 'PARENT')
-        const NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'Items'),
-    ];
+    final List<NavigationDestination> destinations;
+    final List<String> routes;
+
+    if (isTeacher) {
+      destinations = [];
+      routes = [];
+    } else if (isDriver) {
+      destinations = [
+        const NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+        const NavigationDestination(icon: Icon(Icons.directions_bus), label: 'Bus Tracker'),
+        const NavigationDestination(icon: Icon(Icons.message), label: 'Messages'),
+      ];
+      routes = ['/dashboard', '/bus-tracker', '/messages'];
+    } else {
+      destinations = [
+        const NavigationDestination(icon: Icon(Icons.storefront), label: 'Shop'),
+        const NavigationDestination(icon: Icon(Icons.announcement), label: 'News'),
+        const NavigationDestination(icon: Icon(Icons.receipt_long), label: 'Orders'),
+        const NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+        const NavigationDestination(icon: Icon(Icons.directions_bus), label: 'Bus Tracker'),
+        const NavigationDestination(icon: Icon(Icons.menu_book), label: 'Courses'),
+        const NavigationDestination(icon: Icon(Icons.schedule), label: 'Timetable'),
+        const NavigationDestination(icon: Icon(Icons.message), label: 'Messages'),
+        if (role == 'PARENT')
+          const NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'Items'),
+      ];
+      routes = [
+        '/', '/announcements', '/orders', '/dashboard', '/bus-tracker',
+        '/courses', '/timetable', '/messages',
+        if (role == 'PARENT') '/requirements',
+      ];
+    }
 
     if (isTeacher) {
       return Scaffold(
@@ -356,16 +520,7 @@ class MainShell extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         destinations: destinations,
         onDestinationSelected: (index) {
-          final routes = ['/', '/announcements', '/orders', '/dashboard', '/courses', '/timetable', '/messages'];
-          if (role == 'PARENT') {
-            if (index < routes.length) {
-              context.go(routes[index]);
-            } else {
-              context.go('/requirements');
-            }
-          } else {
-            context.go(routes[index]);
-          }
+          context.go(routes[index]);
         },
         backgroundColor: kNavy,
         elevation: 0,
