@@ -42,7 +42,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = `${import.meta.env.BASE_URL}login`;
+        window.location.href = window.location.pathname.includes('/schoolsystem/') ? '/schoolsystem/login' : '/login';
         return Promise.reject(refreshError);
       }
     }
@@ -51,3 +51,16 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+export const submitForm = (form_type, data) =>
+  api.post('/api/shop/form-submissions/', { form_type, data }).then((r) => r.data);
+
+export const formErrorMessage = (err, fallback = 'Could not submit your request. Please try again.') => {
+  if (err?.response?.data?.detail) return String(err.response.data.detail);
+  if (err?.response?.data) {
+    const first = Object.values(err.response.data).flat().find(Boolean);
+    if (first) return String(first);
+  }
+  if (err instanceof Error) return err.message;
+  return fallback;
+};

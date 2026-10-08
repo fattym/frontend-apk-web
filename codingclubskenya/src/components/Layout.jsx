@@ -27,6 +27,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Calendar,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -69,6 +70,7 @@ const Layout = () => {
             ['/assessments', 'Assessments', FileCheck],
             ['/teacher-assignments', 'Teacher Assignments', UserCheck],
             ['/attendance', 'Attendance', CalendarCheck],
+            ['/messages', 'Messages', Mail],
             ['/homework', 'Homework', NotebookPen],
           ],
         },
@@ -129,6 +131,7 @@ const Layout = () => {
               ['/reference-documents', 'Reference Docs', FileText],
               ['/schemes-of-work', 'Schemes of Work', ClipboardList],
               ['/assessments', 'Assessments', FileCheck],
+              ['/timetable', 'Timetable', Calendar],
             ],
           },
           {

@@ -2,11 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import Homepage from './pages/Homepage';
 import Dashboard from './pages/Dashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
-import ParentDashboard from './pages/ParentDashboard';
-import ParentReportCards from './pages/ParentReportCards';
 import Teachers from './pages/Teachers';
 import Students from './pages/Students';
 import Parents from './pages/Parents';
@@ -33,13 +32,13 @@ import Clubs from './pages/Clubs';
 import Attendance from './pages/Attendance';
 import Exams from './pages/Exams';
 import Fees from './pages/Fees';
+import Timetable from './pages/Timetable';
 import Library from './pages/Library';
 import Messaging from './pages/Messaging';
 import Complaints from './pages/Complaints';
 import Events from './pages/Events';
 import Homework from './pages/Homework';
 import Reports from './pages/Reports';
-import LandingPage from './pages/LandingPage';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -48,17 +47,10 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-const Home = () => {
-  const { user, loading, getDashboardRoute } = useAuth();
-  if (loading) return <div className="p-6">Loading...</div>;
-  if (!user) return <LandingPage />;
-  return <Navigate to={getDashboardRoute(user.role)} replace />;
-};
-
 const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
-    <Route path="/" element={<Home />} />
+    <Route index element={<Homepage />} />
     <Route element={
       <ProtectedRoute>
         <Layout />
@@ -67,8 +59,6 @@ const AppRoutes = () => (
       <Route path="school-dashboard" element={<Dashboard />} />
       <Route path="teacher-dashboard" element={<TeacherDashboard />} />
       <Route path="student-dashboard" element={<StudentDashboard />} />
-      <Route path="parent-dashboard" element={<ParentDashboard />} />
-      <Route path="parent-report-cards" element={<ParentReportCards />} />
       <Route path="students" element={<Students />} />
       <Route path="parents" element={<Parents />} />
       <Route path="teachers" element={<Teachers />} />
@@ -95,8 +85,10 @@ const AppRoutes = () => (
       <Route path="attendance" element={<Attendance />} />
       <Route path="exams" element={<Exams />} />
       <Route path="fees" element={<Fees />} />
+      <Route path="timetable" element={<Timetable />} />
       <Route path="library" element={<Library />} />
       <Route path="messaging" element={<Messaging />} />
+      <Route path="messages" element={<Messaging />} />
       <Route path="complaints" element={<Complaints />} />
       <Route path="events" element={<Events />} />
       <Route path="homework" element={<Homework />} />
@@ -106,7 +98,7 @@ const AppRoutes = () => (
 );
 
 const App = () => (
-  <BrowserRouter basename="/learningpack">
+  <BrowserRouter basename="/schoolsystems">
     <AuthProvider>
       <AppRoutes />
     </AuthProvider>

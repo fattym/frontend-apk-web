@@ -57,9 +57,7 @@ class ParentDashboardPage extends StatelessWidget {
                             trailing: IconButton(
                               icon: const Icon(Icons.message, color: Colors.blue),
                               onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Messaging coming soon!')),
-                                );
+                                context.go('/chat');
                               },
                             ),
                           ),

@@ -1,9 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:parent_app/core/constants/app_constants.dart';
 
 class ApiClient {
-  static const String baseUrl = AppConstants.apiBaseUrl;
+  static const String baseUrl = 'https://codingclubskenya.com/api';
   final Dio dio;
   final FlutterSecureStorage secureStorage;
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { submitForm, formErrorMessage } from '../services/api';
 
 const roleContent = {
   school: {
@@ -176,7 +177,7 @@ const FloatingQuoteAction = ({ onNavigate }) => (
   </a>
 );
 
-const OnboardingSection = ({ selectedRole, formValues, onSelectRole, onReset, onComplete, onFieldChange }) => {
+const OnboardingSection = ({ selectedRole, formValues, onSelectRole, onReset, onComplete, onFieldChange, error, loading }) => {
   const selected = selectedRole ? roleContent[selectedRole] : null;
 
   return (
@@ -290,14 +291,30 @@ const OnboardingSection = ({ selectedRole, formValues, onSelectRole, onReset, on
                   );
                 })}
             </div>
+            {error && (
+              <div className="mt-2 p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-medium rounded-xl">
+                <i className="fa-solid fa-circle-exclamation mr-1"></i>
+                {error}
+              </div>
+            )}
             <button
               type="button"
               id="onboarding-cta"
               onClick={onComplete}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-orange hover:bg-brand-orangeHover text-white font-bold rounded-xl clay-button transition-all"
+              disabled={loading}
+              className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-orange hover:bg-brand-orangeHover text-white font-bold rounded-xl clay-button transition-all ${loading ? 'opacity-75 cursor-wait' : ''}`}
             >
-              {selected ? selected.cta : ''}
-              <i className="fa-solid fa-arrow-right text-xs"></i>
+              {loading ? (
+                <>
+                  <i className="fa-solid fa-spinner fa-spin text-xs"></i>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  {selected ? selected.cta : ''}
+                  <i className="fa-solid fa-arrow-right text-xs"></i>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -952,7 +969,7 @@ const PricingSection = () => (
   </section>
 );
 
-const DemoSection = ({ submitted, onSubmit }) => (
+const DemoSection = ({ submitted, loading, error, onSubmit }) => (
   <section id="demo" className="py-20 bg-brand-grayLight/60 px-4 sm:px-8">
     <div className="max-w-4xl mx-auto clay-card p-8 sm:p-12 bg-white">
       <div className="text-center space-y-3 mb-8">
@@ -969,6 +986,7 @@ const DemoSection = ({ submitted, onSubmit }) => (
             <label className="block text-xs font-bold text-brand-navy mb-1">Your Name</label>
             <input
               type="text"
+              name="name"
               required
               placeholder="e.g. Jane Doe"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-orange"
@@ -978,6 +996,7 @@ const DemoSection = ({ submitted, onSubmit }) => (
             <label className="block text-xs font-bold text-brand-navy mb-1">Institution/School Name</label>
             <input
               type="text"
+              name="institution"
               required
               placeholder="e.g. Nairobi STEM Academy"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-orange"
@@ -989,6 +1008,7 @@ const DemoSection = ({ submitted, onSubmit }) => (
             <label className="block text-xs font-bold text-brand-navy mb-1">Email Address</label>
             <input
               type="email"
+              name="email"
               required
               placeholder="e.g. jane@school.ac.ke"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-orange"
@@ -996,18 +1016,39 @@ const DemoSection = ({ submitted, onSubmit }) => (
           </div>
           <div>
             <label className="block text-xs font-bold text-brand-navy mb-1">Estimated Students</label>
-            <select className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-orange">
+            <select
+              name="estimated_students"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-orange"
+            >
               <option>1 - 50 Students</option>
               <option>51 - 200 Students</option>
               <option>200+ Students</option>
             </select>
           </div>
         </div>
+        {error && (
+          <div
+            id="demo-error"
+            className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-medium rounded-xl"
+            role="alert"
+          >
+            <i className="fa-solid fa-circle-exclamation mr-1"></i>
+            {error}
+          </div>
+        )}
         <button
           type="submit"
-          className="w-full py-4 bg-brand-orange text-white font-bold text-sm rounded-xl clay-button hover:bg-brand-orangeHover transition-all"
+          disabled={loading}
+          className={`w-full py-4 bg-brand-orange text-white font-bold text-sm rounded-xl clay-button hover:bg-brand-orangeHover transition-all ${loading ? 'opacity-75 cursor-wait' : ''}`}
         >
-          Submit Request for Demonstration
+          {loading ? (
+            <>
+              <i className="fa-solid fa-spinner fa-spin mr-2"></i>
+              Sending your request...
+            </>
+          ) : (
+            'Submit Request for Demonstration'
+          )}
         </button>
       </form>
       {submitted && (
@@ -1132,6 +1173,10 @@ const LandingPage = () => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [formValues, setFormValues] = useState({});
   const [demoSubmitted, setDemoSubmitted] = useState(false);
+  const [onboardingError, setOnboardingError] = useState('');
+  const [onboardingLoading, setOnboardingLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [demoError, setDemoError] = useState(null);
   const [targetSection, setTargetSection] = useState(null);
 
   useEffect(() => {
@@ -1172,25 +1217,64 @@ const LandingPage = () => {
   const onFieldChange = (e) => {
     const { name, value } = e.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
+    if (onboardingError) setOnboardingError('');
   };
 
-  const onComplete = () => {
+  const focusField = (fieldName) => {
+    const el = document.querySelector(`[name="${fieldName}"]`);
+    if (el) {
+      el.focus();
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  const onComplete = async () => {
     if (!selectedRole) return;
     const selected = roleContent[selectedRole];
     const emptyField = selected.fields.find(([, , , fieldName]) => !formValues[fieldName]);
     if (emptyField) {
+      const [, label, , fieldName] = emptyField;
+      setOnboardingError(`Please fill in the "${label}" field.`);
+      focusField(fieldName);
       return;
     }
     const phone = formValues['contact-phone'] || '';
     if (phone.replace(/\D/g, '').length < 7) {
+      setOnboardingError('Please enter a valid phone number with at least 7 digits.');
+      focusField('contact-phone');
       return;
     }
-    revealAndScroll('demo');
+    setOnboardingError('');
+    setOnboardingLoading(true);
+    try {
+      await submitForm('lead', { role: selectedRole, ...formValues });
+      revealAndScroll('demo');
+    } catch (err) {
+      setOnboardingError(formErrorMessage(err, 'Could not submit your details. Please try again or contact us.'));
+    } finally {
+      setOnboardingLoading(false);
+    }
   };
 
-  const handleDemoSubmit = (e) => {
+  const handleDemoSubmit = async (e) => {
     e.preventDefault();
-    setDemoSubmitted(true);
+    setDemoError(null);
+    setDemoLoading(true);
+    try {
+      const form = new FormData(e.currentTarget);
+      const data = {
+        name: form.get('name') || '',
+        institution: form.get('institution') || '',
+        email: form.get('email') || '',
+        estimated_students: form.get('estimated_students') || '',
+      };
+      await submitForm('demo', data);
+      setDemoSubmitted(true);
+    } catch (err) {
+      setDemoError(formErrorMessage(err, 'Could not submit your request. Please try again.'));
+    } finally {
+      setDemoLoading(false);
+    }
   };
 
   return (
@@ -1208,6 +1292,8 @@ const LandingPage = () => {
         onReset={onReset}
         onComplete={onComplete}
         onFieldChange={onFieldChange}
+        error={onboardingError}
+        loading={onboardingLoading}
       />
       {!onboardingActive && (
         <>
@@ -1217,7 +1303,12 @@ const LandingPage = () => {
           <LmsSection />
           <ParentAppSection />
           <PricingSection />
-          <DemoSection submitted={demoSubmitted} onSubmit={handleDemoSubmit} />
+          <DemoSection
+            submitted={demoSubmitted}
+            loading={demoLoading}
+            error={demoError}
+            onSubmit={handleDemoSubmit}
+          />
           <Footer />
         </>
       )}

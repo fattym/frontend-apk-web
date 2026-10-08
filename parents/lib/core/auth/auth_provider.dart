@@ -7,6 +7,7 @@ class AuthProvider with ChangeNotifier {
   final FlutterSecureStorage secureStorage;
   Map<String, dynamic>? _user;
   bool _isLoading = true;
+  String? _error;
 
   AuthProvider({required this.apiClient, required this.secureStorage}) {
     _loadUser();
@@ -15,6 +16,7 @@ class AuthProvider with ChangeNotifier {
   Map<String, dynamic>? get user => _user;
   bool get isAuthenticated => _user != null;
   bool get isLoading => _isLoading;
+  String? get error => _error;
 
   Future<void> _loadUser() async {
     final token = await secureStorage.read(key: 'access_token');
@@ -30,7 +32,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> login(String email, String password) async {
+  Future<String?> login(String email, String password) async {
+    _error = null;
     try {
       final response = await apiClient.dio.post('/auth/login/', data: {
         'email': email,
@@ -38,18 +41,24 @@ class AuthProvider with ChangeNotifier {
       });
       final access = response.data['access'];
       final refresh = response.data['refresh'];
-      final user = response.data['user'];
       await secureStorage.write(key: 'access_token', value: access);
       await secureStorage.write(key: 'refresh_token', value: refresh);
-      _user = user;
+      if (response.data['user'] != null) {
+        _user = response.data['user'];
+      } else {
+        _user = await _fetchUserProfile();
+      }
       notifyListeners();
-      return true;
+      return null;
     } catch (e) {
-      return false;
+      _error = e.toString();
+      notifyListeners();
+      return _error;
     }
   }
 
-  Future<bool> studentLogin(String studentId, String pinCode) async {
+  Future<String?> studentLogin(String studentId, String pinCode) async {
+    _error = null;
     try {
       final response = await apiClient.dio.post('/auth/student-login/', data: {
         'student_id': studentId,
@@ -57,20 +66,35 @@ class AuthProvider with ChangeNotifier {
       });
       final access = response.data['access'];
       final refresh = response.data['refresh'];
-      final user = response.data['user'];
       await secureStorage.write(key: 'access_token', value: access);
       await secureStorage.write(key: 'refresh_token', value: refresh);
-      _user = user;
+      if (response.data['user'] != null) {
+        _user = response.data['user'];
+      } else {
+        _user = await _fetchUserProfile();
+      }
       notifyListeners();
-      return true;
+      return null;
     } catch (e) {
-      return false;
+      _error = e.toString();
+      notifyListeners();
+      return _error;
+    }
+  }
+
+  Future<Map<String, dynamic>?> _fetchUserProfile() async {
+    try {
+      final response = await apiClient.dio.get('/auth/users/me/');
+      return response.data as Map<String, dynamic>?;
+    } catch (e) {
+      return null;
     }
   }
 
   Future<void> logout() async {
     await secureStorage.deleteAll();
     _user = null;
+    _error = null;
     notifyListeners();
   }
 }
