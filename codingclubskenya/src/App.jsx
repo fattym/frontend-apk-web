@@ -21,6 +21,7 @@ import Requirements from './pages/Requirements';
 import ParentRequirements from './pages/ParentRequirements';
 import Schools from './pages/Schools';
 import Assessments from './pages/Assessments';
+import StudentAssessments from './pages/StudentAssessments';
 import TeacherAssignments from './pages/TeacherAssignments';
 import Courses from './pages/Courses';
 import CourseFlow from './pages/CourseFlow';
@@ -38,7 +39,14 @@ import Messaging from './pages/Messaging';
 import Complaints from './pages/Complaints';
 import Events from './pages/Events';
 import Homework from './pages/Homework';
+import HealthRecords from './pages/HealthRecords';
+import DisciplinaryRecords from './pages/DisciplinaryRecords';
+import Alumni from './pages/Alumni';
+import ParentTeacherMeetings from './pages/ParentTeacherMeetings';
+import Payroll from './pages/Payroll';
 import Reports from './pages/Reports';
+import Drivers from './pages/Drivers';
+import DriverStudents from './pages/DriverStudents';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -74,6 +82,7 @@ const AppRoutes = () => (
       <Route path="parent/requirements" element={<ParentRequirements />} />
       <Route path="schools" element={<Schools />} />
       <Route path="assessments" element={<Assessments />} />
+      <Route path="student-assessments" element={<StudentAssessments />} />
       <Route path="teacher-assignments" element={<TeacherAssignments />} />
       <Route path="courses" element={<Courses />} />
       <Route path="course-flow" element={<CourseFlow />} />
@@ -85,13 +94,20 @@ const AppRoutes = () => (
       <Route path="attendance" element={<Attendance />} />
       <Route path="exams" element={<Exams />} />
       <Route path="fees" element={<Fees />} />
+      <Route path="health" element={<HealthRecords />} />
+      <Route path="discipline" element={<DisciplinaryRecords />} />
+      <Route path="alumni" element={<Alumni />} />
+      <Route path="parent-teacher-meetings" element={<ParentTeacherMeetings />} />
+      <Route path="payroll" element={<Payroll />} />
       <Route path="timetable" element={<Timetable />} />
       <Route path="library" element={<Library />} />
       <Route path="messaging" element={<Messaging />} />
       <Route path="messages" element={<Messaging />} />
-      <Route path="complaints" element={<Complaints />} />
-      <Route path="events" element={<Events />} />
-      <Route path="homework" element={<Homework />} />
+       <Route path="complaints" element={<Complaints />} />
+       <Route path="events" element={<Events />} />
+       <Route path="drivers" element={<Drivers />} />
+       <Route path="driver-students" element={<DriverStudents />} />
+       <Route path="homework" element={<Homework />} />
       <Route path="reports" element={<Reports />} />
     </Route>
   </Routes>

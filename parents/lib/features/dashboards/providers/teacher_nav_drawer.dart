@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_tokens.dart';
+import '../../../core/theme/theme_toggle.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // TEACHER NAVIGATION DRAWER (replaces BottomNavigationBar for teachers)
@@ -31,6 +32,8 @@ class TeacherNavDrawer extends StatelessWidget {
       _NavItem(icon: Icons.sports_esports, label: 'Clubs & Activities', index: 10),
       _NavItem(icon: Icons.report_problem, label: 'Complaints', index: 11),
       _NavItem(icon: Icons.calendar_today, label: 'Events', index: 12),
+      _NavItem(icon: Icons.meeting_room, label: 'PT Meetings', index: 13),
+      _NavItem(icon: Icons.account_balance_wallet, label: 'Payroll', index: 14),
     ];
 
     return SafeArea(
@@ -89,7 +92,7 @@ class TeacherNavDrawer extends StatelessWidget {
                 return ListTile(
                   leading: Icon(
                     item.icon,
-                    color: isActive ? kAccent : kNavy.withValues(alpha: 0.6),
+                    color: isActive ? kAccent : context.appBarForegroundColor.withValues(alpha: 0.6),
                     size: 22,
                   ),
                   title: Text(
@@ -98,7 +101,7 @@ class TeacherNavDrawer extends StatelessWidget {
                       fontFamily: 'Plus Jakarta Sans',
                       fontSize: kType14,
                       fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                      color: isActive ? kAccent : kNavy.withValues(alpha: 0.8),
+                      color: isActive ? kAccent : context.appBarForegroundColor.withValues(alpha: 0.8),
                     ),
                   ),
                   tileColor: isActive ? kAccent.withValues(alpha: 0.08) : Colors.transparent,
@@ -113,10 +116,12 @@ class TeacherNavDrawer extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(kSpacing16),
             decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: kNavy.withValues(alpha: 0.1))),
+              border: Border(top: BorderSide(color: context.appBarForegroundColor.withValues(alpha: 0.1))),
             ),
             child: Row(
               children: [
+                ThemeToggle(),
+                const SizedBox(width: kSpacing8),
                 const Icon(Icons.logout, size: 20, color: kDanger),
                 const SizedBox(width: kSpacing8),
                 Text(

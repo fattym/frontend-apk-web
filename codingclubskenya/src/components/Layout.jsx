@@ -16,8 +16,9 @@ import {
   CalendarDays,
   UserPlus,
   FileText,
-  ShoppingBag,
+   ShoppingBag,
   Tag,
+  BusFront,
   ShoppingCart,
   FileSearch,
   CreditCard,
@@ -28,6 +29,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
+  Menu,
+  X,
+  HeartPulse,
+  AlertTriangle,
+  GraduationCap,
+  CalendarClock,
+  Wallet,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -35,11 +43,14 @@ const Layout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const navLinkClass = ({ isActive }) =>
     `flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
@@ -88,35 +99,46 @@ const Layout = () => {
       ? [
           {
             title: 'Learner',
+            items: [
+              [homePath, 'Dashboard', LayoutDashboard],
+              ['/my-courses', 'My Courses', BookOpen],
+              ['/attendance', 'My Attendance', CalendarCheck],
+              ['/student-assessments', 'My Assessments', FileCheck],
+              ['/parent/requirements', 'Required Items', ClipboardList],
+              ['/homework', 'Homework', NotebookPen],
+              ['/complaints', 'My Complaints', MessageSquareWarning],
+              ['/events', 'Events', CalendarDays],
+            ],
+          },
+        ]
+      : role === 'PARENT'
+        ? [
+            {
+              title: 'Parent',
               items: [
                 [homePath, 'Dashboard', LayoutDashboard],
-                ['/my-courses', 'My Courses', BookOpen],
-                ['/attendance', 'My Attendance', CalendarCheck],
-                ['/assessments', 'My Assessments', FileCheck],
+                ['/parent-report-cards', 'Report Cards', FileText],
+                ['/homework', 'Assignments', ClipboardList],
                 ['/parent/requirements', 'Required Items', ClipboardList],
-                ['/homework', 'Homework', NotebookPen],
-                ['/complaints', 'My Complaints', MessageSquareWarning],
+                ['/attendance', 'Children Attendance', CalendarCheck],
+                ['/messaging', 'Messages', Mail],
+                ['/complaints', 'Complaints', MessageSquareWarning],
                 ['/events', 'Events', CalendarDays],
               ],
             },
           ]
-        : role === 'PARENT'
+        : role === 'DRIVER'
           ? [
               {
-                title: 'Parent',
+                title: 'Transport',
                 items: [
                   [homePath, 'Dashboard', LayoutDashboard],
-                  ['/parent-report-cards', 'Report Cards', FileText],
-                  ['/homework', 'Assignments', ClipboardList],
-                  ['/parent/requirements', 'Required Items', ClipboardList],
-                  ['/attendance', 'Children Attendance', CalendarCheck],
-                  ['/messaging', 'Messages', Mail],
-                  ['/complaints', 'Complaints', MessageSquareWarning],
+                  ['/driver-students', 'My Students', Users],
                   ['/events', 'Events', CalendarDays],
                 ],
               },
             ]
-          : [
+        : [
           {
             title: 'Academics',
             items: [
@@ -145,18 +167,51 @@ const Layout = () => {
               ['/attendance', 'Attendance', CalendarCheck],
               ['/exams', 'Exams', FileSearch],
               ['/fees', 'Fees', CreditCard],
+              ['/health', 'Health Records', HeartPulse],
+              ['/discipline', 'Discipline', AlertTriangle],
+              ['/alumni', 'Alumni Network', GraduationCap],
+              ['/parent-teacher-meetings', 'PT Meetings', CalendarClock],
+              ['/payroll', 'Payroll', Wallet],
               ['/library', 'Library', BookMarked],
               ['/messaging', 'Messages', Mail],
               ['/complaints', 'Complaints', MessageSquareWarning],
               ['/events', 'Events', CalendarDays],
+              ['/drivers', 'Drivers', BusFront],
               ['/reports', 'Reports', BarChart3],
             ],
           },
         ];
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      <aside className={`flex flex-col bg-brand-navy text-white transition-all duration-300 ease-in-out ${collapsed ? 'w-full lg:w-16' : 'w-full lg:w-80 xl:w-96'} lg:min-h-screen`}>
+    <div className="min-h-screen flex">
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={closeMobileMenu} />
+      )}
+
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-brand-navy text-white px-4 py-3 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          className="p-2 text-white hover:text-brand-orange focus:outline-none focus:ring-2 focus:ring-brand-orange/30 rounded-lg"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        <h1 className="text-base font-bold">EduGuide Schools</h1>
+        <div className="w-10" />
+      </header>
+
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-50 bg-brand-navy text-white overflow-y-auto transition-transform duration-300 ease-in-out
+          ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0 lg:static lg:z-auto
+          w-80 min-w-[280px]
+          lg:w-16 lg:min-w-[64px]
+          ${!collapsed ? 'lg:w-80 lg:min-w-[280px] xl:w-96' : ''}
+          lg:min-h-screen
+        `}
+      >
         <div className="border-b border-white/10 px-4 py-5 lg:px-6 lg:py-6">
           <div className="flex items-center justify-between gap-2">
             {!collapsed && (
@@ -169,7 +224,13 @@ const Layout = () => {
               </div>
             )}
             <button
-              onClick={() => setCollapsed((v) => !v)}
+              onClick={() => {
+                if (window.innerWidth < 1024) {
+                  closeMobileMenu();
+                } else {
+                  setCollapsed((v) => !v);
+                }
+              }}
               className="rounded-lg border border-white/20 p-1.5 text-white/60 hover:bg-brand-orange/20 hover:text-white"
               aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
@@ -195,28 +256,29 @@ const Layout = () => {
                   {group.title}
                 </p>
               )}
-               <div className="space-y-1">
-                 {group.items.map(([to, label, Icon]) => (
-                   <NavLink
-                     key={to}
-                     to={to}
-                     className={navLinkClass}
-                     end={to === homePath}
-                     title={collapsed ? label : undefined}
-                   >
-                     {collapsed ? (
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-orange/30 text-white">
-                         <Icon className="h-4 w-4" />
-                       </span>
-                     ) : (
-                       <span className="flex items-center gap-3">
-                         <Icon className="h-4 w-4 shrink-0" />
-                         <span>{label}</span>
-                       </span>
-                     )}
-                   </NavLink>
-                 ))}
-               </div>
+              <div className="space-y-1">
+                {group.items.map(([to, label, Icon]) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    className={navLinkClass}
+                    end={to === homePath}
+                    title={collapsed ? label : undefined}
+                    onClick={closeMobileMenu}
+                  >
+                    {collapsed ? (
+                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-orange/30 text-white">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-3">
+                        <Icon className="h-4 w-4 shrink-0" />
+                        <span>{label}</span>
+                      </span>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
             </section>
           ))}
         </nav>
@@ -238,7 +300,7 @@ const Layout = () => {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden pt-16 lg:pt-0">
         <div className="mx-auto flex min-h-screen w-full max-w-[1600px] flex-col px-4 py-4 sm:px-6 lg:px-8">
           <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">
             <div>

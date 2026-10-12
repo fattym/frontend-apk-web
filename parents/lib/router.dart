@@ -37,6 +37,11 @@ import 'features/messaging/pages/new_chat_page.dart';
 import 'features/onboarding/welcome_page.dart';
 import 'features/onboarding/onboarding_page.dart';
 import 'features/transport/pages/bus_tracker_page.dart';
+import 'features/health/pages/child_health_page.dart';
+import 'features/discipline/pages/child_discipline_page.dart';
+import 'features/alumni/pages/alumni_network_page.dart';
+import 'features/parent_meetings/pages/my_meetings_page.dart';
+import 'features/payroll/pages/payslips_page.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/welcome',
@@ -78,14 +83,20 @@ final GoRouter router = GoRouter(
         GoRoute(path: '/course-studio', builder: (context, state) => const CourseStudioPage()),
         GoRoute(path: '/schemes-of-work', builder: (context, state) => const SchemesOfWorkPage()),
         GoRoute(path: '/assessments', builder: (context, state) => const AssessmentsPage()),
+        GoRoute(path: '/my-assessments', builder: (context, state) => const AssessmentsPage()),
         GoRoute(path: '/teacher-assignments', builder: (context, state) => const TeacherAssignmentsPage()),
         GoRoute(path: '/attendance', builder: (context, state) => const AttendancePage()),
         GoRoute(path: '/homework', builder: (context, state) => const HomeworkPage()),
         GoRoute(path: '/learner-groups', builder: (context, state) => const LearnerGroupsPage()),
         GoRoute(path: '/clubs-activities', builder: (context, state) => const ClubsActivitiesPage()),
         GoRoute(path: '/complaints', builder: (context, state) => const ComplaintsPage()),
-        GoRoute(path: '/events', builder: (context, state) => const EventsPage()),
-        GoRoute(path: '/messages', builder: (context, state) => const ChatPage()),
+         GoRoute(path: '/events', builder: (context, state) => const EventsPage()),
+         GoRoute(path: '/health-records', builder: (context, state) => const ChildHealthPage()),
+         GoRoute(path: '/discipline', builder: (context, state) => const ChildDisciplinePage()),
+         GoRoute(path: '/alumni', builder: (context, state) => const AlumniNetworkPage()),
+         GoRoute(path: '/meetings', builder: (context, state) => const MyMeetingsPage()),
+         GoRoute(path: '/payroll', builder: (context, state) => const PayslipsPage()),
+         GoRoute(path: '/messages', builder: (context, state) => const ChatPage()),
         GoRoute(
           path: '/messages/:id',
           builder: (context, state) => ConversationDetailPage(
@@ -199,7 +210,7 @@ class _LoginFormState extends State<LoginForm> {
       width: double.infinity,
       padding: const EdgeInsets.all(kSpacing24),
       decoration: BoxDecoration(
-        color: kWhite,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(kRadiusLg),
         boxShadow: kClayRaisedShadows,
       ),
@@ -444,23 +455,36 @@ class MainShell extends StatelessWidget {
       ];
       routes = ['/dashboard', '/bus-tracker', '/messages'];
     } else {
-      destinations = [
-        const NavigationDestination(icon: Icon(Icons.storefront), label: 'Shop'),
-        const NavigationDestination(icon: Icon(Icons.announcement), label: 'News'),
-        const NavigationDestination(icon: Icon(Icons.receipt_long), label: 'Orders'),
-        const NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-        const NavigationDestination(icon: Icon(Icons.directions_bus), label: 'Bus Tracker'),
-        const NavigationDestination(icon: Icon(Icons.menu_book), label: 'Courses'),
-        const NavigationDestination(icon: Icon(Icons.schedule), label: 'Timetable'),
-        const NavigationDestination(icon: Icon(Icons.message), label: 'Messages'),
-        if (role == 'PARENT')
-          const NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'Items'),
-      ];
-      routes = [
-        '/', '/announcements', '/orders', '/dashboard', '/bus-tracker',
-        '/courses', '/timetable', '/messages',
-        if (role == 'PARENT') '/requirements',
-      ];
+          destinations = [
+            const NavigationDestination(icon: Icon(Icons.storefront), label: 'Shop'),
+            const NavigationDestination(icon: Icon(Icons.announcement), label: 'News'),
+            const NavigationDestination(icon: Icon(Icons.receipt_long), label: 'Orders'),
+            const NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+            if (role == 'PARENT') const NavigationDestination(icon: Icon(Icons.medical_services), label: 'Health'),
+            if (role == 'PARENT') const NavigationDestination(icon: Icon(Icons.warning_amber), label: 'Discipline'),
+            const NavigationDestination(icon: Icon(Icons.school_outlined), label: 'Assessments'),
+            if (role == 'PARENT') const NavigationDestination(icon: Icon(Icons.menu_book, color: kTeal), label: 'Alumni'),
+            if (role == 'PARENT') const NavigationDestination(icon: Icon(Icons.meeting_room), label: 'Meetings'),
+            if (role == 'TEACHER' || role == 'STAFF') const NavigationDestination(icon: Icon(Icons.account_balance_wallet), label: 'Payroll'),
+            const NavigationDestination(icon: Icon(Icons.directions_bus), label: 'Bus Tracker'),
+            const NavigationDestination(icon: Icon(Icons.menu_book), label: 'Courses'),
+            const NavigationDestination(icon: Icon(Icons.schedule), label: 'Timetable'),
+            const NavigationDestination(icon: Icon(Icons.message), label: 'Messages'),
+            if (role == 'PARENT')
+              const NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'Items'),
+          ];
+          routes = [
+            '/', '/announcements', '/orders', '/dashboard',
+            if (role == 'PARENT') '/health-records',
+            if (role == 'PARENT') '/discipline',
+            '/my-assessments',
+            if (role == 'PARENT') '/alumni',
+            if (role == 'PARENT') '/meetings',
+            if (role == 'TEACHER' || role == 'STAFF') '/payroll',
+            '/bus-tracker',
+            '/courses', '/timetable', '/messages',
+            if (role == 'PARENT') '/requirements',
+          ];
     }
 
     if (isTeacher) {
@@ -508,6 +532,12 @@ class MainShell extends StatelessWidget {
                 break;
               case 12:
                 context.go('/events');
+                break;
+              case 13:
+                context.go('/meetings');
+                break;
+              case 14:
+                context.go('/payroll');
                 break;
             }
           },
