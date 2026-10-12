@@ -18,6 +18,7 @@ const STATS = [
   { key: 'teacherAssignments', label: 'Teacher Assignments', endpoint: '/api/academics/teacher-assignments/', link: '/teacher-assignments', accent: 'text-brand-orange' },
   { key: 'complaints', label: 'Open Complaints', endpoint: '/api/complaints/complaints/?status=Pending', link: '/complaints', accent: 'text-brand-orange' },
   { key: 'events', label: 'Events', endpoint: '/api/events/events/', link: '/events', accent: 'text-brand-orange' },
+  { key: 'drivers', label: 'Drivers', endpoint: '/api/auth/users/?role=DRIVER', link: '/drivers', accent: 'text-brand-orange' },
 ];
 
 const QUICK_LINKS = [
@@ -32,6 +33,7 @@ const QUICK_LINKS = [
   ['/messaging', 'Messaging'],
   ['/complaints', 'Complaints'],
   ['/events', 'Events'],
+  ['/drivers', 'Drivers'],
   ['/schools', 'Schools'],
 ];
 
@@ -41,6 +43,35 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [recent, setRecent] = useState({ complaints: [], events: [] });
   const [ov, setOv] = useState(null);
+
+  const [grades, setGrades] = useState([]);
+  const [newName, setNewName] = useState('');
+  const [newGrade, setNewGrade] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
+  const canManage = user?.role === 'ADMIN' || user?.is_staff;
+
+  const createStream = async (e) => {
+    e.preventDefault();
+    if (!newName || !newGrade || !user?.school) return;
+    setSaving(true);
+    setSaveError('');
+    try {
+      await api.post('/api/academics/streams/', {
+        name: newName,
+        grade: Number(newGrade),
+        school: user.school,
+      });
+      setNewName('');
+      setNewGrade('');
+      setSaveError('Stream added. Streams list will reflect on next visit to Class.');
+    } catch (e) {
+      setSaveError(`Could not create stream (${e.toString().split(':').first}).`);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   useEffect(() => {
     let active = true;
@@ -59,13 +90,16 @@ const Dashboard = () => {
   useEffect(() => {
     let active = true;
     Promise.all([
+      api.get('/api/academics/grades/').then((r) => (r.data.results || r.data)).catch(() => []),
       api.get('/api/complaints/complaints/?limit=5').then((r) => r.data.results || r.data).catch(() => []),
       api.get('/api/events/events/?limit=5').then((r) => r.data.results || r.data).catch(() => []),
       api.get('/api/reports/overview/').then((r) => r.data).catch(() => null),
-    ]).then(([complaints, events, overview]) => {
+    ]).then(([gradesRes, complaints, events, overview]) => {
       if (!active) return;
+      setGrades(gradesRes);
       setRecent({ complaints: complaints.slice(0, 5), events: events.slice(0, 5) });
       setOv(overview);
+      setLoading(false);
     });
     return () => { active = false; };
   }, []);
@@ -83,6 +117,53 @@ const Dashboard = () => {
           </Link>
         ))}
       </div>
+
+      {canManage && (
+        <div className="bg-white rounded-2xl shadow p-6 mb-8">
+          <h2 className="text-xl font-semibold text-brand-navy mb-3">Add a Stream</h2>
+          {saveError && <p className="mb-3 text-sm text-green-700">{saveError}</p>}
+          <form onSubmit={createStream} className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+            <div>
+              <label className="block text-xs font-medium text-brand-navy/60 mb-1">Stream Name</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="e.g. 1A"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-brand-navy/60 mb-1">Grade</label>
+              <select
+                className="w-full border rounded px-3 py-2"
+                value={newGrade}
+                onChange={(e) => setNewGrade(e.target.value)}
+                required
+              >
+                <option value="">Select grade</option>
+                {grades.map((g) => (
+                  <option key={g.id} value={g.id}>{g.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-medium text-brand-navy/60 mb-1">School</label>
+              <input className="w-full border rounded px-3 py-2 bg-brand-grayLight" value={user?.first_name ? `${user.first_name}'s School` : ''} readOnly />
+              <p className="text-[10px] text-brand-navy/50 mt-1">Streams are scoped to your school (ID {user?.school}).</p>
+            </div>
+            <div>
+              <button
+                type="submit"
+                disabled={saving || !newName || !newGrade}
+                className="w-full bg-brand-orange text-white py-2 rounded hover:bg-orange-600 disabled:opacity-50"
+              >
+                {saving ? 'Creating…' : 'Create Stream'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {ov && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

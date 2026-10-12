@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenya CBC Portal - Teacher & Parent Learner Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Competency Radar & Visuals -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        cbc: {
+                            ee: '#059669', // Exceeding Expectations (Level 4)
+                            eebg: '#d1fae5',
+                            me: '#2563eb', // Meeting Expectations (Level 3)
+                            mebg: '#dbeafe',
+                            ae: '#d97706', // Approaching Expectations (Level 2)
+                            aebg: '#fef3c7',
+                            be: '#e11d48', // Below Expectations (Level 1)
+                            bebg: '#ffe4e6',
+                            brand: '#0d9488',
+                            branddark: '#0f766e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+        }
+        .sidebar-item-active {
+            background: linear-gradient(90deg, #0d9488 0%, #0f766e 100%);
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Print styles optimization for KNEC report cards */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .main-content-area {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            .report-card-print {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 no-print z-30 transition-all duration-300">
+        <div>
+            <!-- School Brand Header -->
+            <div class="p-4 border-b border-slate-800 flex items-center space-x-3 bg-slate-950">
+                <div class="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <h1 class="text-sm font-bold text-white leading-tight truncate">Mwangaza School</h1>
+                    <p class="text-[11px] text-teal-400 font-mono">CBC Portal & KNEC Hub</p>
+                </div>
+            </div>
+
+            <!-- Role Switcher Control -->
+            <div class="p-3">
+                <div class="bg-slate-800 p-1 rounded-xl flex text-xs font-semibold">
+                    <button id="modeBtnTeacher" onclick="switchRole('teacher')" class="flex-1 py-1.5 rounded-lg text-center bg-teal-600 text-white shadow transition-all">
+                        <i class="fa-solid fa-chalkboard-user mr-1"></i> Teacher
+                    </button>
+                    <button id="modeBtnParent" onclick="switchRole('parent')" class="flex-1 py-1.5 rounded-lg text-center text-slate-400 hover:text-white transition-all">
+                        <i class="fa-solid fa-people-roof mr-1"></i> Parent
+                    </button>
+                </div>
+            </div>
+
+            <!-- TEACHER NAVIGATION LINKS -->
+            <nav id="teacherNav" class="px-3 py-2 space-y-1">
+                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-1">Teacher Management</div>
+                
+                <a href="#" onclick="switchTeacherTab('dashboard')" id="nav-t-dashboard" class="sidebar-item sidebar-item-active flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>Teacher Dashboard</span>
+                </a>
+
+                <a href="#" onclick="switchTeacherTab('assessments')" id="nav-t-assessments" class="sidebar-item text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-clipboard-check w-5 text-center"></i>
+                    <span>Assessment Hub</span>
+                </a>
+
+                <a href="#" onclick="switchTeacherTab('gradebook')" id="nav-t-gradebook" class="sidebar-item text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-pen-to-square w-5 text-center"></i>
+                    <span>Formative Gradebook</span>
+                </a>
+
+                <a href="#" onclick="switchTeacherTab('schemes')" id="nav-t-schemes" class="sidebar-item text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-book-bookmark w-5 text-center"></i>
+                    <span>Schemes & Lessons</span>
+                </a>
+
+                <a href="#" onclick="switchTeacherTab('interventions')" id="nav-t-interventions" class="sidebar-item text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-hand-holding-hand w-5 text-center"></i>
+                    <span>Remedial & Support</span>
+                </a>
+
+                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mt-4 mb-1">Reports</div>
+
+                <a href="#" onclick="switchTeacherTab('broadsheet')" id="nav-t-broadsheet" class="sidebar-item text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-file-invoice w-5 text-center"></i>
+                    <span>KNEC Broadsheet</span>
+                </a>
+            </nav>
+
+            <!-- PARENT NAVIGATION LINKS -->
+            <nav id="parentNav" class="px-3 py-2 space-y-1 hidden">
+                <div class="text-[10px] font-bold text-teal-400 uppercase tracking-wider px-3 mb-1">Parent & Guardian Hub</div>
+                
+                <a href="#" onclick="switchParentTab('p-dashboard')" id="nav-p-dashboard" class="sidebar-item sidebar-item-active flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-child-reaching w-5 text-center"></i>
+                    <span>Child Overview</span>
+                </a>
+
+                <a href="#" onclick="switchParentTab('p-analytics')" id="nav-p-analytics" class="sidebar-item text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-chart-radar w-5 text-center"></i>
+                    <span>Competency Analytics</span>
+                </a>
+
+                <a href="#" onclick="switchParentTab('p-portfolio')" id="nav-p-portfolio" class="sidebar-item text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-photo-film w-5 text-center"></i>
+                    <span>Portfolio & Evidence</span>
+                </a>
+
+                <a href="#" onclick="switchParentTab('p-reportcard')" id="nav-p-reportcard" class="sidebar-item text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-award w-5 text-center"></i>
+                    <span>Official Report Card</span>
+                </a>
+
+                <a href="#" onclick="switchParentTab('p-homework')" id="nav-p-homework" class="sidebar-item text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+                    <i class="fa-solid fa-house-laptop w-5 text-center"></i>
+                    <span>Home Support & Notes</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- USER FOOTER PROFILE -->
+        <div class="p-3 border-t border-slate-800 bg-slate-950/50">
+            <!-- Teacher info -->
+            <div id="teacherProfileBar" class="flex items-center space-x-3">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Teacher Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-teal-500">
+                <div class="overflow-hidden">
+                    <p class="text-xs font-semibold text-white truncate">Tr. Agnes Mutua</p>
+                    <p class="text-[10px] text-slate-400 truncate">Senior Lead - Grade 6</p>
+                </div>
+            </div>
+
+            <!-- Parent info -->
+            <div id="parentProfileBar" class="flex items-center space-x-3 hidden">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80" alt="Parent Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-500">
+                <div class="overflow-hidden">
+                    <p class="text-xs font-semibold text-white truncate">Mrs. Esther Juma</p>
+                    <p class="text-[10px] text-emerald-400 truncate"><i class="fa-solid fa-circle-check"></i> Verified Parent</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden main-content-area">
+        <!-- TOP HEADER -->
+        <header class="bg-white border-b border-slate-200 h-16 px-6 flex items-center justify-between shrink-0 no-print z-20">
+            <div class="flex items-center space-x-4">
+                <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Teacher Dashboard</h2>
+                <span class="bg-teal-50 text-teal-700 text-xs px-2.5 py-1 rounded-full font-semibold border border-teal-200">
+                    Term 2 - 2026
+                </span>
+            </div>
+
+            <!-- Header Right: Parent Child Switcher OR Teacher Assessment Button -->
+            <div class="flex items-center space-x-3">
+                
+                <!-- Child Switcher Dropdown (Only visible in Parent Mode) -->
+                <div id="childSwitcherContainer" class="hidden flex items-center space-x-2 bg-emerald-50 border border-emerald-200 p-1.5 px-3 rounded-xl">
+                    <i class="fa-solid fa-child text-emerald-600"></i>
+                    <span class="text-xs font-bold text-slate-700 hidden sm:inline">Active Child:</span>
+                    <select id="childSelectDropdown" onchange="changeActiveChild(this.value)" class="bg-white text-xs font-bold text-emerald-800 border border-emerald-300 rounded-lg py-1 px-2 focus:ring-2 focus:ring-emerald-500">
+                        <option value="13K001">Amani Juma (Grade 6 East)</option>
+                        <option value="13K006">Zawadi Juma (Grade 3 North)</option>
+                    </select>
+                </div>
+
+                <!-- Create Assessment CTA (Only visible in Teacher Mode) -->
+                <button id="teacherNewAssessBtn" onclick="openAssessmentModal()" class="bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center space-x-2 transition-all shadow-md">
+                    <i class="fa-solid fa-circle-plus text-sm"></i>
+                    <span class="hidden sm:inline">New CBC Assessment</span>
+                </button>
+
+                <!-- Global Print Trigger -->
+                <button onclick="triggerPrint()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold p-2.5 rounded-xl transition-all" title="Print View">
+                    <i class="fa-solid fa-print text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- VIEW CONTAINER -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6" id="mainContainer">
+
+            <!-- ========================================== -->
+            <!--           1. TEACHER PORTAL VIEWS          -->
+            <!-- ========================================== -->
+
+            <!-- TEACHER DASHBOARD VIEW -->
+            <div id="view-t-dashboard" class="tab-view space-y-6">
+                <!-- Metrics Bar -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-500">Grade 6 Learners</p>
+                            <h3 class="text-2xl font-bold text-slate-800">38 Enrolled</h3>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-square-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-500">Active CBC Tasks</p>
+                            <h3 class="text-2xl font-bold text-blue-700" id="totalAssessmentsBadge">6 Tasks</h3>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-500">Class Mastery Index</p>
+                            <h3 class="text-2xl font-bold text-emerald-600">84.2% <span class="text-xs text-slate-400">(ME Avg)</span></h3>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-500">Remedial Flagged</p>
+                            <h3 class="text-2xl font-bold text-amber-600">4 Learners</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Tasks & Teacher Action Panel -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-teal-600"></i>
+                                Formative Assessment Tasks
+                            </h3>
+                            <button onclick="openAssessmentModal()" class="text-xs font-semibold text-teal-600 hover:text-teal-800">
+                                + Add Task
+                            </button>
+                        </div>
+                        <div class="space-y-3" id="dashboardAssessmentList">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-amber-500"></i>
+                            Quick Actions
+                        </h3>
+                        <div class="space-y-2">
+                            <button onclick="openAssessmentModal()" class="w-full text-left p-3 rounded-xl border border-slate-200 bg-white hover:border-teal-500 hover:shadow-md transition-all flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-all">
+                                        <i class="fa-solid fa-clipboard-question"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-800">Create Assessment Modal</p>
+                                        <p class="text-[10px] text-slate-400">Task setup & student matrix</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-teal-600"></i>
+                            </button>
+
+                            <button onclick="switchTeacherTab('gradebook')" class="w-full text-left p-3 rounded-xl border border-slate-200 bg-white hover:border-teal-500 hover:shadow-md transition-all flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                        <i class="fa-solid fa-award"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-800">Formative Gradebook</p>
+                                        <p class="text-[10px] text-slate-400">Batch mark EE, ME, AE, BE</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-blue-600"></i>
+                            </button>
+
+                            <button onclick="switchRole('parent')" class="w-full text-left p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100/50 transition-all flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-emerald-900">Switch to Parent Preview</p>
+                                        <p class="text-[10px] text-emerald-700">Test parent portal experience</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-xs text-emerald-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEACHER ASSESSMENT HUB VIEW -->
+            <div id="view-t-assessments" class="tab-view space-y-6 hidden">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">CBC Assessment Hub</h3>
+                        <p class="text-xs text-slate-500">Design, evaluate, and publish KICD/KNEC aligned tasks.</p>
+                    </div>
+                    <button onclick="openAssessmentModal()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition-all shadow-md">
+                        <i class="fa-solid fa-circle-plus"></i>
+                        <span>New CBC Assessment Task</span>
+                    </button>
+                </div>
+
+                <div id="assessmentsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- TEACHER FORMATIVE GRADEBOOK VIEW -->
+            <div id="view-t-gradebook" class="tab-view space-y-6 hidden">
+                <div class="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">Strand-Level Formative Assessment Entry</h3>
+                            <p class="text-xs text-slate-500">Record rubric ratings (EE, ME, AE, BE) per learning area.</p>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-100 p-2 rounded-xl text-xs">
+                            <span class="font-semibold text-slate-600">Batch Mark All:</span>
+                            <button onclick="batchMarkRubric('EE')" class="bg-emerald-600 text-white px-2 py-1 rounded font-bold hover:bg-emerald-700">EE</button>
+                            <button onclick="batchMarkRubric('ME')" class="bg-blue-600 text-white px-2 py-1 rounded font-bold hover:bg-blue-700">ME</button>
+                            <button onclick="batchMarkRubric('AE')" class="bg-amber-600 text-white px-2 py-1 rounded font-bold hover:bg-amber-700">AE</button>
+                            <button onclick="batchMarkRubric('BE')" class="bg-rose-600 text-white px-2 py-1 rounded font-bold hover:bg-rose-700">BE</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Learning Area</label>
+                            <select id="gradebookSubject" onchange="renderTeacherGradebookTable()" class="w-full bg-white text-xs border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-teal-500">
+                                <option value="Science & Technology">Science & Technology</option>
+                                <option value="Agriculture & Nutrition">Agriculture & Nutrition</option>
+                                <option value="Mathematics">Mathematics</option>
+                                <option value="Creative Arts">Creative Arts</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Strand</label>
+                            <input type="text" value="Living Things & Environment" class="w-full bg-white text-xs border border-slate-300 rounded-lg p-2">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Sub-strand Task</label>
+                            <input type="text" value="Water Purification Practical" class="w-full bg-white text-xs border border-slate-300 rounded-lg p-2">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 font-semibold uppercase">
+                                    <th class="p-3">UPI / Admin</th>
+                                    <th class="p-3">Learner Name</th>
+                                    <th class="p-3 text-center">Rubric Rating</th>
+                                    <th class="p-3">Qualitative Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacherGradebookTableBody" class="divide-y divide-slate-200 bg-white">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEACHER SCHEMES VIEW -->
+            <div id="view-t-schemes" class="tab-view space-y-6 hidden">
+                <div class="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <h3 class="text-lg font-bold text-slate-800">CBC Schemes of Work & Lesson Planner</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 uppercase font-semibold">
+                                    <th class="p-3">Wk</th>
+                                    <th class="p-3">Subject / Strand</th>
+                                    <th class="p-3">Outcomes</th>
+                                    <th class="p-3">Key Inquiry Question</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schemesTableBody" class="divide-y divide-slate-200 bg-white">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEACHER INTERVENTIONS VIEW -->
+            <div id="view-t-interventions" class="tab-view space-y-6 hidden">
+                <div class="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <h3 class="text-lg font-bold text-slate-800">AfL & Remedial Support Log</h3>
+                    <div id="interventionList" class="space-y-3">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEACHER BROADSHEET VIEW -->
+            <div id="view-t-broadsheet" class="tab-view space-y-6 hidden">
+                <div class="bg-white p-8 rounded-2xl border border-slate-300 shadow-md space-y-6 text-slate-900">
+                    <div class="text-center border-b-2 border-slate-900 pb-4">
+                        <h1 class="text-xl font-black uppercase tracking-wider">MWANGAZA PRIMARY SCHOOL</h1>
+                        <p class="text-xs font-semibold">P.O. BOX 402 - 00100, NAIROBI | NEMIS CODE: 13K-0982</p>
+                        <p class="text-xs font-bold text-teal-700 uppercase mt-1">OFFICIAL CBC FORMATIVE BROADSHEET - GRADE 6 EAST</p>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left border-collapse border border-slate-300">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300 uppercase">
+                                    <th class="border border-slate-300 p-2">UPI</th>
+                                    <th class="border border-slate-300 p-2">Learner Name</th>
+                                    <th class="border border-slate-300 p-2 text-center">Science & Tech</th>
+                                    <th class="border border-slate-300 p-2 text-center">Agri & Nut</th>
+                                    <th class="border border-slate-300 p-2 text-center">Mathematics</th>
+                                    <th class="border border-slate-300 p-2 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="broadsheetTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ========================================== -->
+            <!--           2. PARENT PORTAL VIEWS           -->
+            <!-- ========================================== -->
+
+            <!-- PARENT OVERVIEW DASHBOARD -->
+            <div id="view-p-dashboard" class="tab-view space-y-6 hidden">
+                
+                <!-- Child Hero Summary Card -->
+                <div class="bg-gradient-to-r from-teal-800 via-teal-700 to-slate-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div class="flex items-center space-x-5 z-10">
+                        <img id="parentChildPhoto" src="" class="w-20 h-20 rounded-2xl object-cover ring-4 ring-white/30 shadow-md">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h2 id="parentChildName" class="text-2xl font-bold">Amani Juma</h2>
+                                <span id="parentChildGradeBadge" class="bg-teal-500/40 text-teal-200 text-xs px-2.5 py-0.5 rounded-full font-semibold border border-teal-400/30">Grade 6 East</span>
+                            </div>
+                            <p class="text-xs text-teal-200 mt-1">UPI: <span id="parentChildUPI" class="font-mono font-bold text-white"></span> | NEMIS Verified</p>
+                            
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                <span class="bg-white/10 backdrop-blur-md text-white text-[11px] px-3 py-1 rounded-lg border border-white/10 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-calendar-check text-emerald-400"></i>
+                                    Attendance: <strong id="parentChildAttendance">98.5%</strong>
+                                </span>
+                                <span class="bg-white/10 backdrop-blur-md text-white text-[11px] px-3 py-1 rounded-lg border border-white/10 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-award text-amber-400"></i>
+                                    Band: <strong id="parentChildBand" class="text-emerald-300 font-black">EE (Exceeding)</strong>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="z-10 flex flex-col items-start md:items-end space-y-2">
+                        <button onclick="switchParentTab('p-reportcard')" class="bg-white text-teal-900 hover:bg-teal-50 font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center space-x-2">
+                            <i class="fa-solid fa-file-pdf text-rose-600"></i>
+                            <span>View Term 2 Report Card</span>
+                        </button>
+                        <p class="text-[10px] text-teal-200">Last updated by Tr. Agnes Mutua • Today</p>
+                    </div>
+                </div>
+
+                <!-- Learning Area Rubric Performance Cards -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-teal-600"></i>
+                        Learning Areas Rubric Summary
+                    </h3>
+                    
+                    <div id="parentSubjectSummaryGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Core Values & Recent Teacher Notes Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Values Matrix Card -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-heart text-rose-500"></i>
+                            CBC Core Values Development
+                        </h3>
+                        
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between items-center p-2.5 bg-emerald-50 rounded-xl border border-emerald-100">
+                                <span class="font-semibold text-slate-700">Responsibility & Cleanliness</span>
+                                <span class="px-2 py-0.5 bg-emerald-600 text-white rounded font-bold text-[10px]">EE - Always Exemplary</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2.5 bg-blue-50 rounded-xl border border-blue-100">
+                                <span class="font-semibold text-slate-700">Respect & Social Justice</span>
+                                <span class="px-2 py-0.5 bg-blue-600 text-white rounded font-bold text-[10px]">ME - Consistently Polite</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2.5 bg-blue-50 rounded-xl border border-blue-100">
+                                <span class="font-semibold text-slate-700">Integrity & Honesty</span>
+                                <span class="px-2 py-0.5 bg-blue-600 text-white rounded font-bold text-[10px]">ME - Trustworthy</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Teacher Notes Card -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-comment-dots text-blue-500"></i>
+                            Teacher Remarks & Observation Log
+                        </h3>
+
+                        <div class="space-y-3 text-xs" id="parentTeacherNotesLog">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARENT COMPETENCY ANALYTICS VIEW -->
+            <div id="view-p-analytics" class="tab-view space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Core Competencies Radar -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-chart-radar text-teal-600"></i>
+                            7 Core Competencies Growth Radar
+                        </h3>
+                        <p class="text-xs text-slate-500">Visual mapping of learner performance across KNEC core competencies.</p>
+                        
+                        <div class="w-full h-72">
+                            <canvas id="parentCompetencyRadarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Strand Breakdown List -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-bars-staggered text-teal-600"></i>
+                            Strand-by-Strand Evaluation Detail
+                        </h3>
+                        
+                        <div class="space-y-3 text-xs overflow-y-auto max-h-80" id="parentStrandDetailList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARENT PORTFOLIO SHOWCASE VIEW -->
+            <div id="view-p-portfolio" class="tab-view space-y-6 hidden">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">Learner Portfolio & Evidence Vault</h3>
+                    <p class="text-xs text-slate-500">Photos, artifacts, and practical project tasks submitted by learner.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="parentPortfolioGrid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- PARENT REPORT CARD VIEW -->
+            <div id="view-p-reportcard" class="tab-view space-y-6 hidden">
+                <div class="flex justify-between items-center no-print">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Official KNEC Assessment Report Card</h3>
+                        <p class="text-xs text-slate-500">Printable termly transcript with official school seal and rubric breakdown.</p>
+                    </div>
+                    <button onclick="triggerPrint()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-2 shadow-md">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Print Official Report Card</span>
+                    </button>
+                </div>
+
+                <!-- Official Report Card Card Component -->
+                <div class="report-card-print bg-white p-8 rounded-2xl border border-slate-300 shadow-xl space-y-6 text-slate-900 max-w-4xl mx-auto">
+                    <!-- School Header -->
+                    <div class="text-center border-b-2 border-slate-900 pb-4 relative">
+                        <div class="flex justify-center items-center space-x-3 mb-1">
+                            <div class="w-12 h-12 rounded-full bg-teal-800 text-white flex items-center justify-center font-bold text-2xl shadow">
+                                M
+                            </div>
+                        </div>
+                        <h1 class="text-xl font-black uppercase tracking-wider">MWANGAZA PRIMARY SCHOOL</h1>
+                        <p class="text-xs font-semibold">P.O. BOX 402 - 00100, NAIROBI | NEMIS CODE: 13K-0982</p>
+                        <p class="text-xs font-bold text-teal-800 uppercase mt-1">COMPETENCY-BASED CURRICULUM (CBC) TERMLY LEARNER REPORT</p>
+                    </div>
+
+                    <!-- Learner Bio Header Bar -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-300 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                        <div><span class="text-slate-500 block">Learner Name:</span> <strong id="rcName" class="text-slate-900 text-sm">Amani Juma</strong></div>
+                        <div><span class="text-slate-500 block">UPI / NEMIS:</span> <strong id="rcUPI" class="font-mono">NEMIS-78192-A</strong></div>
+                        <div><span class="text-slate-500 block">Grade & Stream:</span> <strong id="rcGrade">Grade 6 East</strong></div>
+                        <div><span class="text-slate-500 block">Term & Year:</span> <strong>Term 2 - 2026</strong></div>
+                    </div>
+
+                    <!-- Subject Rubrics Table -->
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-700">1. Learning Area Performance Rubrics</h4>
+                        <table class="w-full text-xs text-left border-collapse border border-slate-300">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300 uppercase">
+                                    <th class="border border-slate-300 p-2">Learning Area</th>
+                                    <th class="border border-slate-300 p-2 text-center">Formative Rating</th>
+                                    <th class="border border-slate-300 p-2">Specific Competency Descriptor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rcSubjectTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Core Competencies & Values Matrix -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="border border-slate-300 p-3 rounded-lg bg-slate-50">
+                            <h5 class="font-bold text-slate-800 uppercase mb-2">2. Core Competencies</h5>
+                            <p class="text-slate-600 mb-1">• Critical Thinking: <strong class="text-emerald-700">Exceeding (EE)</strong></p>
+                            <p class="text-slate-600 mb-1">• Digital Literacy: <strong class="text-blue-700">Meeting (ME)</strong></p>
+                            <p class="text-slate-600">• Creativity & Innovation: <strong class="text-emerald-700">Exceeding (EE)</strong></p>
+                        </div>
+
+                        <div class="border border-slate-300 p-3 rounded-lg bg-slate-50">
+                            <h5 class="font-bold text-slate-800 uppercase mb-2">3. Values & Conduct</h5>
+                            <p class="text-slate-600 mb-1">• Responsibility & Integrity: <strong class="text-emerald-700">Exceeding (EE)</strong></p>
+                            <p class="text-slate-600 mb-1">• Respect & Social Justice: <strong class="text-blue-700">Meeting (ME)</strong></p>
+                            <p class="text-slate-600">• Attendance Rate: <strong class="text-slate-900">98.5%</strong></p>
+                        </div>
+                    </div>
+
+                    <!-- Remarks & Signatures Section -->
+                    <div class="space-y-4 pt-2 border-t border-slate-300 text-xs">
+                        <div>
+                            <span class="font-bold text-slate-800">Class Teacher Remarks:</span>
+                            <p id="rcTeacherRemarks" class="italic bg-slate-50 p-2.5 rounded-lg border border-slate-200 mt-1">
+                                Amani demonstrates exemplary curiosity in Science and practical tasks. Consistently helps peers during group assignments.
+                            </p>
+                        </div>
+
+                        <div>
+                            <span class="font-bold text-slate-800">Head Teacher Recommendation:</span>
+                            <p class="italic text-slate-700 mt-0.5">Recommended for progression to Grade 7 Junior Secondary School pathway.</p>
+                        </div>
+
+                        <!-- Signatures & Parent Digital Acknowledgment Pad -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+                            <div>
+                                <p class="text-slate-400 text-[10px]">Class Teacher Signature</p>
+                                <p class="font-bold text-slate-800 font-serif text-sm mt-1">Tr. Agnes Mutua</p>
+                            </div>
+
+                            <div>
+                                <p class="text-slate-400 text-[10px]">Head Teacher Stamp</p>
+                                <p class="font-bold text-teal-800 font-serif text-sm mt-1">Mr. J. K. Mwangi</p>
+                            </div>
+
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 no-print">
+                                <p class="font-bold text-emerald-900 text-xs">Parent Digital Acknowledgment</p>
+                                <label class="flex items-center space-x-2 mt-2 cursor-pointer">
+                                    <input type="checkbox" id="parentAckCheckbox" onchange="toggleParentAck(this.checked)" class="w-4 h-4 text-emerald-600 rounded">
+                                    <span class="text-[11px] text-emerald-800 font-semibold">I acknowledge reviewing this report</span>
+                                </label>
+                                <p id="ackStatusText" class="text-[10px] text-emerald-600 mt-1 italic hidden"><i class="fa-solid fa-check"></i> Signed by Mrs. Esther Juma</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARENT HOMEWORK & MESSAGES VIEW -->
+            <div id="view-p-homework" class="tab-view space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Home Tasks Panel -->
+                    <div class="lg:col-span-2 glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-house-laptop text-teal-600"></i>
+                            Parent-Guided Home Extension Activities
+                        </h3>
+                        
+                        <div class="space-y-3 text-xs" id="parentHomeworkList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Direct Note to Class Teacher -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane text-teal-600"></i>
+                            Send Note to Class Teacher
+                        </h3>
+                        
+                        <form onsubmit="sendParentNote(event)" class="space-y-3 text-xs">
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">To</label>
+                                <input type="text" value="Tr. Agnes Mutua (Grade 6)" readonly class="w-full bg-slate-100 p-2 rounded-lg border border-slate-200">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Subject</label>
+                                <input type="text" id="parentNoteSubject" placeholder="e.g. Science project materials" required class="w-full bg-white p-2 rounded-lg border border-slate-300">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Message</label>
+                                <textarea id="parentNoteBody" rows="4" placeholder="Write your note..." required class="w-full bg-white p-2 rounded-lg border border-slate-300"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold p-2.5 rounded-xl transition-all">
+                                Send Note
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- TEACHER ASSESSMENT MODAL (4-STEP WIZARD) -->
+    <div id="modalAssessment" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center hidden p-3 sm:p-6 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-4xl w-full my-auto shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+            
+            <!-- Modal Header -->
+            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-teal-500 text-white flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-white">CBC Assessment Task Builder & Evaluator</h3>
+                        <p class="text-[11px] text-teal-400">KICD Formative Task & Direct Scoring Grid</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modalAssessment')" class="text-slate-400 hover:text-white text-lg transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Wizard Steps Header -->
+            <div class="bg-slate-100 border-b border-slate-200 px-6 py-2.5 flex justify-between items-center shrink-0 text-xs">
+                <button id="stepBtn1" onclick="switchAssessmentStep(1)" class="font-bold text-teal-700 bg-teal-100 px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all">
+                    <span>1. Task Metadata</span>
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                <button id="stepBtn2" onclick="switchAssessmentStep(2)" class="font-semibold text-slate-500 px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all">
+                    <span>2. Competencies & Values</span>
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                <button id="stepBtn3" onclick="switchAssessmentStep(3)" class="font-semibold text-slate-500 px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all">
+                    <span>3. Rubric Descriptors</span>
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                <button id="stepBtn4" onclick="switchAssessmentStep(4)" class="font-semibold text-slate-500 px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all">
+                    <span>4. Live Student Scoring</span>
+                </button>
+            </div>
+
+            <!-- Modal Steps Body -->
+            <div class="p-6 overflow-y-auto space-y-5 flex-1 text-xs">
+
+                <!-- STEP 1 -->
+                <div id="assessStep1" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Learning Area *</label>
+                            <select id="modalSubject" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+                                <option value="Science & Technology">Science & Technology</option>
+                                <option value="Agriculture & Nutrition">Agriculture & Nutrition</option>
+                                <option value="Mathematics">Mathematics</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Grade Level *</label>
+                            <select id="modalGrade" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+                                <option value="Grade 6 East">Grade 6 East</option>
+                                <option value="Grade 3 North">Grade 3 North</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Task Type *</label>
+                            <select id="modalTaskType" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+                                <option value="Practical Performance Task">Practical Performance Task</option>
+                                <option value="Project-Based Learning">Project-Based Learning (P5)</option>
+                                <option value="Observation Rubric">Teacher Observation Rubric</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Strand Name *</label>
+                            <input type="text" id="modalStrand" value="Living Things & Environment" class="w-full p-2.5 border border-slate-300 rounded-xl">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Sub-strand Task *</label>
+                            <input type="text" id="modalSubstrand" value="Water Filtration & Natural Purification" class="w-full p-2.5 border border-slate-300 rounded-xl">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div id="assessStep2" class="space-y-4 hidden">
+                    <label class="block font-bold text-slate-800 text-sm mb-2">Tag Target Core Competencies</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="p-2 bg-slate-50 border rounded-lg flex items-center space-x-2"><input type="checkbox" checked><span class="font-semibold">Critical Thinking & Problem Solving</span></label>
+                        <label class="p-2 bg-slate-50 border rounded-lg flex items-center space-x-2"><input type="checkbox" checked><span class="font-semibold">Creativity & Innovation</span></label>
+                        <label class="p-2 bg-slate-50 border rounded-lg flex items-center space-x-2"><input type="checkbox"><span class="font-semibold">Digital Literacy</span></label>
+                        <label class="p-2 bg-slate-50 border rounded-lg flex items-center space-x-2"><input type="checkbox" checked><span class="font-semibold">Communication & Collaboration</span></label>
+                    </div>
+                </div>
+
+                <!-- STEP 3 -->
+                <div id="assessStep3" class="space-y-3 hidden">
+                    <p class="font-bold text-slate-800 text-sm">4-Level Performance Assessment Rubrics</p>
+                    <div class="p-2 bg-emerald-50 border border-emerald-200 rounded-lg"><span class="font-bold text-emerald-800">EE:</span> Constructs apparatus independently and purifies water flawlessly.</div>
+                    <div class="p-2 bg-blue-50 border border-blue-200 rounded-lg"><span class="font-bold text-blue-800">ME:</span> Constructs filter apparatus with minimal support.</div>
+                    <div class="p-2 bg-amber-50 border border-amber-200 rounded-lg"><span class="font-bold text-amber-800">AE:</span> Assembles filter but water remains turbid; needs guidance.</div>
+                    <div class="p-2 bg-rose-50 border border-rose-200 rounded-lg"><span class="font-bold text-rose-800">BE:</span> Struggles with assembly; needs teacher demonstration.</div>
+                </div>
+
+                <!-- STEP 4 -->
+                <div id="assessStep4" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between bg-teal-50 p-3 rounded-xl border border-teal-200">
+                        <p class="font-bold text-teal-900">Score Learners Live for Grade 6 East</p>
+                        <div class="space-x-1">
+                            <button onclick="batchSetModalRubric('EE')" class="px-2 py-1 bg-emerald-600 text-white font-bold rounded">All EE</button>
+                            <button onclick="batchSetModalRubric('ME')" class="px-2 py-1 bg-blue-600 text-white font-bold rounded">All ME</button>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <th class="p-2.5">Learner</th>
+                                    <th class="p-2.5 text-center">Score</th>
+                                    <th class="p-2.5">Teacher Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalScoringTableBody" class="divide-y divide-slate-200 bg-white">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 border-t border-slate-200 px-6 py-3 flex justify-between items-center shrink-0">
+                <button id="modalPrevBtn" onclick="navigateAssessmentStep(-1)" class="px-4 py-2 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 disabled:opacity-50">
+                    Previous
+                </button>
+                <div class="flex items-center space-x-2">
+                    <button id="modalNextBtn" onclick="navigateAssessmentStep(1)" class="px-5 py-2 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700">
+                        Next Step
+                    </button>
+                    <button id="modalSaveBtn" onclick="saveAndPublishAssessment()" class="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 hidden">
+                        Save & Publish
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // GLOBAL DATA STORE
+        const appData = {
+            currentRole: 'teacher', // 'teacher' or 'parent'
+            activeChildId: '13K001', // Default child for parent portal
+            currentAssessmentStep: 1,
+            modalTempScores: {},
+            learners: [
+                {
+                    id: '13K001',
+                    name: 'Amani Juma',
+                    upi: 'NEMIS-78192-A',
+                    grade: 'Grade 6 East',
+                    attendance: '98.5%',
+                    overallBand: 'EE',
+                    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
+                    scores: {
+                        'Science & Technology': 'EE',
+                        'Agriculture & Nutrition': 'ME',
+                        'Mathematics': 'EE',
+                        'Creative Arts': 'EE'
+                    },
+                    teacherRemarks: 'Amani demonstrates exemplary curiosity in Science and practical tasks. Consistently helps peers during group assignments.',
+                    portfolio: [
+                        { title: 'Water Filter Apparatus Practical', date: '08 Oct 2026', subject: 'Science & Technology', rating: 'EE', image: 'https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400&auto=format&fit=crop&q=80' },
+                        { title: 'Soil Conservation Mulching Project', date: '28 Sep 2026', subject: 'Agriculture', rating: 'ME', image: 'https://images.unsplash.com/photo-1592417817098-8f3d6eb231fc?w=400&auto=format&fit=crop&q=80' }
+                    ]
+                },
+                {
+                    id: '13K006',
+                    name: 'Zawadi Juma',
+                    upi: 'NEMIS-78192-F',
+                    grade: 'Grade 3 North',
+                    attendance: '96.0%',
+                    overallBand: 'ME',
+                    avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&auto=format&fit=crop&q=80',
+                    scores: {
+                        'Science & Technology': 'ME',
+                        'Agriculture & Nutrition': 'ME',
+                        'Mathematics': 'ME',
+                        'Creative Arts': 'EE'
+                    },
+                    teacherRemarks: 'Zawadi shows great enthusiasm in environmental activities and creative storytelling.',
+                    portfolio: [
+                        { title: 'Natural Leaf Pattern Weaving', date: '02 Oct 2026', subject: 'Creative Arts', rating: 'EE', image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&auto=format&fit=crop&q=80' }
+                    ]
+                },
+                {
+                    id: '13K002',
+                    name: 'Brian Omondi',
+                    upi: 'NEMIS-78192-B',
+                    grade: 'Grade 6 East',
+                    attendance: '94.0%',
+                    overallBand: 'ME',
+                    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80',
+                    scores: { 'Science & Technology': 'ME', 'Agriculture & Nutrition': 'ME', 'Mathematics': 'AE', 'Creative Arts': 'ME' },
+                    teacherRemarks: 'Good effort in practical activities. Math problem solving requires guided practice.'
+                },
+                {
+                    id: '13K003',
+                    name: 'Emmanuel Kiprop',
+                    upi: 'NEMIS-78192-C',
+                    grade: 'Grade 6 East',
+                    attendance: '91.0%',
+                    overallBand: 'AE',
+                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+                    scores: { 'Science & Technology': 'AE', 'Agriculture & Nutrition': 'BE', 'Mathematics': 'AE', 'Creative Arts': 'ME' },
+                    teacherRemarks: 'Remedial intervention ongoing in Soil Conservation strand.'
+                }
+            ],
+            assessments: [
+                { id: 'ASM-01', subject: 'Science & Technology', grade: 'Grade 6 East', taskType: 'Practical Performance Task', strand: 'Living Things & Environment', substrand: 'Water Purification Practical', status: 'Completed', date: '10 Oct 2026' },
+                { id: 'ASM-02', subject: 'Agriculture & Nutrition', grade: 'Grade 6 East', taskType: 'Project-Based Learning', strand: 'Soil Conservation', substrand: 'Mulching Techniques', status: 'Active', date: '12 Oct 2026' }
+            ],
+            schemes: [
+                { subject: 'Science & Technology', week: 3, strand: 'Living Things', outcome: 'Construct water filter using sand and gravel.', kiq: 'How can dirty water be purified?', status: 'Approved' }
+            ],
+            homework: [
+                { id: 1, subject: 'Science & Technology', title: 'Collect 3 Local Soil Samples', dueDate: '14 Oct 2026', teacherNote: 'Please assist child in labeling sandy, clay, and loam soil samples.', status: 'Pending' }
+            ]
+        };
+
+        let parentRadarChartInstance = null;
+
+        // INIT ON LOAD
+        window.onload = function() {
+            renderAssessmentCards();
+            renderTeacherGradebookTable();
+            renderSchemesTable();
+            renderInterventions();
+            renderBroadsheetTable();
+            initializeModalScoringState();
+
+            // Render Parent Views
+            renderParentDashboard();
+            renderParentPortfolio();
+            renderParentHomework();
+        };
+
+        // ROLE SWITCHER (TEACHER vs PARENT)
+        function switchRole(role) {
+            appData.currentRole = role;
+            const btnT = document.getElementById('modeBtnTeacher');
+            const btnP = document.getElementById('modeBtnParent');
+            const tNav = document.getElementById('teacherNav');
+            const pNav = document.getElementById('parentNav');
+            const tProf = document.getElementById('teacherProfileBar');
+            const pProf = document.getElementById('parentProfileBar');
+            const childSwitcher = document.getElementById('childSwitcherContainer');
+            const teacherBtn = document.getElementById('teacherNewAssessBtn');
+
+            if (role === 'teacher') {
+                btnT.className = "flex-1 py-1.5 rounded-lg text-center bg-teal-600 text-white shadow transition-all";
+                btnP.className = "flex-1 py-1.5 rounded-lg text-center text-slate-400 hover:text-white transition-all";
+                tNav.classList.remove('hidden');
+                pNav.classList.add('hidden');
+                tProf.classList.remove('hidden');
+                pProf.classList.add('hidden');
+                childSwitcher.classList.add('hidden');
+                teacherBtn.classList.remove('hidden');
+                switchTeacherTab('dashboard');
+            } else {
+                btnP.className = "flex-1 py-1.5 rounded-lg text-center bg-emerald-600 text-white shadow transition-all";
+                btnT.className = "flex-1 py-1.5 rounded-lg text-center text-slate-400 hover:text-white transition-all";
+                pNav.classList.remove('hidden');
+                tNav.classList.add('hidden');
+                pProf.classList.remove('hidden');
+                tProf.classList.add('hidden');
+                childSwitcher.classList.remove('hidden');
+                teacherBtn.classList.add('hidden');
+                switchParentTab('p-dashboard');
+            }
+        }
+
+        // TEACHER TAB SWITCHER
+        function switchTeacherTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+            document.getElementById('view-t-' + tabId).classList.remove('hidden');
+
+            document.querySelectorAll('#teacherNav .sidebar-item').forEach(item => {
+                item.classList.remove('sidebar-item-active');
+                item.classList.add('text-slate-400');
+            });
+            const active = document.getElementById('nav-t-' + tabId);
+            if (active) active.classList.add('sidebar-item-active');
+
+            const titleMap = {
+                'dashboard': 'Teacher Overview',
+                'assessments': 'CBC Assessment Hub',
+                'gradebook': 'Formative Assessment Gradebook',
+                'schemes': 'Schemes of Work & Lessons',
+                'interventions': 'AfL Remedial Log',
+                'broadsheet': 'KNEC Broadsheet'
+            };
+            document.getElementById('pageTitle').textContent = titleMap[tabId] || 'Teacher Hub';
+        }
+
+        // PARENT TAB SWITCHER
+        function switchParentTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+
+            document.querySelectorAll('#parentNav .sidebar-item').forEach(item => {
+                item.classList.remove('sidebar-item-active');
+                item.classList.add('text-slate-400');
+            });
+            const active = document.getElementById('nav-' + tabId);
+            if (active) active.classList.add('sidebar-item-active');
+
+            const titleMap = {
+                'p-dashboard': 'Parent Child Overview',
+                'p-analytics': 'Competency Analytics & Radar',
+                'p-portfolio': 'Learner Portfolio Vault',
+                'p-reportcard': 'Official Report Card Transcript',
+                'p-homework': 'Home Support & Collaboration'
+            };
+            document.getElementById('pageTitle').textContent = titleMap[tabId] || 'Parent Hub';
+
+            if (tabId === 'p-analytics') {
+                renderParentRadarChart();
+                renderParentStrandDetails();
+            }
+        }
+
+        // ACTIVE CHILD SWITCHER FOR PARENTS
+        function changeActiveChild(childId) {
+            appData.activeChildId = childId;
+            renderParentDashboard();
+            renderParentPortfolio();
+            renderParentReportCard();
+        }
+
+        // RENDER PARENT DASHBOARD DATA
+        function renderParentDashboard() {
+            const child = appData.learners.find(l => l.id === appData.activeChildId) || appData.learners[0];
+
+            document.getElementById('parentChildName').textContent = child.name;
+            document.getElementById('parentChildUPI').textContent = child.upi;
+            document.getElementById('parentChildGradeBadge').textContent = child.grade;
+            document.getElementById('parentChildAttendance').textContent = child.attendance;
+            document.getElementById('parentChildPhoto').src = child.avatar;
+            document.getElementById('parentChildBand').textContent = `${child.overallBand} (${getBandLabel(child.overallBand)})`;
+
+            // Render subject cards
+            const grid = document.getElementById('parentSubjectSummaryGrid');
+            grid.innerHTML = '';
+
+            Object.entries(child.scores).forEach(([subj, score]) => {
+                const card = document.createElement('div');
+                card.className = "glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-2";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-xs text-slate-800">${subj}</span>
+                        <span class="px-2 py-0.5 rounded font-extrabold text-[10px] ${getRubricBadgeClass(score)}">${score}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500">${getRubricDefaultRemark(score)}</p>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div class="h-full ${getScoreProgressColor(score)}" style="width: ${getScorePercent(score)}%"></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Teacher Notes Log
+            const notesLog = document.getElementById('parentTeacherNotesLog');
+            notesLog.innerHTML = `
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <p class="text-slate-700 font-semibold">"${child.teacherRemarks}"</p>
+                    <p class="text-[10px] text-teal-600 mt-1 font-bold">— Tr. Agnes Mutua</p>
+                </div>
+            `;
+
+            renderParentReportCard();
+        }
+
+        function getBandLabel(band) {
+            switch(band) {
+                case 'EE': return 'Exceeding Expectations';
+                case 'ME': return 'Meeting Expectations';
+                case 'AE': return 'Approaching Expectations';
+                case 'BE': return 'Below Expectations';
+            }
+        }
+
+        function getScorePercent(score) {
+            switch(score) {
+                case 'EE': return 95;
+                case 'ME': return 75;
+                case 'AE': return 50;
+                case 'BE': return 25;
+            }
+        }
+
+        function getScoreProgressColor(score) {
+            switch(score) {
+                case 'EE': return 'bg-emerald-600';
+                case 'ME': return 'bg-blue-600';
+                case 'AE': return 'bg-amber-600';
+                case 'BE': return 'bg-rose-600';
+            }
+        }
+
+        // PARENT COMPETENCY RADAR CHART
+        function renderParentRadarChart() {
+            const ctx = document.getElementById('parentCompetencyRadarChart').getContext('2d');
+            if (parentRadarChartInstance) parentRadarChartInstance.destroy();
+
+            parentRadarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Critical Thinking', 'Creativity', 'Communication', 'Digital Literacy', 'Learning to Learn', 'Leadership', 'Citizenship'],
+                    datasets: [{
+                        label: 'Competency Score (Level 1-4)',
+                        data: [3.9, 3.8, 3.6, 3.2, 3.7, 3.8, 4.0],
+                        backgroundColor: 'rgba(13, 148, 136, 0.25)',
+                        borderColor: '#0d9488',
+                        pointBackgroundColor: '#0f766e',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { r: { min: 0, max: 4, ticks: { stepSize: 1 } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderParentStrandDetails() {
+            const list = document.getElementById('parentStrandDetailList');
+            list.innerHTML = `
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="flex justify-between font-bold"><span>Water Filtration & Natural Purification</span><span class="text-emerald-600">EE</span></div>
+                    <p class="text-slate-500 text-[11px] mt-1">Science & Tech • Task date: 10 Oct 2026</p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="flex justify-between font-bold"><span>Soil Conservation & Mulching</span><span class="text-blue-600">ME</span></div>
+                    <p class="text-slate-500 text-[11px] mt-1">Agriculture • Task date: 28 Sep 2026</p>
+                </div>
+            `;
+        }
+
+        // RENDER PARENT PORTFOLIO
+        function renderParentPortfolio() {
+            const child = appData.learners.find(l => l.id === appData.activeChildId) || appData.learners[0];
+            const grid = document.getElementById('parentPortfolioGrid');
+            grid.innerHTML = '';
+
+            if (!child.portfolio || child.portfolio.length === 0) {
+                grid.innerHTML = `<p class="text-xs text-slate-400 col-span-3">No portfolio items uploaded yet.</p>`;
+                return;
+            }
+
+            child.portfolio.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "glass-panel rounded-2xl overflow-hidden border border-slate-200 shadow-sm space-y-2";
+                card.innerHTML = `
+                    <img src="${item.image}" class="w-full h-40 object-cover">
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-800">${item.title}</span>
+                            <span class="px-2 py-0.5 rounded font-bold ${getRubricBadgeClass(item.rating)}">${item.rating}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">${item.subject} • ${item.date}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // RENDER PARENT REPORT CARD
+        function renderParentReportCard() {
+            const child = appData.learners.find(l => l.id === appData.activeChildId) || appData.learners[0];
+
+            document.getElementById('rcName').textContent = child.name;
+            document.getElementById('rcUPI').textContent = child.upi;
+            document.getElementById('rcGrade').textContent = child.grade;
+            document.getElementById('rcTeacherRemarks').textContent = child.teacherRemarks;
+
+            const tbody = document.getElementById('rcSubjectTableBody');
+            tbody.innerHTML = '';
+
+            Object.entries(child.scores).forEach(([subj, score]) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-300";
+                tr.innerHTML = `
+                    <td class="p-2 border border-slate-300 font-semibold">${subj}</td>
+                    <td class="p-2 border border-slate-300 text-center font-bold ${getRubricColorText(score)}">${score}</td>
+                    <td class="p-2 border border-slate-300">${getRubricDefaultRemark(score)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleParentAck(checked) {
+            const txt = document.getElementById('ackStatusText');
+            if (checked) txt.classList.remove('hidden');
+            else txt.classList.add('hidden');
+        }
+
+        // PARENT HOMEWORK LOGIC
+        function renderParentHomework() {
+            const list = document.getElementById('parentHomeworkList');
+            list.innerHTML = '';
+
+            appData.homework.forEach(hw => {
+                const card = document.createElement('div');
+                card.className = "p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-800">${hw.title}</span>
+                        <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] rounded font-bold">Due: ${hw.dueDate}</span>
+                    </div>
+                    <p class="text-slate-600 text-[11px]"><strong>Teacher Guidance:</strong> ${hw.teacherNote}</p>
+                    <div class="pt-2 flex justify-end">
+                        <button onclick="markHomeworkDone(this)" class="px-3 py-1 bg-teal-600 text-white rounded-lg text-[10px] font-bold">
+                            Mark Completed at Home
+                        </button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function markHomeworkDone(btn) {
+            btn.className = "px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold";
+            btn.innerHTML = `<i class="fa-solid fa-check mr-1"></i> Completed`;
+        }
+
+        function sendParentNote(e) {
+            e.preventDefault();
+            alert("Note sent successfully to Tr. Agnes Mutua!");
+            e.target.reset();
+        }
+
+        // TEACHER HELPER FUNCTIONS
+        function renderAssessmentCards() {
+            const grid = document.getElementById('assessmentsGrid');
+            const dashList = document.getElementById('dashboardAssessmentList');
+            if (grid) grid.innerHTML = '';
+            if (dashList) dashList.innerHTML = '';
+
+            appData.assessments.forEach(asm => {
+                if (grid) {
+                    const card = document.createElement('div');
+                    card.className = "glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-2";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center text-[10px]">
+                            <span class="px-2 py-0.5 bg-teal-50 text-teal-700 font-bold rounded">${asm.subject}</span>
+                            <span class="text-slate-400">${asm.date}</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800">${asm.substrand}</h4>
+                        <p class="text-xs text-slate-500">${asm.taskType}</p>
+                    `;
+                    grid.appendChild(card);
+                }
+
+                if (dashList) {
+                    const item = document.createElement('div');
+                    item.className = "p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center text-xs";
+                    item.innerHTML = `
+                        <div>
+                            <p class="font-bold text-slate-800">${asm.substrand}</p>
+                            <p class="text-[10px] text-slate-400">${asm.subject}</p>
+                        </div>
+                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded">${asm.status}</span>
+                    `;
+                    dashList.appendChild(item);
+                }
+            });
+        }
+
+        function renderTeacherGradebookTable() {
+            const subject = document.getElementById('gradebookSubject').value;
+            const tbody = document.getElementById('teacherGradebookTableBody');
+            tbody.innerHTML = '';
+
+            appData.learners.forEach(l => {
+                const score = l.scores[subject] || 'ME';
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-200";
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-slate-500">${l.upi}</td>
+                    <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
+                        <img src="${l.avatar}" class="w-6 h-6 rounded-full object-cover">
+                        <span>${l.name}</span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <div class="inline-flex rounded-lg p-1 bg-slate-100 space-x-1">
+                            ${['EE', 'ME', 'AE', 'BE'].map(lvl => `
+                                <button onclick="setLearnerRubric('${l.id}', '${subject}', '${lvl}')" class="px-2 py-0.5 text-[10px] font-bold rounded transition-all ${score === lvl ? getRubricBadgeClass(lvl) : 'text-slate-500 hover:bg-slate-200'}">
+                                    ${lvl}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </td>
+                    <td class="p-3"><input type="text" value="${getRubricDefaultRemark(score)}" class="w-full text-xs p-1 bg-slate-50 border rounded"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function setLearnerRubric(learnerId, subject, lvl) {
+            const learner = appData.learners.find(l => l.id === learnerId);
+            if (learner) {
+                learner.scores[subject] = lvl;
+                renderTeacherGradebookTable();
+                renderBroadsheetTable();
+            }
+        }
+
+        function batchMarkRubric(lvl) {
+            const subject = document.getElementById('gradebookSubject').value;
+            appData.learners.forEach(l => l.scores[subject] = lvl);
+            renderTeacherGradebookTable();
+            renderBroadsheetTable();
+        }
+
+        function renderSchemesTable() {
+            const tbody = document.getElementById('schemesTableBody');
+            tbody.innerHTML = '';
+            appData.schemes.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-200";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-teal-700">Wk ${s.week}</td>
+                    <td class="p-3 font-semibold">${s.strand}<br><span class="text-[10px] text-slate-400">${s.subject}</span></td>
+                    <td class="p-3 text-slate-600">${s.outcome}</td>
+                    <td class="p-3 text-slate-600 italic">"${s.kiq}"</td>
+                    <td class="p-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold">${s.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderInterventions() {
+            const container = document.getElementById('interventionList');
+            container.innerHTML = `
+                <div class="p-3 bg-white border border-slate-200 rounded-xl flex justify-between items-center text-xs">
+                    <div>
+                        <span class="font-bold text-slate-800">Emmanuel Kiprop</span>
+                        <span class="px-2 py-0.5 bg-rose-100 text-rose-700 font-bold text-[10px] rounded ml-2">BE</span>
+                        <p class="text-slate-500 mt-0.5">Soil Conservation • Peer tutoring assigned</p>
+                    </div>
+                    <button class="px-3 py-1 bg-emerald-50 text-emerald-700 border rounded-lg">Resolve</button>
+                </div>
+            `;
+        }
+
+        function renderBroadsheetTable() {
+            const tbody = document.getElementById('broadsheetTableBody');
+            tbody.innerHTML = '';
+
+            appData.learners.forEach(l => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-300 text-xs";
+                tr.innerHTML = `
+                    <td class="p-2 border border-slate-300 font-mono">${l.upi}</td>
+                    <td class="p-2 border border-slate-300 font-semibold">${l.name}</td>
+                    <td class="p-2 border border-slate-300 text-center font-bold ${getRubricColorText(l.scores['Science & Technology'])}">${l.scores['Science & Technology']}</td>
+                    <td class="p-2 border border-slate-300 text-center font-bold ${getRubricColorText(l.scores['Agriculture & Nutrition'])}">${l.scores['Agriculture & Nutrition']}</td>
+                    <td class="p-2 border border-slate-300 text-center font-bold ${getRubricColorText(l.scores['Mathematics'])}">${l.scores['Mathematics']}</td>
+                    <td class="p-2 border border-slate-300 text-emerald-700 font-bold">KNEC Uploaded</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // UTILITIES & MODAL WIZARD
+        function openAssessmentModal() {
+            appData.currentAssessmentStep = 1;
+            switchAssessmentStep(1);
+            document.getElementById('modalAssessment').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function switchAssessmentStep(step) {
+            appData.currentAssessmentStep = step;
+            [1, 2, 3, 4].forEach(s => {
+                const el = document.getElementById(`assessStep${s}`);
+                const btn = document.getElementById(`stepBtn${s}`);
+                if (s === step) {
+                    el.classList.remove('hidden');
+                    btn.className = "font-bold text-teal-700 bg-teal-100 px-3 py-1.5 rounded-lg transition-all";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "font-semibold text-slate-500 px-3 py-1.5 rounded-lg transition-all";
+                }
+            });
+
+            const prevBtn = document.getElementById('modalPrevBtn');
+            const nextBtn = document.getElementById('modalNextBtn');
+            const saveBtn = document.getElementById('modalSaveBtn');
+
+            prevBtn.disabled = step === 1;
+            if (step === 4) {
+                nextBtn.classList.add('hidden');
+                saveBtn.classList.remove('hidden');
+                renderModalScoringTable();
+            } else {
+                nextBtn.classList.remove('hidden');
+                saveBtn.classList.add('hidden');
+            }
+        }
+
+        function navigateAssessmentStep(delta) {
+            const next = appData.currentAssessmentStep + delta;
+            if (next >= 1 && next <= 4) switchAssessmentStep(next);
+        }
+
+        function initializeModalScoringState() {
+            appData.learners.forEach(l => {
+                appData.modalTempScores[l.id] = { score: 'ME', remark: 'Demonstrates expected criteria.' };
+            });
+        }
+
+        function renderModalScoringTable() {
+            const tbody = document.getElementById('modalScoringTableBody');
+            tbody.innerHTML = '';
+
+            appData.learners.forEach(l => {
+                const state = appData.modalTempScores[l.id] || { score: 'ME', remark: 'Demonstrates expected criteria.' };
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5 font-semibold text-slate-800 flex items-center space-x-2">
+                        <img src="${l.avatar}" class="w-6 h-6 rounded-full object-cover">
+                        <span>${l.name}</span>
+                    </td>
+                    <td class="p-2.5 text-center">
+                        <div class="inline-flex rounded-lg p-0.5 bg-slate-100 space-x-1">
+                            ${['EE', 'ME', 'AE', 'BE'].map(lvl => `
+                                <button onclick="setModalLearnerScore('${l.id}', '${lvl}')" class="px-2 py-0.5 text-[10px] font-bold rounded ${state.score === lvl ? getRubricBadgeClass(lvl) : 'text-slate-500'}">
+                                    ${lvl}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </td>
+                    <td class="p-2.5"><input type="text" value="${state.remark}" class="w-full text-xs p-1 bg-slate-50 border rounded"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function setModalLearnerScore(id, lvl) {
+            if (!appData.modalTempScores[id]) appData.modalTempScores[id] = {};
+            appData.modalTempScores[id].score = lvl;
+            renderModalScoringTable();
+        }
+
+        function batchSetModalRubric(score) {
+            appData.learners.forEach(l => {
+                if (!appData.modalTempScores[l.id]) appData.modalTempScores[l.id] = {};
+                appData.modalTempScores[l.id].score = score;
+            });
+            renderModalScoringTable();
+        }
+
+        function saveAndPublishAssessment() {
+            const subj = document.getElementById('modalSubject').value;
+            appData.learners.forEach(l => {
+                if (appData.modalTempScores[l.id]) {
+                    l.scores[subj] = appData.modalTempScores[l.id].score;
+                }
+            });
+
+            renderTeacherGradebookTable();
+            renderBroadsheetTable();
+            renderParentDashboard();
+            closeModal('modalAssessment');
+            alert("Assessment task saved and results synchronized to Parent Portal!");
+        }
+
+        function getRubricBadgeClass(lvl) {
+            switch(lvl) {
+                case 'EE': return 'bg-emerald-600 text-white shadow-sm';
+                case 'ME': return 'bg-blue-600 text-white shadow-sm';
+                case 'AE': return 'bg-amber-600 text-white shadow-sm';
+                case 'BE': return 'bg-rose-600 text-white shadow-sm';
+            }
+        }
+
+        function getRubricColorText(lvl) {
+            switch(lvl) {
+                case 'EE': return 'text-emerald-600';
+                case 'ME': return 'text-blue-600';
+                case 'AE': return 'text-amber-600';
+                case 'BE': return 'text-rose-600';
+                default: return 'text-slate-600';
+            }
+        }
+
+        function getRubricDefaultRemark(lvl) {
+            switch(lvl) {
+                case 'EE': return 'Exceeds target criteria comfortably.';
+                case 'ME': return 'Meets required strand expectations.';
+                case 'AE': return 'Requires minor guided practice.';
+                case 'BE': return 'Needs step-by-step remedial support.';
+            }
+        }
+
+        function triggerPrint() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

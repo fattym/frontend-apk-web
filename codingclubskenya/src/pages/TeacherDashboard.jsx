@@ -1,614 +1,621 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+import { useState, useEffect, useMemo } from 'react';
+import api, {
+  fetchGrades,
+  fetchLearningAreas,
+  fetchAssessmentTasks,
+  createAssessmentTask,
+  formErrorMessage,
+} from '../services/api';
 import AITeacherAssist from '../components/AITeacherAssist';
 
+const RUBRIC = [
+  { key: 'EE', label: 'EE (4)', color: 'bg-emerald-600 text-white shadow-sm' },
+  { key: 'ME', label: 'ME (3)', color: 'bg-blue-600 text-white shadow-sm' },
+  { key: 'AE', label: 'AE (2)', color: 'bg-amber-600 text-white shadow-sm' },
+  { key: 'BE', label: 'BE (1)', color: 'bg-rose-600 text-white shadow-sm' },
+];
+
+const LEVEL_LABEL = { EE: 'EE (4)', ME: 'ME (3)', AE: 'AE (2)', BE: 'BE (1)' };
+
+const levelFromPct = (pct) => {
+  if (pct >= 80) return 'EE';
+  if (pct >= 65) return 'ME';
+  if (pct >= 50) return 'AE';
+  return 'BE';
+};
+
+const DEFAULT_REMARKS = {
+  EE: 'Exceeds target criteria comfortably.',
+  ME: 'Meets required strand expectations.',
+  AE: 'Requires minor guided practice.',
+  BE: 'Needs step-by-step remedial support.',
+};
+
 const TeacherDashboard = () => {
-  const { user } = useAuth();
-
-  const STANDARD_FIELDS = [
-    { key: 'week_number', label: 'Week Number' },
-    { key: 'strand_name', label: 'Strand Name' },
-    { key: 'sub_strand_name', label: 'Sub-strand Name' },
-    { key: 'specific_learning_outcomes', label: 'Learning Outcomes' },
-    { key: 'key_inquiry_question', label: 'Inquiry Question' },
-    { key: 'learning_experiences', label: 'Learning Experiences' },
-    { key: 'learning_resources', label: 'Resources' },
-    { key: 'assessment_method', label: 'Assessment Method' },
-  ];
-
-  const [assignments, setAssignments] = useState([]);
-  const [timetable, setTimetable] = useState([]);
-  const [recentAssessments, setRecentAssessments] = useState([]);
-  const [schemes, setSchemes] = useState([]);
-  const [refDocs, setRefDocs] = useState([]);
-  const [homeworks, setHomeworks] = useState([]);
-  const [complaints, setComplaints] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [attendanceStats, setAttendanceStats] = useState(null);
+  const [grades, setGrades] = useState([]);
+  const [learningAreas, setLearningAreas] = useState([]);
+  const [roster, setRoster] = useState({ term: '', term_id: null, learners: [] });
+  const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showGenerate, setShowGenerate] = useState(false);
-  const [selectedScheme, setSelectedScheme] = useState(null);
-  const [streams, setStreams] = useState([]);
-  const [areas, setAreas] = useState([]);
-  const [terms, setTerms] = useState([]);
-  const [streamId, setStreamId] = useState('');
-  const [areaId, setAreaId] = useState('');
-  const [termId, setTermId] = useState('');
-  const [error, setError] = useState('');
+
+  const [showModal, setShowModal] = useState(false);
+  const [step, setStep] = useState(1);
+  const [modalSubject, setModalSubject] = useState('');
+  const [modalGrade, setModalGrade] = useState('');
+  const [modalTaskType, setModalTaskType] = useState('Practical Performance Task');
+  const [modalStrand, setModalStrand] = useState('Living Things & Environment');
+  const [modalSubstrand, setModalSubstrand] = useState('Water Filtration & Natural Purification');
+  const [modalScores, setModalScores] = useState({});
   const [saving, setSaving] = useState(false);
-  const [showUpload, setShowUpload] = useState(false);
-  const [uploadFile, setUploadFile] = useState(null);
-  const [parseResult, setParseResult] = useState(null);
-  const [showPreview, setShowPreview] = useState(false);
-  const [columnMappings, setColumnMappings] = useState({});
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchData = async () => {
+    const load = async () => {
       try {
-        const [assignRes, timeRes, assessRes, schemesRes, docsRes, hwRes, compRes, coursesRes, attRes] = await Promise.all([
-          api.get('/api/academics/teacher-assignments/'),
-          api.get('/api/academics/timetable/'),
-          api.get('/api/assessment/assessments/'),
-          api.get('/api/curriculum/schemes/'),
-          api.get('/api/curriculum/reference-documents/'),
-          api.get('/api/homework/homeworks/'),
-          api.get('/api/complaints/complaints/'),
-          api.get('/api/courses/courses/'),
-          api.get('/api/attendance/attendance-records/stats/'),
+        const [g, la, rosterRes, tasksRes] = await Promise.all([
+          fetchGrades(),
+          fetchLearningAreas(),
+          api.get('/api/gradebook/learners/').then((r) => r.data),
+          fetchAssessmentTasks(),
         ]);
-        setAssignments(assignRes.data.results || assignRes.data);
-        setTimetable(timeRes.data.results || timeRes.data);
-        setRecentAssessments(assessRes.data.results || assessRes.data);
-        setSchemes(schemesRes.data.results || schemesRes.data);
-        setRefDocs(docsRes.data.results || docsRes.data);
-        setHomeworks(hwRes.data.results || hwRes.data);
-        setComplaints(compRes.data.results || compRes.data);
-        setCourses(coursesRes.data.results || coursesRes.data);
-        setAttendanceStats(attRes.data);
+        setGrades(g);
+        setLearningAreas(la);
+        setRoster({
+          term: rosterRes.term || '',
+          term_id: rosterRes.term_id || null,
+          learners: rosterRes.learners || [],
+        });
+        setTasks(tasksRes);
+        if (la.length) setModalSubject(la[0].name);
+        if (g.length) setModalGrade(g.find((x) => x.name.startsWith('Grade 6'))?.name || g[0].name);
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    load();
   }, []);
 
-  useEffect(() => {
-    if (showGenerate) {
-      const token = localStorage.getItem('access_token');
-      Promise.all([
-        fetch('/api/academics/streams/', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).then(r => r.json()),
-        fetch('/api/academics/learning-areas/', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).then(r => r.json()),
-        fetch('/api/academics/terms/', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).then(r => r.json()),
-      ]).then(([streamsData, areas, terms]) => {
-        setStreams(Array.isArray(streamsData) ? streamsData : streamsData.results || []);
-        setAreas(Array.isArray(areas) ? areas : areas.results || []);
-        setTerms(Array.isArray(terms) ? terms : terms.results || []);
-      }).catch(err => console.error('Failed to load form data:', err));
-    }
-  }, [showGenerate]);
+  const subjectOptions = useMemo(
+    () => learningAreas.map((la) => la.name),
+    [learningAreas]
+  );
 
-  const handleGenerate = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setError('');
-    try {
-      const token = localStorage.getItem('access_token');
-      const res = await fetch('/api/curriculum/schemes/generate/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ learning_area: areaId, term: termId, stream: streamId }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || 'Failed to generate scheme');
-      }
-      const data = await res.json();
-      setSchemes(prev => [data, ...prev]);
-      setSelectedScheme(data);
-      setShowGenerate(false);
-      setStreamId('');
-      setAreaId('');
-      setTermId('');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
+  const metrics = useMemo(() => {
+    const learners = roster.learners || [];
+    const pcts = learners.map((l) => l.overall_percentage || 0);
+    if (!learners.length) return { enrolled: 0, tasks: tasks.length, avg: null, remedial: 0 };
+    const avg = Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length);
+    const remedial = learners.filter((l) => (l.overall_percentage || 0) < 50).length;
+    return {
+      enrolled: learners.length,
+      tasks: tasks.filter((t) => t.status !== 'DRAFT').length,
+      avg,
+      remedial,
+    };
+  }, [roster, tasks]);
 
-  const handleDownloadTemplate = async () => {
-    const token = localStorage.getItem('access_token');
-    const res = await fetch('/api/curriculum/schemes/download_template/', {
-      headers: { 'Authorization': `Bearer ${token}` },
+  const masteryLabel = metrics.avg != null ? levelFromPct(metrics.avg) : null;
+
+  const taskCards = useMemo(
+    () =>
+      (tasks || []).map((t) => ({
+        subject: t.learning_area_name || 'General',
+        substrand: t.sub_strand || '-',
+        date: t.created_at ? new Date(t.created_at).toLocaleDateString() : '-',
+        status: (t.status || 'Active').toUpperCase(),
+      })),
+    [tasks]
+  );
+
+  const openModal = () => {
+    setShowModal(true);
+    setStep(1);
+    setModalScores({});
+    (roster.learners || []).forEach((l) => {
+      setModalScores((prev) => ({ ...prev, [l.id]: { score: 'ME', remark: DEFAULT_REMARKS.ME } }));
     });
-    if (!res.ok) {
-      setError('Failed to download template');
-      return;
-    }
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'scheme_of_work_template.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
   };
 
-  const handleParseFile = async () => {
-    if (!uploadFile) {
-      setError('Please select a file.');
-      return;
-    }
-    setSaving(true);
-    setError('');
-    try {
-      const token = localStorage.getItem('access_token');
-      const formData = new FormData();
-      formData.append('file', uploadFile);
-      const res = await fetch('/api/curriculum/schemes/parse/', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData,
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || 'Failed to parse file');
-      }
-      const data = await res.json();
-      setParseResult(data);
-      const initialMappings = {};
-      STANDARD_FIELDS.forEach(f => {
-        if (data.column_mapping && data.column_mapping[f.key]) {
-          initialMappings[f.key] = data.column_mapping[f.key]['index'];
-        } else {
-          initialMappings[f.key] = '';
-        }
-      });
-      setColumnMappings(initialMappings);
-      setShowPreview(true);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSaving(false);
-    }
+  const closeModal = () => setShowModal(false);
+
+  const nextStep = () => setStep((s) => Math.min(s + 1, 4));
+  const prevStep = () => setStep((s) => Math.max(s - 1, 1));
+
+  const setScore = (learnerId, score) => {
+    setModalScores((prev) => ({
+      ...prev,
+      [learnerId]: { ...prev[learnerId], score, remark: DEFAULT_REMARKS[score] },
+    }));
   };
 
-  const handleConfirmImport = async () => {
-    setSaving(true);
-    setError('');
-    try {
-      const token = localStorage.getItem('access_token');
-      const formData = new FormData();
-      formData.append('file', uploadFile);
-      formData.append('learning_area', areaId);
-      formData.append('term', termId);
-      formData.append('stream', streamId);
-      const res = await fetch('/api/curriculum/schemes/upload/', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData,
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || 'Failed to upload scheme');
-      }
-      const data = await res.json();
-      setSchemes(prev => [data.scheme, ...prev]);
-      setSelectedScheme(data.scheme);
-      setShowUpload(false);
-      setShowPreview(false);
-      setUploadFile(null);
-      setParseResult(null);
-      setStreamId('');
-      setAreaId('');
-      setTermId('');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSaving(false);
-    }
+  const setRemark = (learnerId, remark) => {
+    setModalScores((prev) => ({
+      ...prev,
+      [learnerId]: { ...prev[learnerId], remark },
+    }));
   };
 
-  const handleUpdateWeek = async (weekId, field, value) => {
-    const token = localStorage.getItem('access_token');
-    await fetch(`/api/curriculum/scheme-weeks/${weekId}/`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ [field]: value }),
+  const batchSet = (score) => {
+    const next = {};
+    (roster.learners || []).forEach((l) => {
+      next[l.id] = { score, remark: DEFAULT_REMARKS[score] };
     });
-    if (selectedScheme) {
-      const res = await fetch(`/api/curriculum/schemes/${selectedScheme.id}/`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+    setModalScores(next);
+  };
+
+  const handleSaveAssessment = async () => {
+    const la = learningAreas.find((l) => l.name === modalSubject);
+    if (!la) return;
+    setSaving(true);
+    setError('');
+    try {
+      const results = (roster.learners || []).map((l) => {
+        const ms = modalScores[l.id] || { score: 'ME', remark: DEFAULT_REMARKS.ME };
+        return { learner: l.id, level_achieved: ms.score, remark: ms.remark };
       });
-      const data = await res.json();
-      setSelectedScheme(data);
-      setSchemes(prev => prev.map(s => s.id === data.id ? data : s));
+      await createAssessmentTask({
+        learning_area: la.id,
+        term: roster.term_id,
+        title: modalStrand || modalSubstrand,
+        task_type: 'PPT',
+        strand: modalStrand,
+        sub_strand: modalSubstrand,
+        status: 'COMPLETED',
+        results,
+      });
+      const [rosterRes, tasksRes] = await Promise.all([
+        api.get('/api/gradebook/learners/').then((r) => r.data),
+        fetchAssessmentTasks(),
+      ]);
+      setRoster({
+        term: rosterRes.term || '',
+        term_id: rosterRes.term_id || null,
+        learners: rosterRes.learners || [],
+      });
+      setTasks(tasksRes);
+      closeModal();
+      window.alert('Assessment task saved and results synchronized to parent portal!');
+    } catch (err) {
+      setError(formErrorMessage(err));
+    } finally {
+      setSaving(false);
     }
   };
+
+  const rubricClass = (lvl) => RUBRIC.find((r) => r.key === lvl)?.color || 'text-slate-500';
 
   if (loading) return <div className="p-6">Loading...</div>;
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-brand-navy mb-2">Teacher Dashboard</h1>
-      <p className="text-brand-navy/70 mb-6">Welcome, {user?.first_name} {user?.last_name}</p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-brand-navy/60 text-sm">Classes Taught</h3>
-          <p className="text-3xl font-bold text-brand-orange">{assignments.length}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-brand-navy/60 text-sm">Attendance Rate</h3>
-          <p className="text-3xl font-bold text-brand-orange">{attendanceStats ? `${attendanceStats.attendance_pct || Math.round((attendanceStats.present / (attendanceStats.total || 1)) * 100)}%` : '--'}</p>
-          <p className="text-xs text-brand-navy/60 mt-1">{attendanceStats ? `${attendanceStats.present || 0} present / ${attendanceStats.total || 0} records` : ''}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-brand-navy/60 text-sm">Absences</h3>
-          <p className="text-3xl font-bold text-brand-orange">{attendanceStats?.absent || 0}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-brand-navy/60 text-sm">Timetable Slots</h3>
-          <p className="text-3xl font-bold text-brand-orange">{timetable.length}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-brand-navy/60 text-sm">Schemes of Work</h3>
-          <p className="text-3xl font-bold text-brand-orange">{schemes.length}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-brand-navy/60 text-sm">Homework Assigned</h3>
-          <p className="text-3xl font-bold text-brand-orange">{homeworks.length}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-brand-navy/60 text-sm">Open Complaints</h3>
-          <p className="text-3xl font-bold text-brand-orange">
-            {complaints.filter((c) => c.status !== 'Resolved').length}
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded shadow">
-          <div className="px-6 py-4 border-b">
-            <h2 className="text-xl font-semibold text-brand-navy">My Teaching Assignments</h2>
+      <section className="space-y-6">
+        {/* Metrics Bar */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl font-bold">
+              <i className="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500">
+                {metrics.enrolled === 1 ? 'Grade 6 Learner' : 'Grade 6 Learners'} Enrolled
+              </p>
+              <h3 className="text-2xl font-bold text-slate-800 mt-1">{metrics.enrolled}</h3>
+            </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-brand-grayLight/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Class</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Learning Area</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-brand-navy/10">
-                {assignments.map((a) => (
-                  <tr key={a.id}>
-                    <td className="px-6 py-4">{a.stream?.name || a.stream}</td>
-                    <td className="px-6 py-4">{a.learning_area?.name || a.learning_area}</td>
-                  </tr>
-                ))}
-                {assignments.length === 0 && (
-                  <tr><td colSpan="2" className="px-6 py-8 text-center text-brand-navy/60">No assignments yet.</td></tr>
-                )}
-              </tbody>
-            </table>
+
+          <div className="glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-xl font-bold">
+              <i className="fa-solid fa-square-check"></i>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500">Active CBC Tasks</p>
+              <h3 className="text-2xl font-bold text-blue-700 mt-1">
+                {metrics.tasks} {metrics.tasks === 1 ? 'Task' : 'Tasks'}
+              </h3>
+            </div>
+          </div>
+
+          <div className="glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold">
+              <i className="fa-solid fa-chart-line"></i>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500">Class Mastery Index</p>
+              <h3 className="text-2xl font-bold text-emerald-600 mt-1">
+                {metrics.avg != null ? `${metrics.avg}%` : '--'}{' '}
+                <span className="text-xs text-slate-400">
+                  ({masteryLabel ? LEVEL_LABEL[masteryLabel] : '–'} Avg)
+                </span>
+              </h3>
+            </div>
+          </div>
+
+          <div className="glass-panel p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl font-bold">
+              <i className="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500">Remedial Flagged</p>
+              <h3 className="text-2xl font-bold text-amber-600 mt-1">{metrics.remedial} Learners</h3>
+              <span className="text-[11px] text-rose-500 font-medium">Requires Targeted Support</span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded shadow">
-          <div className="px-6 py-4 border-b">
-            <h2 className="text-xl font-semibold text-brand-navy">Reference Documents</h2>
-          </div>
-          <div className="p-6">
-            {refDocs.length === 0 ? (
-              <p className="text-brand-navy/60">No reference documents uploaded yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {refDocs.slice(0, 5).map((doc) => (
-                  <div key={doc.id} className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <p className="font-medium text-sm">{doc.title}</p>
-                      <p className="text-xs text-brand-navy/60">{doc.learning_area?.name} • {doc.document_type?.replace('_', ' ')}</p>
-                    </div>
-                    <a href={doc.file} target="_blank" rel="noopener noreferrer" className="text-brand-orange hover:underline text-sm">Download</a>
+        {/* Recent Tasks & Quick Actions */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                <i className="fa-solid fa-list-check text-teal-600"></i>
+                Formative Assessment Tasks
+              </h3>
+              <button
+                onClick={openModal}
+                className="text-xs font-semibold text-teal-600 hover:text-teal-800"
+              >
+                + Add Task
+              </button>
+            </div>
+            <div className="space-y-3">
+              {taskCards.map((t, i) => (
+                <div
+                  key={`${t.subject}-${i}`}
+                  className="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center text-xs"
+                >
+                  <div>
+                    <p className="font-bold text-slate-800">{t.substrand}</p>
+                    <p className="text-[10px] text-slate-400">{t.subject}</p>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded shadow mb-8">
-        <div className="px-6 py-4 border-b flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-brand-navy">My Homework</h2>
-          <Link to="/homework" className="text-sm text-brand-orange hover:underline">Manage →</Link>
-        </div>
-        <div className="divide-y">
-          {homeworks.slice(0, 5).map((hw) => (
-            <div key={hw.id} className="px-6 py-3 flex justify-between gap-3">
-              <span className="truncate">{hw.title}</span>
-              <span className="text-xs text-brand-navy/40 whitespace-nowrap">{hw.due_date}</span>
-            </div>
-          ))}
-          {homeworks.length === 0 && (
-            <p className="px-6 py-4 text-sm text-brand-navy/60">No homework assigned yet.</p>
-          )}
-        </div>
-      </div>
-
-      <div className="bg-white rounded shadow mb-8">
-        <div className="px-6 py-4 border-b flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-brand-navy">My Learning Area Content</h2>
-        </div>
-        <div className="divide-y">
-          {courses.slice(0, 5).map((c) => (
-            <div key={c.id} className="px-6 py-3 flex justify-between items-center gap-3 hover:bg-brand-grayLight/50 cursor-pointer">
-              <div>
-                <p className="font-medium text-brand-orange">{c.title} <span className="text-brand-navy/40 text-xs">(v{c.version})</span></p>
-                <p className="text-sm text-brand-navy/60">Learning Area: {c.learning_area?.name || c.learning_area} • Mode: {c.delivery_mode.replace('_', ' ')}</p>
-              </div>
-              <span className={`px-2 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${c.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-brand-grayLight text-brand-navy'}`}>
-                {c.status.replace('_', ' ')}
-              </span>
-            </div>
-          ))}
-          {courses.length === 0 && (
-            <p className="px-6 py-4 text-sm text-brand-navy/60">No learning area content published yet.</p>
-          )}
-        </div>
-      </div>
-
-      <div className="bg-white rounded shadow mb-8">
-        <div className="px-6 py-4 border-b flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-brand-navy">My Schemes of Work</h2>
-          <div className="flex gap-2">
-            <button onClick={handleDownloadTemplate} className="bg-brand-navy text-white px-4 py-2 rounded hover:bg-brand-navy/80 text-sm">Download Template</button>
-            <button onClick={() => setShowGenerate(true)} className="bg-brand-orange text-white px-4 py-2 rounded hover:bg-brand-orangeHover text-sm">Generate Scheme</button>
-            <button onClick={() => setShowUpload(true)} className="bg-accent-teal text-white px-4 py-2 rounded hover:bg-accent-teal-strong text-sm">Upload Scheme</button>
-          </div>
-        </div>
-        {selectedScheme ? (
-          <div>
-            <div className="px-6 py-3 bg-brand-grayLight/50 border-b flex justify-between items-center">
-              <div>
-                <span className="font-medium">{selectedScheme.learning_area?.name} - {selectedScheme.stream?.name}</span>
-                <span className="ml-3 text-sm text-brand-navy/70">Term: {selectedScheme.term?.name} | Status: <span className="capitalize">{selectedScheme.status}</span></span>
-              </div>
-              <button onClick={() => setSelectedScheme(null)} className="text-brand-orange hover:underline text-sm">Back to list</button>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead className="bg-brand-grayLight/50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Week</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Strand</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Sub-strand</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Learning Outcomes</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Inquiry Question</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Learning Experiences</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Resources</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Assessment</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-brand-navy/10">
-                  {selectedScheme.weeks?.map((week) => (
-                    <tr key={week.id}>
-                      <td className="px-4 py-3 font-medium">{week.week_number}</td>
-                      <td className="px-4 py-3">{week.strand?.name || '-'}</td>
-                      <td className="px-4 py-3">{week.sub_strand?.name || '-'}</td>
-                      <td className="px-4 py-3">
-                        <textarea className="w-full border rounded px-2 py-1 text-sm" rows="3" value={week.specific_learning_outcomes || ''} onChange={(e) => handleUpdateWeek(week.id, 'specific_learning_outcomes', e.target.value)} />
-                      </td>
-                      <td className="px-4 py-3">
-                        <textarea className="w-full border rounded px-2 py-1 text-sm" rows="2" value={week.key_inquiry_question || ''} onChange={(e) => handleUpdateWeek(week.id, 'key_inquiry_question', e.target.value)} />
-                      </td>
-                      <td className="px-4 py-3">
-                        <textarea className="w-full border rounded px-2 py-1 text-sm" rows="2" value={week.learning_experiences || ''} onChange={(e) => handleUpdateWeek(week.id, 'learning_experiences', e.target.value)} />
-                      </td>
-                      <td className="px-4 py-3">
-                        <textarea className="w-full border rounded px-2 py-1 text-sm" rows="2" value={week.learning_resources || ''} onChange={(e) => handleUpdateWeek(week.id, 'learning_resources', e.target.value)} />
-                      </td>
-                      <td className="px-4 py-3">
-                        <textarea className="w-full border rounded px-2 py-1 text-sm" rows="2" value={week.assessment_method || ''} onChange={(e) => handleUpdateWeek(week.id, 'assessment_method', e.target.value)} />
-                      </td>
-                    </tr>
-                  ))}
-                  {(!selectedScheme.weeks || selectedScheme.weeks.length === 0) && (
-                    <tr><td colSpan="8" className="px-6 py-8 text-center text-brand-navy/60">No weeks generated yet.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-brand-grayLight/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Learning Area</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Class</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Term</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-brand-navy/60 uppercase">Updated</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-brand-navy/10">
-                {schemes.map((s) => (
-                  <tr key={s.id} className="cursor-pointer hover:bg-brand-grayLight/50" onClick={() => setSelectedScheme(s)}>
-                    <td className="px-6 py-4 font-medium">{s.learning_area?.name || s.learning_area}</td>
-                     <td className="px-6 py-4">{s.stream?.name || s.stream}</td>
-                    <td className="px-6 py-4">{s.term?.name || s.term}</td>
-                    <td className="px-6 py-4 capitalize">{s.status}</td>
-                    <td className="px-6 py-4">{new Date(s.updated_at).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-                {schemes.length === 0 && (
-                  <tr><td colSpan="5" className="px-6 py-8 text-center text-brand-navy/60">No schemes yet. Generate your first scheme of work.</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {showGenerate && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <form onSubmit={handleGenerate} className="bg-white p-6 rounded shadow-md w-full max-w-lg">
-            <h2 className="text-xl font-bold mb-4">Generate Scheme of Work</h2>
-            {error && <p className="text-red-500 mb-3">{error}</p>}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Stream</label>
-              <select className="w-full border rounded px-3 py-2" value={streamId} onChange={e => setStreamId(e.target.value)} required>
-                <option value="">Select stream</option>
-                {streams.map((s) => <option key={s.id} value={s.id}>{s.name} ({s.grade?.name})</option>)}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Learning Area</label>
-              <select className="w-full border rounded px-3 py-2" value={areaId} onChange={e => setAreaId(e.target.value)} required>
-                <option value="">Select learning area</option>
-                {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
-            </div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-1">Term</label>
-              <select className="w-full border rounded px-3 py-2" value={termId} onChange={e => setTermId(e.target.value)} required>
-                <option value="">Select term</option>
-                {terms.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.academic_year})</option>)}
-              </select>
-            </div>
-            <div className="flex justify-end gap-3">
-              <button type="button" onClick={() => setShowGenerate(false)} className="px-4 py-2 border rounded">Cancel</button>
-              <button type="submit" disabled={saving} className="px-4 py-2 bg-brand-orange text-white rounded hover:bg-brand-orangeHover disabled:opacity-50">{saving ? 'Generating...' : 'Generate'}</button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {showUpload && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <form onSubmit={(e) => { e.preventDefault(); handleParseFile(); }} className="bg-white p-6 rounded shadow-md w-full max-w-lg">
-            <h2 className="text-xl font-bold mb-4">Upload Scheme of Work</h2>
-            {error && <p className="text-red-500 mb-3">{error}</p>}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Stream</label>
-              <select className="w-full border rounded px-3 py-2" value={streamId} onChange={e => setStreamId(e.target.value)} required>
-                <option value="">Select stream</option>
-                {streams.map((s) => <option key={s.id} value={s.id}>{s.name} ({s.grade?.name})</option>)}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Learning Area</label>
-              <select className="w-full border rounded px-3 py-2" value={areaId} onChange={e => setAreaId(e.target.value)} required>
-                <option value="">Select learning area</option>
-                {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Term</label>
-              <select className="w-full border rounded px-3 py-2" value={termId} onChange={e => setTermId(e.target.value)} required>
-                <option value="">Select term</option>
-                {terms.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.academic_year})</option>)}
-              </select>
-            </div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-1">File (CSV or Excel)</label>
-              <input type="file" accept=".csv,.xlsx,.xls" className="w-full border rounded px-3 py-2" onChange={(e) => setUploadFile(e.target.files[0])} required />
-              <p className="text-xs text-brand-navy/60 mt-1">Upload any table format. We will auto-detect columns.</p>
-            </div>
-            <div className="flex justify-end gap-3">
-              <button type="button" onClick={() => { setShowUpload(false); setUploadFile(null); }} className="px-4 py-2 border rounded">Cancel</button>
-              <button type="button" onClick={handleParseFile} disabled={saving} className="px-4 py-2 bg-brand-orange text-white rounded hover:bg-brand-orangeHover disabled:opacity-50">{saving ? 'Parsing...' : 'Next: Preview'}</button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {showPreview && parseResult && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto">
-          <div className="bg-white p-6 rounded shadow-md w-full max-w-6xl max-h-screen overflow-auto">
-            <h2 className="text-xl font-bold mb-2">Preview & Map Columns</h2>
-            <p className="text-sm text-brand-navy/70 mb-4">
-              Detected {parseResult.total_rows} rows. We auto-mapped {Object.keys(parseResult.column_mapping || {}).length} columns. Review the preview and confirm mappings below.
-            </p>
-
-            <div className="mb-4">
-              <h3 className="text-sm font-semibold mb-2">Column Mapping</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {STANDARD_FIELDS.map((field) => (
-                  <div key={field.key} className="flex items-center gap-2">
-                    <label className="w-48 text-sm font-medium">{field.label}</label>
-                    <select
-                      className="flex-1 border rounded px-2 py-1 text-sm"
-                      value={columnMappings[field.key] || ''}
-                      onChange={(e) => setColumnMappings({ ...columnMappings, [field.key]: e.target.value ? Number(e.target.value) : '' })}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-400">{t.date}</span>
+                    <span
+                      className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                        t.status === 'EE'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : t.status === 'ME'
+                          ? 'bg-blue-100 text-blue-700'
+                          : t.status === 'AE'
+                          ? 'bg-amber-100 text-amber-700'
+                          : t.status === 'BE'
+                          ? 'bg-rose-100 text-rose-700'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}
                     >
-                      <option value="">-- Not mapped --</option>
-                      {(parseResult.headers || []).map((h, idx) => (
-                        <option key={idx} value={idx}>{h}</option>
-                      ))}
-                    </select>
-                    {parseResult.column_mapping && parseResult.column_mapping[field.key] && (
-                      <span className="text-xs text-brand-orange">
-                        Auto-detected ({Math.round((parseResult.column_mapping[field.key].confidence || 0) * 100)}%)
-                      </span>
-                    )}
+                      {t.status}
+                    </span>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
+              {taskCards.length === 0 && (
+                <p className="text-xs text-slate-400">No formative tasks recorded yet.</p>
+              )}
             </div>
+          </div>
 
-            <div className="mb-4">
-              <h3 className="text-sm font-semibold mb-2">Preview (first {Math.min(10, parseResult.preview?.length || 0)} rows)</h3>
-              <div className="overflow-x-auto border rounded">
-                <table className="min-w-full text-sm">
-                  <thead className="bg-brand-grayLight/50">
-                    <tr>
-                      {STANDARD_FIELDS.map((f) => (
-                        <th key={f.key} className="px-2 py-2 text-left text-xs font-medium text-brand-navy/60 uppercase">{f.label}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-brand-navy/10">
-                    {(parseResult.preview || []).slice(0, 10).map((row, idx) => (
-                      <tr key={idx}>
-                        {STANDARD_FIELDS.map((f) => (
-                          <td key={f.key} className="px-2 py-2 max-w-xs truncate">{row[f.key] || '-'}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div className="glass-panel p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+            <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
+              <i className="fa-solid fa-bolt text-amber-500"></i>
+              Quick Actions
+            </h3>
+            <div className="space-y-2">
+              <button
+                onClick={openModal}
+                className="w-full text-left p-3 rounded-xl border border-slate-200 bg-white hover:border-teal-500 hover:shadow-md transition-all flex items-center justify-between group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-all">
+                    <i className="fa-solid fa-clipboard-question"></i>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">Create Assessment Modal</p>
+                    <p className="text-[10px] text-slate-400">Task setup & student matrix</p>
+                  </div>
+                </div>
+                <i className="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-teal-600"></i>
+              </button>
 
-            {parseResult.unmapped_headers && parseResult.unmapped_headers.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold mb-2">Unmapped Columns</h3>
-                <p className="text-xs text-brand-navy/60">These columns were not recognized and will be ignored: {parseResult.unmapped_headers.map(h => h.header).join(', ')}</p>
-              </div>
-            )}
+              <button
+                onClick={() => (window.location.href = '/assessments')}
+                className="w-full text-left p-3 rounded-xl border border-slate-200 bg-white hover:border-teal-500 hover:shadow-md transition-all flex items-center justify-between group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <i className="fa-solid fa-award"></i>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">Formative Gradebook</p>
+                    <p className="text-[10px] text-slate-400">Batch mark EE, ME, AE, BE</p>
+                  </div>
+                </div>
+                <i className="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-blue-600"></i>
+              </button>
 
-            <div className="flex justify-end gap-3">
-              <button type="button" onClick={() => { setShowPreview(false); setParseResult(null); }} className="px-4 py-2 border rounded">Cancel</button>
-              <button type="button" onClick={handleConfirmImport} disabled={saving} className="px-4 py-2 bg-accent-teal text-white rounded hover:bg-accent-teal-strong disabled:opacity-50">{saving ? 'Importing...' : 'Confirm & Import'}</button>
+              <button
+                onClick={() =>
+                  window.alert('Switch to parent preview mode — view the portal as a parent/guardian.')
+                }
+                className="w-full text-left p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100/50 transition-all flex items-center justify-between group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center">
+                    <i className="fa-solid fa-eye"></i>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-emerald-900">Switch to Parent Preview</p>
+                    <p className="text-[10px] text-emerald-700">Test parent portal experience</p>
+                  </div>
+                </div>
+                <i className="fa-solid fa-chevron-right text-xs text-emerald-600"></i>
+              </button>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* New CBC Assessment Task Wizard Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-4xl w-full my-auto shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+            <div className="bg-slate-900 text-white px-6 py-4 flex justify-between items-center shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="w-9 h-9 rounded-xl bg-teal-500 text-white flex items-center justify-center font-bold text-lg">
+                  <i className="fa-solid fa-clipboard-check"></i>
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-white">CBC Assessment Task Builder & Evaluator</h3>
+                  <p className="text-[11px] text-teal-400">KICD Formative Task & Direct Scoring Grid</p>
+                </div>
+              </div>
+              <button
+                onClick={closeModal}
+                className="text-slate-400 hover:text-white text-lg transition-all"
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div className="bg-slate-100 border-b border-slate-200 px-6 py-2.5 flex justify-between items-center shrink-0 text-xs">
+              {[1, 2, 3, 4].map((s) => [
+                <button
+                  key={s}
+                  onClick={() => setStep(s)}
+                  className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all ${
+                    step === s
+                      ? 'font-bold text-teal-700 bg-teal-100'
+                      : 'font-semibold text-slate-500'
+                  }`}
+                >
+                  <span>
+                    {s}.{' '}
+                    {s === 1
+                      ? 'Task Metadata'
+                      : s === 2
+                      ? 'Competencies & Values'
+                      : s === 3
+                      ? 'Rubric Descriptors'
+                      : 'Live Student Scoring'}
+                  </span>
+                </button>,
+                s < 4 && <i key={`c${s}`} className="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>,
+              ])}
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-5 flex-1 text-xs">
+              {step === 1 && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Learning Area *</label>
+                      <select
+                        value={modalSubject}
+                        onChange={(e) => setModalSubject(e.target.value)}
+                        className="w-full p-2.5 bg-white border border-slate-300 rounded-xl"
+                      >
+                        {subjectOptions.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Grade Level *</label>
+                      <select
+                        value={modalGrade}
+                        onChange={(e) => setModalGrade(e.target.value)}
+                        className="w-full p-2.5 bg-white border border-slate-300 rounded-xl"
+                      >
+                        {grades.map((g) => (
+                          <option key={g.id} value={g.name}>
+                            {g.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Task Type *</label>
+                      <select
+                        value={modalTaskType}
+                        onChange={(e) => setModalTaskType(e.target.value)}
+                        className="w-full p-2.5 bg-white border border-slate-300 rounded-xl"
+                      >
+                        <option value="Practical Performance Task">Practical Performance Task</option>
+                        <option value="Project-Based Learning">Project-Based Learning (P5)</option>
+                        <option value="Observation Rubric">Teacher Observation Rubric</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Strand Name *</label>
+                      <input
+                        type="text"
+                        value={modalStrand}
+                        onChange={(e) => setModalStrand(e.target.value)}
+                        className="w-full p-2.5 border border-slate-300 rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Sub-strand Task *</label>
+                      <input
+                        type="text"
+                        value={modalSubstrand}
+                        onChange={(e) => setModalSubstrand(e.target.value)}
+                        className="w-full p-2.5 border border-slate-300 rounded-xl"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {step === 2 && (
+                <div className="space-y-4">
+                  <label className="block font-bold text-slate-800 text-sm mb-2">
+                    Tag Target Core Competencies
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="p-2 bg-slate-50 border rounded-lg flex items-center space-x-2">
+                      <input type="checkbox" defaultChecked />
+                      <span className="font-semibold">Critical Thinking & Problem Solving</span>
+                    </label>
+                    <label className="p-2 bg-slate-50 border rounded-lg flex items-center space-x-2">
+                      <input type="checkbox" defaultChecked />
+                      <span className="font-semibold">Creativity & Innovation</span>
+                    </label>
+                    <label className="p-2 bg-slate-50 border rounded-lg flex items-center space-x-2">
+                      <input type="checkbox" />
+                      <span className="font-semibold">Digital Literacy</span>
+                    </label>
+                    <label className="p-2 bg-slate-50 border rounded-lg flex items-center space-x-2">
+                      <input type="checkbox" defaultChecked />
+                      <span className="font-semibold">Communication & Collaboration</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="space-y-3">
+                  <p className="font-bold text-slate-800 text-sm">4-Level Performance Assessment Rubrics</p>
+                  <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                    <span className="font-bold text-emerald-800">EE:</span> Constructs apparatus independently and purifies water flawlessly.
+                  </div>
+                  <div className="p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                    <span className="font-bold text-blue-800">ME:</span> Constructs filter apparatus with minimal support.
+                  </div>
+                  <div className="p-2 bg-amber-50 border border-amber-200 rounded-lg">
+                    <span className="font-bold text-amber-800">AE:</span> Assembles filter but water remains turbid; needs guidance.
+                  </div>
+                  <div className="p-2 bg-rose-50 border border-rose-200 rounded-lg">
+                    <span className="font-bold text-rose-800">BE:</span> Struggles with assembly; needs teacher demonstration.
+                  </div>
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between bg-teal-50 p-3 rounded-xl border border-teal-200">
+                    <p className="font-bold text-teal-900">Score Learners Live for {modalGrade}</p>
+                    <div className="space-x-1">
+                      <button
+                        onClick={() => batchSet('EE')}
+                        className="px-2 py-1 bg-emerald-600 text-white font-bold rounded"
+                      >
+                        All EE
+                      </button>
+                      <button
+                        onClick={() => batchSet('ME')}
+                        className="px-2 py-1 bg-blue-600 text-white font-bold rounded"
+                      >
+                        All ME
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                          <th className="p-2.5">Learner</th>
+                          <th className="p-2.5 text-center">Score</th>
+                          <th className="p-2.5">Teacher Remark</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 bg-white">
+                        {(roster.learners || []).map((l) => {
+                          const ms = modalScores[l.id] || { score: 'ME', remark: DEFAULT_REMARKS.ME };
+                          return (
+                            <tr key={l.id}>
+                              <td className="p-2.5 font-semibold text-slate-800">{l.name}</td>
+                              <td className="p-2.5 text-center">
+                                <div className="inline-flex rounded-lg p-0.5 bg-slate-100 space-x-1">
+                                  {['EE', 'ME', 'AE', 'BE'].map((lvl) => (
+                                    <button
+                                      key={lvl}
+                                      onClick={() => setScore(l.id, lvl)}
+                                      className={`px-2 py-0.5 text-[10px] font-bold rounded transition-all ${
+                                        ms.score === lvl ? rubricClass(lvl) : 'text-slate-500 hover:bg-slate-200'
+                                      }`}
+                                    >
+                                      {lvl}
+                                    </button>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="p-2.5">
+                                <textarea
+                                  value={ms.remark}
+                                  onChange={(e) => setRemark(l.id, e.target.value)}
+                                  rows={1}
+                                  className="w-full text-xs p-1 bg-slate-50 border rounded"
+                                />
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-slate-50 border-t border-slate-200 px-6 py-3 flex justify-between items-center shrink-0">
+              <button
+                onClick={prevStep}
+                disabled={step === 1}
+                className="px-4 py-2 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <div className="flex items-center space-x-2">
+                {step < 4 ? (
+                  <button
+                    onClick={nextStep}
+                    className="px-5 py-2 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700"
+                  >
+                    Next Step
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSaveAssessment}
+                    disabled={saving}
+                    className="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 disabled:opacity-50"
+                  >
+                    {saving ? 'Saving…' : 'Save & Publish'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {error && <p className="px-6 text-xs text-rose-600">{error}</p>}
+          </div>
+        </div>
       )}
+
       <AITeacherAssist />
     </div>
   );

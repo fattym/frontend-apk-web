@@ -55,6 +55,45 @@ export default api;
 export const submitForm = (form_type, data) =>
   api.post('/api/shop/form-submissions/', { form_type, data }).then((r) => r.data);
 
+export const fetchFormSubmissions = () =>
+  api.get('/api/shop/form-submissions/').then((r) => r.data);
+
+export const fetchBuses = () =>
+  api.get('/api/transport/buses/').then((r) => r.data.results || r.data);
+
+export const fetchDrivers = () =>
+  api.get('/api/auth/users/?role=DRIVER').then((r) => r.data.results || r.data);
+
+export const fetchStudents = () =>
+  api.get('/api/auth/users/?role=STUDENT').then((r) => r.data.results || r.data);
+
+export const fetchDriverStudents = () =>
+  api.get('/api/transport/driver/students/').then((r) => r.data);
+
+export const createAssignment = (payload) =>
+  api.post('/api/transport/assignments/', payload).then((r) => r.data);
+
+export const fetchGrades = () =>
+  api.get('/api/academics/grades/').then((r) => r.data.results || r.data);
+
+export const fetchLearningAreas = () =>
+  api.get('/api/academics/learning-areas/').then((r) => r.data.results || r.data);
+
+export const fetchTerms = () =>
+  api.get('/api/academics/terms/').then((r) => (Array.isArray(r.data) ? r.data : r.data.results || r.data));
+
+export const fetchAssessmentTasks = () =>
+  api.get('/api/assessment/tasks/').then((r) => (Array.isArray(r.data) ? r.data : r.data.results || r.data));
+
+export const createAssessmentTask = (payload) =>
+  api.post('/api/assessment/tasks/', payload).then((r) => r.data);
+
+export const fetchStreams = () =>
+  api.get('/api/academics/streams/').then((r) => r.data.results || r.data);
+
+export const patchLearnerAssessment = (learnerId, payload) =>
+  api.patch(`/api/gradebook/learners/${learnerId}/assessments/`, payload).then((r) => r.data);
+
 export const formErrorMessage = (err, fallback = 'Could not submit your request. Please try again.') => {
   if (err?.response?.data?.detail) return String(err.response.data.detail);
   if (err?.response?.data) {

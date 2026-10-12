@@ -1,4 +1,5 @@
 import ResourceManager from '../components/ResourceManager';
+import TeachingMaterialsCatalog from '../components/TeachingMaterialsCatalog';
 
 const ROLE_OPTIONS = [
   { value: 'subject_teacher', label: 'Subject Teacher' },
@@ -7,7 +8,8 @@ const ROLE_OPTIONS = [
 ];
 
 const TeacherAssignments = () => (
-  <ResourceManager
+  <>
+    <ResourceManager
     title="Teacher Assignments"
     endpoint="/api/academics/teacher-assignments/"
     columns={[
@@ -29,6 +31,9 @@ const TeacherAssignments = () => (
     ]}
     defaultValues={{ is_active: true, role: 'subject_teacher' }}
   />
+
+    <TeachingMaterialsCatalog />
+  </>
 );
 
 export default TeacherAssignments;

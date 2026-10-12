@@ -237,7 +237,7 @@ const CourseStudio = () => {
     setError('');
     try {
       const payload = { ...activeCourse };
-      payload.learning_area = typeof payload.learning_area === 'object' ? payload.learning_area?.id : payload.learning_area;
+      payload.learning_area = typeof payload.learning_area === 'object' ? payload.learning_area?.id : payload.learning_area || null;
       payload.grade = typeof payload.grade === 'object' ? payload.grade?.id : payload.grade || null;
       payload.stream = typeof payload.stream === 'object' ? payload.stream?.id : payload.stream || null;
       payload.term = typeof payload.term === 'object' ? payload.term?.id : payload.term || null;

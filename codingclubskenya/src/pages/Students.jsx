@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import useApiList from '../hooks/useApiList';
+import Gradebook from './Gradebook';
 import UserForm from '../components/UserForm';
 
 const TEMPLATE = 'first_name,last_name,email,password,phone,class\nJane,Doe,jane.doe@school.edu,Pass@1234,0712345678,Grade 7 A\n';
@@ -33,21 +33,18 @@ const parseCsv = (text) => {
 };
 
 const Students = () => {
-  const { data: users, loading, refresh } = useApiList('/api/auth/users/?role=STUDENT');
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [showImport, setShowImport] = useState(false);
-
-  const handleSaved = () => {
-    refresh();
-    setShowForm(false);
-    setEditingUser(null);
-  };
-
   const [parsed, setParsed] = useState([]);
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState(null);
   const [importError, setImportError] = useState('');
+
+  const handleSaved = () => {
+    setShowForm(false);
+    setEditingUser(null);
+  };
 
   const onFile = (e) => {
     const file = e.target.files?.[0];
@@ -74,7 +71,6 @@ const Students = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Import failed');
       setResult(data);
-      if (data.created > 0) refresh();
     } catch (err) {
       setImportError(err.message);
     } finally {
@@ -93,55 +89,26 @@ const Students = () => {
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Students</h1>
-        <div className="flex gap-3">
-          <button
-            onClick={() => { setShowImport(true); setParsed([]); setResult(null); setImportError(''); }}
-            className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded"
-          >
-            Bulk Import
-          </button>
-          <button
-            onClick={() => { setEditingUser(null); setShowForm(true); }}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Add Student
-          </button>
-        </div>
-      </div>
+    <>
+      {/* CBC Gradebook / Learner Profile / Report Card (template UI) */}
+      <Gradebook />
 
-      <div className="bg-white rounded shadow overflow-hidden">
-        <table className="min-w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">NEMIS No.</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Adm No.</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">School</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td className="px-6 py-4 font-medium">{u.first_name} {u.last_name}</td>
-                <td className="px-6 py-4">{u.email}</td>
-                <td className="px-6 py-4">{u.student_profile?.nemis_number || '-'}</td>
-                <td className="px-6 py-4">{u.student_profile?.admission_number || '-'}</td>
-                <td className="px-6 py-4">{u.school?.name || '-'}</td>
-                <td className="px-6 py-4">
-                  <button onClick={() => { setEditingUser(u); setShowForm(true); }} className="text-blue-600 hover:underline mr-3">Edit</button>
-                </td>
-              </tr>
-            ))}
-            {users.length === 0 && !loading && (
-              <tr><td colSpan="6" className="px-6 py-8 text-center text-gray-500">No students found. Add your first student.</td></tr>
-            )}
-          </tbody>
-        </table>
+      {/* Floating action bar — register / import learners (admin functions) */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-40">
+        <button
+          onClick={() => { setEditingUser(null); setShowForm(true); }}
+          title="Register New Learner"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white w-12 h-12 rounded-full shadow-lg shadow-emerald-900/30 flex items-center justify-center"
+        >
+          <i className="fa-solid fa-user-plus"></i>
+        </button>
+        <button
+          onClick={() => { setShowImport(true); setParsed([]); setResult(null); setImportError(''); }}
+          title="Bulk Import"
+          className="bg-amber-500 hover:bg-amber-600 text-white w-12 h-12 rounded-full shadow-lg shadow-amber-900/30 flex items-center justify-center"
+        >
+          <i className="fa-solid fa-upload"></i>
+        </button>
       </div>
 
       {showForm && (
@@ -150,20 +117,20 @@ const Students = () => {
 
       {showImport && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded shadow-md w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 border border-slate-200">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Bulk Import Students</h2>
-              <button onClick={() => setShowImport(false)} className="text-gray-500 hover:text-gray-800">✕</button>
+              <h2 className="text-xl font-bold text-slate-800">Bulk Import Students</h2>
+              <button onClick={() => setShowImport(false)} className="text-slate-400 hover:text-slate-700 text-lg">&times;</button>
             </div>
 
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-slate-600 mb-3">
               Upload a CSV (Excel → Save As CSV). Columns:{' '}
-              <code className="bg-gray-100 px-1 rounded">first_name, last_name, email, password, phone, class</code>.
-              The <code className="bg-gray-100 px-1 rounded">class</code> column should match an existing stream name (e.g. "Grade 7 A").
+              <code className="bg-slate-100 px-1 rounded">first_name, last_name, email, password, phone, class</code>.
+              The <code className="bg-slate-100 px-1 rounded">class</code> column should match an existing stream name (e.g. "Grade 7 A").
             </p>
 
             <div className="flex gap-3 mb-4">
-              <button onClick={downloadTemplate} className="text-blue-600 hover:underline text-sm">Download template</button>
+              <button onClick={downloadTemplate} className="text-teal-600 hover:underline text-sm font-medium">Download template</button>
               <input type="file" accept=".csv,text/csv" onChange={onFile} className="text-sm" />
             </div>
 
@@ -173,7 +140,7 @@ const Students = () => {
               <>
                 <div className="bg-white rounded border mb-4 overflow-x-auto max-h-64">
                   <table className="min-w-full text-sm">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-slate-50">
                       <tr>
                         <th className="px-3 py-2 text-left">Name</th>
                         <th className="px-3 py-2 text-left">Email</th>
@@ -193,14 +160,17 @@ const Students = () => {
                     </tbody>
                   </table>
                 </div>
-                <p className="text-sm text-gray-600 mb-3">{parsed.length} rows parsed.</p>
+                <p className="text-sm text-slate-600 mb-3">{parsed.length} rows parsed.</p>
               </>
             )}
 
             {result && (
-              <div className={`mb-4 p-3 rounded text-sm ${result.errors.length ? 'bg-amber-50' : 'bg-green-50'}`}>
-                <p className="font-medium">Imported {result.created} student(s).</p>
-                {result.errors.length > 0 && (
+              <div className={`mb-4 p-3 rounded text-sm ${result.errors?.length ? 'bg-amber-50' : 'bg-emerald-50'}`}>
+                <p className="font-medium">
+                  <i className={`fa-solid mr-1 ${result.errors?.length ? 'fa-circle-exclamation text-amber-600' : 'fa-check-circle text-emerald-600'}`}></i>
+                  Imported {result.created} student(s).
+                </p>
+                {result.errors?.length > 0 && (
                   <ul className="mt-1 list-disc list-inside text-red-700">
                     {result.errors.slice(0, 10).map((e, i) => (
                       <li key={i}>Row {e.row}: {e.error}</li>
@@ -211,11 +181,11 @@ const Students = () => {
             )}
 
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowImport(false)} className="px-4 py-2 border rounded">Cancel</button>
+              <button onClick={() => setShowImport(false)} className="px-4 py-2 border rounded text-slate-700">Cancel</button>
               <button
                 onClick={doImport}
                 disabled={importing || parsed.length === 0}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 disabled:opacity-50"
               >
                 {importing ? 'Importing…' : `Import ${parsed.length} student(s)`}
               </button>
@@ -223,7 +193,7 @@ const Students = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
