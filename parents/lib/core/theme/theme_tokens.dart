@@ -49,6 +49,16 @@ const Color kNavy900 = Color(0xFF071020);
 const Color kCloudHi = Color(0xFFFFFFFF);
 const Color kCloudLo = Color(0xFFE2E5EA);
 
+// ── Dark mode palette (PRD §5.1 — inverted claymorphism) ─────────
+// Accent (kAccent) and navy (kNavy) stay brand-identical across both
+// modes; only surfaces, text and backgrounds invert for dark.
+const Color kDarkBackground = Color(0xFF0F1729);
+const Color kDarkSurface = Color(0xFF1E293B);
+const Color kDarkSurfaceHi = Color(0xFF273449);
+const Color kDarkInk = Color(0xFFE2E5EA);
+const Color kDarkInkMuted = Color(0xFF94A3B8);
+const Color kDarkBorder = Color(0xFF334155);
+
 // ── Radius tokens (PRD §5.3) ────────────────────────────────────
 const double kRadiusSm = 12.0;
 const double kRadiusMd = 20.0;
@@ -56,6 +66,7 @@ const double kRadiusLg = 28.0;
 const double kRadiusFull = 999.0;
 const double kRadius12 = 12.0;
 const double kRadius16 = 16.0;
+const double kRadius20 = 20.0;
 
 // ── Spacing tokens (PRD §5.4) ───────────────────────────────────
 const double kSpacing4 = 4.0;
@@ -64,6 +75,7 @@ const double kSpacing12 = 12.0;
 const double kSpacing16 = 16.0;
 const double kSpacing24 = 24.0;
 const double kSpacing32 = 32.0;
+const double kSpacing40 = 40.0;
 const double kSpacing48 = 48.0;
 
 // Grid gap (PRD §5.4: between stat tiles)
@@ -76,48 +88,66 @@ const double kSpacing18 = 18.0;
 // Type scale steps: 12 / 14 / 16 / 18 / 20 / 21 / 25 / 31 / 39 / 49
 const double kType12 = 12.0;
 const double kType14 = 14.0;
+const double kType15 = 15.0;
 const double kType16 = 16.0;
 const double kType18 = 18.0;
 const double kType20 = 20.0;
 const double kType21 = 21.0;
 const double kType25 = 25.0;
 const double kType31 = 31.0;
+const double kType36 = 36.0;
 const double kType39 = 39.0;
 const double kType49 = 49.0;
 
 // ── Clay shadow tokens (PRD §5.3) ──────────────────────────────
-// Raised: dual shadow, light top-left highlight + soft dark bottom-right.
-// Used for: primary actions, active nav, hero stat (1–2 per view max).
+// Raised: subtle dual shadow — soft dark bottom-right drop + a very
+// light top-left highlight. Kept low to avoid a "glow" halo,
+// especially over dark (kNavy) surfaces. Used for primary actions,
+// active nav, hero stat (1–2 per view max).
 final List<BoxShadow> kClayRaisedShadows = [
   BoxShadow(
-    color: kNavy.withValues(alpha: 0.16),
-    blurRadius: 16,
-    offset: const Offset(8, 8),
+    color: kNavy.withValues(alpha: 0.08),
+    blurRadius: 6,
+    offset: const Offset(4, 4),
   ),
   BoxShadow(
-    color: kWhite.withValues(alpha: 0.85),
-    blurRadius: 14,
-    offset: const Offset(-6, -6),
+    color: kWhite.withValues(alpha: 0.14),
+    blurRadius: 5,
+    offset: const Offset(-3, -3),
   ),
 ];
 
 // Recessed / inset: simulated via gradient (Flutter BoxShadow lacks inset).
 // Used for: stat cards, content area, inputs.
-BoxDecoration clayInsetDecoration({Color? surface, double? borderRadius}) {
+// Theme-aware: pass `context` so the clay gradient matches light/dark mode.
+BoxDecoration clayInsetDecoration(
+  BuildContext context, {
+  Color? surface,
+  double? borderRadius,
+}) {
+  final isDark = context.isDarkMode;
+  final s = surface ?? (isDark ? kDarkSurface : kWhite);
   return BoxDecoration(
-    color: surface ?? kWhite,
+    color: s,
     borderRadius: borderRadius != null
         ? BorderRadius.circular(borderRadius)
         : null,
     gradient: LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [
-        (surface ?? kWhite).withValues(alpha: 0.65),
-        (surface ?? kWhite),
-        (surface ?? kWhite),
-        kNavy.withValues(alpha: 0.10),
-      ],
+      colors: isDark
+          ? [
+              kWhite.withValues(alpha: 0.04),
+              s,
+              s,
+              const Color(0x000000).withValues(alpha: 0.30),
+            ]
+          : [
+              s.withValues(alpha: 0.65),
+              s,
+              s,
+              kNavy.withValues(alpha: 0.10),
+            ],
       stops: const [0.0, 0.3, 0.7, 1.0],
     ),
   );
@@ -148,14 +178,14 @@ final List<BoxShadow> kClayFlushShadows = [];
 // Dark-surface raised (sidebar, hero on navy).
 final List<BoxShadow> kClayRaisedDarkShadows = [
   BoxShadow(
-    color: const Color(0x000000).withValues(alpha: 0.35),
-    blurRadius: 16,
-    offset: const Offset(8, 8),
+    color: const Color(0x000000).withValues(alpha: 0.18),
+    blurRadius: 6,
+    offset: const Offset(4, 4),
   ),
   BoxShadow(
     color: kWhite.withValues(alpha: 0.06),
-    blurRadius: 14,
-    offset: const Offset(-6, -6),
+    blurRadius: 5,
+    offset: const Offset(-3, -3),
   ),
 ];
 
@@ -166,3 +196,35 @@ const Color kClayFlushBgShift = Color(0x050B1F);
 
 // ── Focus ring color for accessibility (PRD §8) ─────────────────
 const Color kFocusRing = kAccent;
+
+// ── Brightness-aware color resolution ───────────────────────────
+// Single source of truth for light/dark color resolution so reusable
+// clay components adapt automatically. Usage: `context.surfaceColor`.
+extension ThemeColorsX on BuildContext {
+  bool get isDarkMode => Theme.of(this).brightness == Brightness.dark;
+
+  /// Card / container surface (raised content panels).
+  Color get surfaceColor => isDarkMode ? kDarkSurface : kWhite;
+
+  /// App canvas background.
+  Color get canvasColor => isDarkMode ? kDarkBackground : kCloud;
+
+  /// Primary text / icon color.
+  Color get inkColor => isDarkMode ? kDarkInk : kInk;
+
+  /// Muted text / secondary icon color.
+  Color get inkMutedColor => isDarkMode ? kDarkInkMuted : kGray600;
+
+  /// AppBar background.
+  Color get appBarBackgroundColor => isDarkMode ? kDarkSurface : kWhite;
+
+  /// AppBar foreground (titles + icons).
+  Color get appBarForegroundColor => isDarkMode ? kDarkInk : kNavy;
+
+  /// Bottom Navigation / nav-rail background (navy is brand-identical).
+  Color get navBarBackgroundColor => kNavy;
+
+  /// Inactive nav icon tint.
+  Color get navBarInactiveColor =>
+      isDarkMode ? kDarkInkMuted : kNavy.withValues(alpha: 0.6);
+}

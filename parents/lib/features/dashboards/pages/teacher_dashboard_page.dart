@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/theme_tokens.dart';
 import '../../../core/theme/clay_card.dart';
+import '../../../core/theme/theme_toggle.dart';
 import '../../onboarding/teacher_onboarding_page.dart';
 import '../providers/teacher_nav_drawer.dart';
 import '../providers/dashboard_provider.dart';
@@ -26,7 +27,7 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
     final provider = context.watch<DashboardProvider>();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kWhite,
+        backgroundColor: context.appBarBackgroundColor,
         elevation: 0,
         title: Text(
           'Teacher Dashboard',
@@ -34,19 +35,21 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
             fontFamily: 'Baloo 2',
             fontSize: kType21,
             fontWeight: FontWeight.w700,
-            color: kNavy,
+            color: context.appBarForegroundColor,
           ),
         ),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: kNavy),
+            icon: Icon(Icons.menu, color: context.appBarForegroundColor),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
         actions: [
+          ThemeToggle(),
+          const SizedBox(width: kSpacing8),
           IconButton(
-            icon: Icon(Icons.notifications, color: kNavy),
+            icon: Icon(Icons.notifications, color: context.appBarForegroundColor),
             onPressed: () {},
           ),
           const SizedBox(width: kSpacing8),
@@ -129,7 +132,7 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
                           fontFamily: 'Baloo 2',
                           fontSize: kType18,
                           fontWeight: FontWeight.w700,
-                          color: kNavy,
+                          color: context.appBarForegroundColor,
                         ),
                       ),
                       const SizedBox(height: kSpacing12),
@@ -196,19 +199,19 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
                           fontFamily: 'Baloo 2',
                           fontSize: kType18,
                           fontWeight: FontWeight.w700,
-                          color: kNavy,
+                          color: context.appBarForegroundColor,
                         ),
                       ),
                       const SizedBox(height: kSpacing8),
                       if (provider.classes.isEmpty)
                         ClayContainer(
                           borderRadius: kRadius12,
-                          child: const Padding(
-                            padding: EdgeInsets.all(kSpacing16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(kSpacing16),
                             child: Center(
                               child: Text(
                                 'No classes yet. Start by creating a class.',
-                                style: TextStyle(color: kGray600),
+                                style: TextStyle(color: context.inkMutedColor),
                               ),
                             ),
                           ),
@@ -232,7 +235,7 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
                                               fontFamily: 'Plus Jakarta Sans',
                                               fontSize: kType14,
                                               fontWeight: FontWeight.w700,
-                                              color: kNavy,
+                                              color: context.appBarForegroundColor,
                                             ),
                                           ),
                                           Text(
@@ -240,13 +243,13 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
                                             style: TextStyle(
                                               fontFamily: 'Plus Jakarta Sans',
                                               fontSize: kType12,
-                                              color: kGray600,
+                                              color: context.inkMutedColor,
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    Icon(Icons.chevron_right, color: kGray400),
+                                    Icon(Icons.chevron_right, color: context.inkMutedColor),
                                   ],
                                 ),
                               ),
@@ -260,7 +263,7 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
                           fontFamily: 'Baloo 2',
                           fontSize: kType18,
                           fontWeight: FontWeight.w700,
-                          color: kNavy,
+                          color: context.appBarForegroundColor,
                         ),
                       ),
                       const SizedBox(height: kSpacing8),
@@ -288,7 +291,7 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
                                 title: 'English Essay',
                                 subtitle: 'Grade 9 • Due in 1 week',
                                 status: 'Draft',
-                                statusColor: kGray400,
+                                statusColor: context.inkMutedColor,
                               ),
                             ],
                           ),
@@ -303,7 +306,7 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
                           fontFamily: 'Baloo 2',
                           fontSize: kType18,
                           fontWeight: FontWeight.w700,
-                          color: kNavy,
+                          color: context.appBarForegroundColor,
                         ),
                       ),
                       const SizedBox(height: kSpacing8),
@@ -452,7 +455,7 @@ class _StatTile extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Plus Jakarta Sans',
               fontSize: kType12,
-              color: kGray600,
+              color: context.inkMutedColor,
             ),
           ),
         ],
@@ -488,7 +491,7 @@ class _AssessmentItem extends StatelessWidget {
                   fontFamily: 'Plus Jakarta Sans',
                   fontSize: kType14,
                   fontWeight: FontWeight.w600,
-                  color: kNavy,
+                  color: context.appBarForegroundColor,
                 ),
               ),
               Text(
@@ -496,7 +499,7 @@ class _AssessmentItem extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Plus Jakarta Sans',
                   fontSize: kType12,
-                  color: kGray600,
+                  color: context.inkMutedColor,
                 ),
               ),
             ],
@@ -553,7 +556,7 @@ class _ActivityItem extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Plus Jakarta Sans',
                   fontSize: kType14,
-                  color: kNavy,
+                  color: context.appBarForegroundColor,
                 ),
               ),
               Text(
@@ -561,7 +564,7 @@ class _ActivityItem extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Plus Jakarta Sans',
                   fontSize: kType12,
-                  color: kGray400,
+                  color: context.inkMutedColor,
                 ),
               ),
             ],

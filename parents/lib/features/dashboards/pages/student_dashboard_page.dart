@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/theme_tokens.dart';
 import '../../../core/theme/clay_card.dart';
 import '../../../core/theme/clay_badge.dart';
+import '../../../core/theme/theme_toggle.dart';
 import '../../onboarding/teacher_onboarding_page.dart';
 import '../providers/dashboard_provider.dart';
 import '../providers/teacher_nav_drawer.dart';
@@ -27,7 +28,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
     final provider = context.watch<DashboardProvider>();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kWhite,
+        backgroundColor: context.appBarBackgroundColor,
         elevation: 0,
         title: Text(
           'Student Dashboard',
@@ -35,19 +36,21 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
             fontFamily: 'Baloo 2',
             fontSize: kType21,
             fontWeight: FontWeight.w700,
-            color: kNavy,
+            color: context.appBarForegroundColor,
           ),
         ),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: kNavy),
+            icon: Icon(Icons.menu, color: context.appBarForegroundColor),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
         actions: [
+          ThemeToggle(),
+          const SizedBox(width: kSpacing8),
           IconButton(
-            icon: Icon(Icons.notifications, color: kNavy),
+            icon: Icon(Icons.notifications, color: context.appBarForegroundColor),
             onPressed: () {},
           ),
           const SizedBox(width: kSpacing8),
@@ -128,17 +131,17 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
                               fontFamily: 'Baloo 2',
                               fontSize: kType18,
                               fontWeight: FontWeight.w700,
-                              color: kNavy,
+                              color: context.appBarForegroundColor,
                             ),
                           ),
                           const SizedBox(height: kSpacing8),
                           if (provider.classes.isEmpty)
                             ClayContainer(
                               borderRadius: kRadius12,
-                              child: const Padding(
-                                padding: EdgeInsets.all(kSpacing16),
+                              child: Padding(
+                                padding: const EdgeInsets.all(kSpacing16),
                                 child: Center(
-                                  child: Text('No classes enrolled yet.', style: TextStyle(color: kGray600)),
+                                  child: Text('No classes enrolled yet.', style: TextStyle(color: context.inkMutedColor)),
                                 ),
                               ),
                             )
@@ -158,7 +161,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
                                               fontFamily: 'Plus Jakarta Sans',
                                               fontSize: kType14,
                                               fontWeight: FontWeight.w700,
-                                              color: kNavy,
+                                              color: context.appBarForegroundColor,
                                             ),
                                           ),
                                         ),
@@ -178,17 +181,17 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
                               fontFamily: 'Baloo 2',
                               fontSize: kType18,
                               fontWeight: FontWeight.w700,
-                              color: kNavy,
+                              color: context.appBarForegroundColor,
                             ),
                           ),
                           const SizedBox(height: kSpacing8),
                           ClayContainer(
                             borderRadius: kRadius12,
-                            child: const Padding(
-                              padding: EdgeInsets.all(kSpacing16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(kSpacing16),
                               child: Text(
                                 'No upcoming assessments.',
-                                style: TextStyle(color: kGray600),
+                                style: TextStyle(color: context.inkMutedColor),
                               ),
                             ),
                           ),

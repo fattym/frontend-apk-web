@@ -10,11 +10,11 @@ class CourseFlowPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kWhite,
+        backgroundColor: context.appBarBackgroundColor,
         elevation: 0,
-        title: Text('Course Flow', style: TextStyle(fontFamily: 'Baloo 2', fontSize: kType21, fontWeight: FontWeight.w700, color: kNavy)),
+        title: Text('Course Flow', style: TextStyle(fontFamily: 'Baloo 2', fontSize: kType21, fontWeight: FontWeight.w700, color: context.appBarForegroundColor)),
         centerTitle: true,
-        leading: Builder(builder: (context) => IconButton(icon: Icon(Icons.menu, color: kNavy), onPressed: () => Scaffold.of(context).openDrawer())),
+        leading: Builder(builder: (context) => IconButton(icon: Icon(Icons.menu, color: context.appBarForegroundColor), onPressed: () => Scaffold.of(context).openDrawer())),
       ),
       drawer: TeacherNavDrawer(currentIndex: 1, onTap: (i) {}),
       body: SingleChildScrollView(
@@ -22,13 +22,13 @@ class CourseFlowPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Course Flow', style: TextStyle(fontFamily: 'Baloo 2', fontSize: kType18, fontWeight: FontWeight.w700, color: kNavy)),
+            Text('Course Flow', style: TextStyle(fontFamily: 'Baloo 2', fontSize: kType18, fontWeight: FontWeight.w700, color: context.appBarForegroundColor)),
             const SizedBox(height: kSpacing8),
-            ClayContainer(borderRadius: kRadius12, child: const Padding(padding: EdgeInsets.all(kSpacing16), child: Text('View and manage the flow of courses through your teaching schedule.', style: TextStyle(color: kGray600)))),
+            ClayContainer(borderRadius: kRadius12, child: Padding(padding: const EdgeInsets.all(kSpacing16), child: Text('View and manage the flow of courses through your teaching schedule.', style: TextStyle(color: context.inkMutedColor)))),
             const SizedBox(height: kSpacing16),
-            Text('Course Calendar', style: TextStyle(fontFamily: 'Baloo 2', fontSize: kType18, fontWeight: FontWeight.w700, color: kNavy)),
+            Text('Course Calendar', style: TextStyle(fontFamily: 'Baloo 2', fontSize: kType18, fontWeight: FontWeight.w700, color: context.appBarForegroundColor)),
             const SizedBox(height: kSpacing8),
-            ClayContainer(borderRadius: kRadius12, child: const Padding(padding: EdgeInsets.all(kSpacing16), child: Text('Calendar view of upcoming course sessions and deadlines.', style: TextStyle(color: kGray600)))),
+            ClayContainer(borderRadius: kRadius12, child: Padding(padding: const EdgeInsets.all(kSpacing16), child: Text('Calendar view of upcoming course sessions and deadlines.', style: TextStyle(color: context.inkMutedColor)))),
           ],
         ),
       ),

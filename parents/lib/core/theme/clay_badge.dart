@@ -22,8 +22,8 @@ class ClayBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = _backgroundColor;
-    final fg = _foregroundColor;
+    final bg = _backgroundColor(context);
+    final fg = _foregroundColor(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -46,7 +46,7 @@ class ClayBadge extends StatelessWidget {
     );
   }
 
-  Color get _backgroundColor {
+  Color _backgroundColor(BuildContext context) {
     switch (type) {
       case ClayBadgeType.info:
         return kInfo.withValues(alpha: 0.12);
@@ -57,11 +57,11 @@ class ClayBadge extends StatelessWidget {
       case ClayBadgeType.danger:
         return kDanger.withValues(alpha: 0.12);
       case ClayBadgeType.cloud:
-        return kCloud.withValues(alpha: 0.8);
+        return (context.isDarkMode ? kDarkSurface : kCloud).withValues(alpha: 0.6);
     }
   }
 
-  Color get _foregroundColor {
+  Color _foregroundColor(BuildContext context) {
     switch (type) {
       case ClayBadgeType.info:
         return kInfo;
@@ -72,7 +72,7 @@ class ClayBadge extends StatelessWidget {
       case ClayBadgeType.danger:
         return kDanger;
       case ClayBadgeType.cloud:
-        return kNavy;
+        return context.appBarForegroundColor;
     }
   }
 }

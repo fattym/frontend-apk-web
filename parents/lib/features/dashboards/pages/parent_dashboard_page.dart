@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/auth/auth_provider.dart';
 import '../providers/dashboard_provider.dart';
 import '../widgets/stat_card.dart';
+import '../../../core/theme/theme_toggle.dart';
 
 class ParentDashboardPage extends StatelessWidget {
   const ParentDashboardPage({super.key});
@@ -18,7 +19,13 @@ class ParentDashboardPage extends StatelessWidget {
     final teachers = data['teachers'] as List<dynamic>? ?? [];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Parent Dashboard')),
+      appBar: AppBar(
+        title: const Text('Parent Dashboard'),
+        actions: [
+          ThemeToggle(),
+          const SizedBox(width: 16),
+        ],
+      ),
       body: provider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(

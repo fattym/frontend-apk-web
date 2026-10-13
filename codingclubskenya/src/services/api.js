@@ -42,7 +42,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = window.location.pathname.includes('/schoolsystem/') ? '/schoolsystem/login' : '/login';
+        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }

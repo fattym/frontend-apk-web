@@ -28,11 +28,11 @@ class ClayStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = valueColor ?? _defaultColor;
+    final effectiveColor = valueColor ?? _defaultColor(context);
 
     return Container(
       padding: const EdgeInsets.all(kSpacing24),
-      decoration: clayInsetDecoration(surface: kWhite, borderRadius: kRadiusLg),
+      decoration: clayInsetDecoration(context, borderRadius: kRadiusLg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -42,7 +42,7 @@ class ClayStatCard extends StatelessWidget {
               fontFamily: 'Plus Jakarta Sans',
               fontSize: kType14,
               fontWeight: FontWeight.w400,
-              color: kInk.withValues(alpha: 0.7),
+              color: context.inkColor.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: kSpacing8),
@@ -61,7 +61,7 @@ class ClayStatCard extends StatelessWidget {
     );
   }
 
-  Color get _defaultColor => kNavy;
+  Color _defaultColor(BuildContext context) => context.appBarForegroundColor;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -88,7 +88,7 @@ class ClayCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(kSpacing24),
-      decoration: clayInsetDecoration(surface: kWhite, borderRadius: kRadiusLg),
+      decoration: clayInsetDecoration(context, borderRadius: kRadiusLg),
       child: childWidget,
     );
   }
@@ -119,7 +119,7 @@ class ClayContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: clayInsetDecoration(surface: kWhite, borderRadius: borderRadius),
+      decoration: clayInsetDecoration(context, borderRadius: borderRadius),
       child: child,
     );
   }
@@ -153,10 +153,10 @@ class ClayRow extends StatelessWidget {
         horizontal: kSpacing16,
         vertical: kSpacing12,
       ),
-      decoration: BoxDecoration(
+       decoration: BoxDecoration(
         color: isZebra
-            ? kClayFlushBgShift.withValues(alpha: 0.5)
-            : kWhite,
+            ? (context.isDarkMode ? kDarkBorder.withValues(alpha: 0.4) : kClayFlushBgShift.withValues(alpha: 0.5))
+            : context.surfaceColor,
         borderRadius: BorderRadius.circular(kRadiusSm),
       ),
       child: childWidget,
