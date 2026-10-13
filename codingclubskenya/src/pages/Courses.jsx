@@ -446,10 +446,10 @@ const CoursesPage = () => {
     if (!active) return;
     const payload = {
       ...active,
-      learning_area: normalizeId(active.learning_area),
-      grade: normalizeId(active.grade),
-      stream: normalizeId(active.stream),
-      term: normalizeId(active.term),
+      learning_area: normalizeId(active.learning_area) || null,
+      grade: normalizeId(active.grade) || null,
+      stream: normalizeId(active.stream) || null,
+      term: normalizeId(active.term) || null,
       available_from: active.available_from
         ? new Date(active.available_from).toISOString()
         : null,
@@ -1006,8 +1006,9 @@ const CoursesPage = () => {
 
   return (
     <div className="space-y-5">
-      <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-gradient-to-br from-slate-950 via-slate-900 to-red-950 text-white shadow-xl">
-        <div className="grid gap-6 px-5 py-6 lg:grid-cols-[1.4fr_0.9fr] lg:px-7">
+      <section className="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-red-950 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+        <div className="relative grid gap-6 px-5 py-6 lg:grid-cols-[1.4fr_0.9fr] lg:px-7">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-red-900/40 bg-red-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-red-200">
@@ -1089,7 +1090,7 @@ const CoursesPage = () => {
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_320px]">
+      <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="space-y-4">
           <div className="rounded-[1.75rem] border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
@@ -1108,9 +1109,11 @@ const CoursesPage = () => {
 
           <div className="space-y-3">
             {visibleCourses.length === 0 ? (
-              <div className="rounded-[1.75rem] border border-dashed border-slate-200 bg-white p-6 text-center shadow-sm">
-                <BookOpen className="mx-auto h-8 w-8 text-slate-300" />
-                <p className="mt-2 text-sm font-semibold text-slate-700">
+              <div className="flex flex-col items-center justify-center rounded-[1.75rem] border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center transition-colors hover:border-slate-300 hover:bg-slate-50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 mb-2">
+                  <BookOpen className="h-6 w-6 text-slate-400" />
+                </div>
+                <p className="text-sm font-semibold text-slate-700">
                   No courses found
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
@@ -1118,7 +1121,7 @@ const CoursesPage = () => {
                 </p>
                 <button
                   onClick={createNewCourse}
-                  className="mt-4 rounded-2xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white"
+                  className="mt-5 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 hover:shadow"
                 >
                   Create course
                 </button>
@@ -1135,10 +1138,10 @@ const CoursesPage = () => {
                   <button
                     key={course.id}
                     onClick={() => openCourse(course)}
-                    className={`w-full rounded-[1.75rem] border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+                    className={`w-full group rounded-[1.5rem] border p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                       isActive
-                        ? "border-red-400 ring-2 ring-red-100"
-                        : "border-slate-200"
+                        ? "border-red-400 bg-red-50/30 ring-4 ring-red-500/10"
+                        : "border-slate-200 bg-white hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -1297,13 +1300,13 @@ const CoursesPage = () => {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition ${
+                        className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
                           activeClass
-                            ? "bg-slate-950 text-white"
-                            : "text-slate-600 hover:bg-slate-50"
+                            ? "bg-slate-900 text-white shadow-md ring-1 ring-slate-900/5"
+                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                       >
-                        <Icon className="h-4 w-4" />
+                        <Icon className={`h-4 w-4 ${activeClass ? "text-white" : "text-slate-400"}`} />
                         {tab.label}
                       </button>
                     );

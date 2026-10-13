@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Tabs from '../components/Tabs';
 import useApiList from '../hooks/useApiList';
+import useLearningAreas from '../hooks/useLearningAreas';
+import api, { formErrorMessage } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import UserForm from '../components/UserForm';
+import GradesStreamsManager from '../components/GradesStreamsManager';
 
 const Teachers = () => {
   const [tab, setTab] = useState('teachers');
@@ -101,6 +105,7 @@ const Teachers = () => {
         tabs={[
           { key: 'teachers', label: 'Teachers' },
           { key: 'assignments', label: 'Assignments' },
+          { key: 'grades_streams', label: 'Grades & Streams' },
           { key: 'leaves', label: 'Leave Requests' },
         ]}
         active={tab}
@@ -241,6 +246,13 @@ const Teachers = () => {
         </div>
       )}
 
+      {tab === 'grades_streams' && (
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Grades &amp; Streams</h2>
+          <GradesStreamsManager />
+        </div>
+      )}
+
       {showUserForm && <UserForm user={editingUser} onClose={() => { setShowUserForm(false); setEditingUser(null); }} onSaved={handleUserSaved} />}
       {showAssignForm && <AssignTeacherForm teacher={selectedTeacher} onClose={() => { setShowAssignForm(false); setSelectedTeacher(null); }} onSaved={handleAssignSaved} />}
       {showLeaveForm && <LeaveForm leave={leaveFormData} onClose={() => { setShowLeaveForm(false); setLeaveFormData({}); }} onSaved={handleLeaveSubmit} error={leaveError} saving={leaveSaving} />}
@@ -249,48 +261,57 @@ const Teachers = () => {
 };
 
 const AssignTeacherForm = ({ teacher, onClose, onSaved }) => {
+  const { user } = useAuth();
+  const schoolId = user?.school;
   const [stream, setStream] = useState('');
   const [learningArea, setLearningArea] = useState('');
-  const [streams, setStreams] = useState([]);
-  const [areas, setAreas] = useState([]);
+  const { data: streams, loading: streamsLoading } = useApiList('/api/academics/streams/');
+  const { data: areas, refresh: refreshAreas } = useLearningAreas();
+  const { data: grades } = useApiList('/api/academics/grades/');
+  const [showAddArea, setShowAddArea] = useState(false);
+  const [addAreaForm, setAddAreaForm] = useState({ name: '', code: '', grade: '' });
+  const [addAreaError, setAddAreaError] = useState('');
+  const [addAreaSaving, setAddAreaSaving] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    Promise.all([
-      fetch('/api/academics/streams/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      }).then(r => r.json()),
-      fetch('/api/academics/learning-areas/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      }).then(r => r.json()),
-    ]).then(([streamsData, areasData]) => {
-      setStreams(Array.isArray(streamsData) ? streamsData : streamsData.results || []);
-      setAreas(Array.isArray(areasData) ? areasData : areasData.results || []);
-    }).catch(err => {
-      console.error('Failed to load streams/learning areas:', err);
-    });
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     setError('');
     try {
-      const token = localStorage.getItem('access_token');
-      const res = await fetch('/api/academics/teacher-assignments/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ teacher: teacher.id, stream: stream, learning_area: learningArea }),
+      const res = await api.post('/api/academics/teacher-assignments/', {
+        teacher: teacher.id,
+        stream: stream,
+        learning_area: learningArea,
       });
-      if (!res.ok) throw new Error('Failed to assign');
-      onSaved?.();
-      onClose?.();
+      if (res.status >= 200 && res.status < 300) {
+        onSaved?.();
+        onClose?.();
+      }
     } catch (err) {
-      setError(err.message);
+      setError(formErrorMessage(err, 'Failed to assign'));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAddArea = async (e) => {
+    e.preventDefault();
+    setAddAreaSaving(true);
+    setAddAreaError('');
+    try {
+      const payload = { name: addAreaForm.name, code: addAreaForm.code, grade: Number(addAreaForm.grade) };
+      if (schoolId) payload.school = schoolId;
+      const res = await api.post('/api/academics/learning-areas/', payload);
+      setLearningArea(res.data.id);
+      setShowAddArea(false);
+      setAddAreaForm({ name: '', code: '', grade: '' });
+      refreshAreas();
+    } catch (err) {
+      setAddAreaError(formErrorMessage(err, 'Could not create learning area.'));
+    } finally {
+      setAddAreaSaving(false);
     }
   };
 
@@ -304,16 +325,50 @@ const AssignTeacherForm = ({ teacher, onClose, onSaved }) => {
           <label className="block text-sm font-medium mb-1">Stream</label>
           <select className="w-full border rounded px-3 py-2" value={stream} onChange={e => setStream(e.target.value)} required>
             <option value="">Select stream</option>
-            {streams.map((s) => <option key={s.id} value={s.id}>{s.name} ({s.grade?.name})</option>)}
+            {streams.map((s) => {
+              const g = grades.find((gr) => gr.id === s.grade);
+              return <option key={s.id} value={s.id}>{s.name} ({g?.name || s.grade || ''})</option>;
+            })}
+            {streamsLoading && <option disabled>Loading...</option>}
           </select>
         </div>
         <div className="mb-6">
           <label className="block text-sm font-medium mb-1">Learning Area</label>
-          <select className="w-full border rounded px-3 py-2" value={learningArea} onChange={e => setLearningArea(e.target.value)} required>
+          <select
+            className="w-full border rounded px-3 py-2"
+            value={learningArea}
+            onChange={e => (e.target.value === '__add__' ? setShowAddArea(true) : setLearningArea(e.target.value))}
+            required
+          >
             <option value="">Select learning area</option>
-            {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+            {areas.map((a) => <option key={a.id} value={a.id}>{a.name} ({a.code})</option>)}
+            <option value="__add__">+ Add new learning area…</option>
           </select>
         </div>
+
+        {showAddArea && (
+          <div className="border-t pt-4 mb-4">
+            <h3 className="text-sm font-semibold mb-2">Add a New Learning Area</h3>
+            {addAreaError && <p className="text-red-500 mb-2 text-sm">{addAreaError}</p>}
+            <div className="mb-2">
+              <label className="block text-xs font-medium mb-1">Name</label>
+              <input className="w-full border rounded px-2 py-1 text-sm" value={addAreaForm.name} onChange={e => setAddAreaForm({ ...addAreaForm, name: e.target.value })} required />
+            </div>
+            <div className="mb-2">
+              <label className="block text-xs font-medium mb-1">Code</label>
+              <input className="w-full border rounded px-2 py-1 text-sm" value={addAreaForm.code} onChange={e => setAddAreaForm({ ...addAreaForm, code: e.target.value })} required />
+            </div>
+            <div className="mb-2">
+              <label className="block text-xs font-medium mb-1">Grade</label>
+              <select className="w-full border rounded px-2 py-1 text-sm" value={addAreaForm.grade} onChange={e => setAddAreaForm({ ...addAreaForm, grade: e.target.value })} required>
+                <option value="">Select grade</option>
+                {grades.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+              </select>
+            </div>
+            <button type="button" onClick={handleAddArea} disabled={addAreaSaving} className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 disabled:opacity-50">{addAreaSaving ? 'Adding...' : 'Add Learning Area'}</button>
+          </div>
+        )}
+
         <div className="flex justify-end gap-3">
           <button type="button" onClick={onClose} className="px-4 py-2 border rounded">Cancel</button>
           <button type="submit" disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">{saving ? 'Saving...' : 'Assign'}</button>

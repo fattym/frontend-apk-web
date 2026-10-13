@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
+import useLearningAreas from '../hooks/useLearningAreas';
 
 const UserForm = ({ user, onClose, onSaved }) => {
   const isEdit = !!user;
@@ -32,15 +33,9 @@ const UserForm = ({ user, onClose, onSaved }) => {
       employment_type: user?.teacher_profile?.employment_type || 'Full-Time',
     }
   });
-  const [learningAreas, setLearningAreas] = useState([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (form.role === 'TEACHER') {
-      api.get('/api/academics/learning-areas/').then((r) => setLearningAreas(r.data.results || r.data)).catch(() => setLearningAreas([]));
-    }
-  }, [form.role]);
+  const { data: learningAreas } = useLearningAreas();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,8 +47,10 @@ const UserForm = ({ user, onClose, onSaved }) => {
       if (form.role !== 'TEACHER') {
         delete payload.tsc_number;
         delete payload.qualification;
-        delete payload.subject_specializations;
         delete payload.teacher_profile;
+      }
+      if (form.role !== 'TEACHER' && form.role !== 'STUDENT') {
+        delete payload.subject_specializations;
       }
       if (form.role !== 'STUDENT') {
         delete payload.student_profile;
@@ -151,6 +148,20 @@ const UserForm = ({ user, onClose, onSaved }) => {
                   <option value="Other">Other</option>
                 </select>
               </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Learning Areas (Taking)</label>
+              <select
+                multiple
+                className="w-full border rounded px-3 py-2 h-28"
+                value={form.subject_specializations}
+                onChange={(e) => setForm({ ...form, subject_specializations: Array.from(e.target.selectedOptions, (o) => Number(o.value)) })}
+              >
+                {learningAreas.map((l) => (
+                  <option key={l.id} value={l.id}>{l.name} ({l.code})</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple.</p>
             </div>
           </>
         )}

@@ -56,11 +56,12 @@ export const AuthProvider = ({ children }) => {
   const getDashboardRoute = (role) => {
     if (role === 'TEACHER') return '/teacher-dashboard';
     if (role === 'STUDENT') return '/student-dashboard';
+    if (role === 'PARENT') return '/parent-dashboard';
     return '/school-dashboard';
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, getDashboardRoute }}>
+    <AuthContext.Provider value={{ user, login, studentLogin, logout, loading, getDashboardRoute }}>
       {children}
     </AuthContext.Provider>
   );

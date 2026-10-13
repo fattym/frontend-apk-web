@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/requirements_provider.dart';
+import '../../../core/auth/auth_provider.dart';
+import '../../shop/providers/cart_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class ParentRequirementsPage extends StatefulWidget {
   const ParentRequirementsPage({super.key});
@@ -14,10 +17,12 @@ class _ParentRequirementsPageState extends State<ParentRequirementsPage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      final provider = context.read<RequirementsProvider>();
-      if (provider.requiredItems.isEmpty) {
-        provider.fetchRequiredItems();
-      }
+        final provider = context.read<RequirementsProvider>();
+        final auth = context.read<AuthProvider>();
+        final schoolId = auth.user?['school'] is int ? auth.user!['school'] as int : null;
+        if (provider.requiredItems.isEmpty) {
+          provider.fetchRequiredItems(schoolId: schoolId);
+        }
     });
   }
 
@@ -44,7 +49,11 @@ class _ParentRequirementsPageState extends State<ParentRequirementsPage> {
                         Text(provider.error!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12)),
                         const SizedBox(height: 16),
                         FilledButton.icon(
-                          onPressed: () => provider.fetchRequiredItems(),
+                          onPressed: () {
+                            final auth = context.read<AuthProvider>();
+                            final schoolId = auth.user?['school'] is int ? auth.user!['school'] as int : null;
+                            provider.fetchRequiredItems(schoolId: schoolId);
+                          },
                           icon: const Icon(Icons.refresh),
                           label: const Text('Retry'),
                         ),
@@ -54,7 +63,9 @@ class _ParentRequirementsPageState extends State<ParentRequirementsPage> {
                 )
               : RefreshIndicator(
               onRefresh: () async {
-                await provider.fetchRequiredItems();
+                final auth = context.read<AuthProvider>();
+                final schoolId = auth.user?['school'] is int ? auth.user!['school'] as int : null;
+                await provider.fetchRequiredItems(schoolId: schoolId);
               },
               child: requiredItems.isEmpty
                   ? const Center(child: Text('No required items published yet.'))
@@ -85,7 +96,7 @@ class _ParentRequirementsPageState extends State<ParentRequirementsPage> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${_display(item['class_level'])} • ${_display(item['term'])}',
+                                  '${_display(item['class_level_name'] ?? item['class_level'])} • ${_display(item['term_name'] ?? item['term'])}',
                                   style: TextStyle(color: Colors.grey[600], fontSize: 14),
                                 ),
                                 if (item['description'] != null && item['description'].toString().isNotEmpty)
@@ -96,8 +107,8 @@ class _ParentRequirementsPageState extends State<ParentRequirementsPage> {
                                 const SizedBox(height: 12),
                                 const Text('Buying Options:', style: TextStyle(fontWeight: FontWeight.w600)),
                                 const SizedBox(height: 8),
-                                for (final option in options)
-                                  _buildOption(option),
+                                 for (final option in options)
+                                   _buildOption(item, option),
                               ],
                             ),
                           ),
@@ -108,7 +119,7 @@ class _ParentRequirementsPageState extends State<ParentRequirementsPage> {
     );
   }
 
-  Widget _buildOption(Map<String, dynamic> option) {
+  Widget _buildOption(Map<String, dynamic> item, Map<String, dynamic> option) {
     final isRecommended = option['is_recommended'] == true;
     final sourceType = option['source_type']?.toString() ?? '';
     final price = option['price']?.toString() ?? '';
@@ -149,11 +160,30 @@ class _ParentRequirementsPageState extends State<ParentRequirementsPage> {
                     ],
                   ],
                 ),
-                if (location.isNotEmpty) Text('📍 $location', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                if (delivery) const Text('🚚 Delivery Available', style: TextStyle(color: Colors.blue, fontSize: 12)),
-              ],
-            ),
-          ),
+                 if (location.isNotEmpty) Text('📍 $location', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                 if (delivery) const Text('🚚 Delivery Available', style: TextStyle(color: Colors.blue, fontSize: 12)),
+               ],
+             ),
+           ),
+           IconButton(
+             icon: const Icon(Icons.shopping_cart, size: 20),
+             color: Colors.blue,
+             onPressed: () {
+               final cart = context.read<CartProvider>();
+               cart.addItem({
+                 'id': '${item['id']}_${option['id']}',
+                 'name': '${item['name'] ?? item['id']} (${option['source_type']})',
+                 'image': null,
+                 'effective_price': option['price'] ?? '0',
+                 'price': option['price'] ?? '0',
+               });
+               ScaffoldMessenger.of(context).showSnackBar(
+                 SnackBar(content: Text('${option['price'] ?? 'Item'} added to cart')),
+               );
+               context.go('/cart');
+             },
+             tooltip: 'Add to cart',
+           ),
         ],
       ),
     );

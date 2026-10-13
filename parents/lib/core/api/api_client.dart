@@ -16,11 +16,6 @@ class ApiClient {
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }
-        // Dio replaces the base URL path when the request path starts with '/',
-        // causing the /api prefix to be dropped. Prepend /api to preserve it.
-        if (!options.path.startsWith('http') && !options.path.startsWith('/api')) {
-          options.path = '/api${options.path}';
-        }
         return handler.next(options);
       },
       onError: (error, handler) async {

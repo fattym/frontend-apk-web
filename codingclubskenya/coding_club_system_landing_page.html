@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Club System | Powered by Coding Clubs Kenya</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#E63B00',
+                            navy: '#0B1F3A',
+                            grayLight: '#F4F5F7',
+                            charcoal: '#202124',
+                            orangeHover: '#CC3400'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #202124;
+            background-color: #FFFFFF;
+        }
+
+        body.onboarding-active>section:not(#onboarding),
+        body.onboarding-active>footer {
+            display: none;
+        }
+
+        /* Soft Claymorphism Styles */
+        .clay-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            box-shadow: 8px 8px 16px rgba(11, 31, 58, 0.05), -8px -8px 16px rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .clay-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 12px 12px 24px rgba(11, 31, 58, 0.08), -12px -12px 24px rgba(255, 255, 255, 0.9);
+        }
+
+        .clay-card-dark {
+            background: #0B1F3A;
+            border-radius: 24px;
+            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.25), -6px -6px 16px rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .clay-button {
+            border-radius: 16px;
+            box-shadow: 4px 4px 10px rgba(230, 59, 0, 0.3), -2px -2px 6px rgba(255, 255, 255, 0.2) inset;
+            transition: all 0.2s ease;
+        }
+
+        .clay-button:active {
+            box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.2);
+            transform: scale(0.98);
+        }
+
+        .clay-pill {
+            background: #F4F5F7;
+            border-radius: 9999px;
+            box-shadow: inset 2px 2px 5px rgba(11, 31, 58, 0.06), inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Phone Screen Frame */
+        .phone-mockup {
+            border: 12px solid #0B1F3A;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(11, 31, 58, 0.2);
+            overflow: hidden;
+            background: #FFFFFF;
+        }
+
+        @media (max-width: 639px) {
+            .phone-mockup {
+                border-width: 8px;
+                border-radius: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased overflow-x-hidden onboarding-active">
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 py-4 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex min-w-0 items-center space-x-2 sm:space-x-3 group">
+                <div
+                    class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-2xl bg-brand-navy flex items-center justify-center text-brand-orange font-bold text-lg sm:text-xl shadow-md group-hover:scale-105 transition-transform">
+                    <i class="fa-solid font-mono fa-code"></i>
+                </div>
+                <div class="min-w-0">
+                    <span
+                        class="text-base sm:text-xl font-extrabold text-brand-navy tracking-tight block leading-tight truncate">Coding
+                        Club
+                        System</span>
+                    <span
+                        class="text-[8px] sm:text-[10px] font-semibold text-brand-orange tracking-widest uppercase whitespace-nowrap">By
+                        Coding Clubs
+                        Kenya</span>
+                </div>
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center space-x-8 font-medium text-sm text-brand-navy">
+                <a href="#overview" onclick="showOverview(event)"
+                    class="hover:text-brand-orange transition-colors">Overview</a>
+                <a href="#erp" class="hover:text-brand-orange transition-colors">ERP Module</a>
+                <a href="#lms" class="hover:text-brand-orange transition-colors">LMS Module</a>
+                <a href="#parent-app" class="hover:text-brand-orange transition-colors">Parent Mobile App</a>
+                <a href="#pricing" class="hover:text-brand-orange transition-colors">Pricing</a>
+                <a href="#onboarding" class="hover:text-brand-orange transition-colors">Get Started</a>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="#demo"
+                    class="px-5 py-2.5 rounded-xl text-sm font-semibold text-brand-navy hover:bg-brand-grayLight transition-colors">Log
+                    In</a>
+                <a href="#demo"
+                    class="px-6 py-2.5 text-sm font-bold text-white bg-brand-orange hover:bg-brand-orangeHover clay-button transition-all">Request
+                    Demo</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="flex items-center gap-1 md:hidden">
+                <button type="button" onclick="showOverview(event)"
+                    class="px-2 py-2 text-xs font-bold text-brand-navy hover:text-brand-orange focus:outline-none"
+                    aria-label="View overview">Overview</button>
+                <button id="menu-btn" type="button" class="text-brand-navy focus:outline-none p-2"
+                    aria-label="Open navigation menu">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-100 px-4 pt-4 pb-6 space-y-4">
+            <a href="#overview" onclick="showOverview(event)"
+                class="block text-brand-navy font-semibold py-2 hover:text-brand-orange">Overview</a>
+            <a href="#erp" class="block text-brand-navy font-semibold py-2 hover:text-brand-orange">ERP Module</a>
+            <a href="#lms" class="block text-brand-navy font-semibold py-2 hover:text-brand-orange">LMS Module</a>
+            <a href="#parent-app" class="block text-brand-navy font-semibold py-2 hover:text-brand-orange">Parent Mobile
+                App</a>
+            <a href="#pricing" class="block text-brand-navy font-semibold py-2 hover:text-brand-orange">Pricing</a>
+            <a href="#onboarding" class="block text-brand-navy font-semibold py-2 hover:text-brand-orange">Get
+                Started</a>
+            <div class="pt-2 flex flex-col space-y-3">
+                <a href="#demo"
+                    class="w-full text-center px-5 py-2.5 rounded-xl font-semibold text-brand-navy bg-brand-grayLight">Log
+                    In</a>
+                <a href="#demo"
+                    class="w-full text-center px-6 py-2.5 font-bold text-white bg-brand-orange clay-button">Request
+                    Demo</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Quote Action -->
+    <a href="#pricing" onclick="showPricing(event)" title="Request a quote" aria-label="Request a quote"
+        class="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 px-4 py-3 bg-brand-orange text-white rounded-full font-bold text-sm shadow-lg hover:bg-brand-orangeHover hover:-translate-y-1 transition-all">
+        <i class="fa-solid fa-cart-plus text-base"></i>
+        <span class="hidden sm:inline">Shop For School Items</span>
+    </a>
+
+    <!-- Progressive Onboarding Section -->
+    <section id="onboarding" class="py-12 sm:py-20 bg-brand-grayLight/60 px-4 sm:px-8">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-10 space-y-3">
+                <span
+                    class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-100 text-brand-orange">
+                    Find your best starting point
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-brand-navy">How will you use Coding Club System?
+                </h2>
+                <p class="text-sm text-brand-charcoal/70">Choose your role and we will point you to the tools and next
+                    step that fit you best.</p>
+            </div>
+
+            <div class="clay-card bg-white p-4 sm:p-10">
+                <div class="flex items-center gap-3 mb-8" aria-label="Onboarding progress">
+                    <div id="onboarding-progress-one" class="h-2 flex-1 rounded-full bg-brand-orange transition-all">
+                    </div>
+                    <div id="onboarding-progress-two" class="h-2 flex-1 rounded-full bg-gray-200 transition-all"></div>
+                </div>
+
+                <div id="onboarding-step-one">
+                    <div class="flex items-center justify-between gap-4 mb-6">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-brand-orange">Step 1 of 2</p>
+                            <h3 class="text-xl sm:text-2xl font-extrabold text-brand-navy mt-1">I am a...</h3>
+                        </div>
+                        <span class="hidden sm:block text-xs font-semibold text-gray-400">Select one option</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button type="button" onclick="selectOnboardingRole('school')" data-onboarding-role="school"
+                            class="onboarding-role clay-card p-5 text-left hover:border-brand-orange focus:outline-none focus:ring-2 focus:ring-brand-orange/40">
+                            <span
+                                class="w-12 h-12 rounded-2xl bg-orange-100 text-brand-orange flex items-center justify-center text-xl mb-4"><i
+                                    class="fa-solid fa-school"></i></span>
+                            <span class="block font-bold text-brand-navy">A school or club</span>
+                            <span class="block text-xs text-gray-500 mt-2 leading-relaxed">I manage a learning program,
+                                team, or coding club.</span>
+                        </button>
+                        <button type="button" onclick="selectOnboardingRole('parent')" data-onboarding-role="parent"
+                            class="onboarding-role clay-card p-5 text-left hover:border-brand-orange focus:outline-none focus:ring-2 focus:ring-brand-orange/40">
+                            <span
+                                class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center text-xl mb-4"><i
+                                    class="fa-solid fa-user-group"></i></span>
+                            <span class="block font-bold text-brand-navy">A parent or guardian</span>
+                            <span class="block text-xs text-gray-500 mt-2 leading-relaxed">I want to support and follow
+                                a learner's progress.</span>
+                        </button>
+                        <button type="button" onclick="selectOnboardingRole('student')" data-onboarding-role="student"
+                            class="onboarding-role clay-card p-5 text-left hover:border-brand-orange focus:outline-none focus:ring-2 focus:ring-brand-orange/40">
+                            <span
+                                class="w-12 h-12 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center text-xl mb-4"><i
+                                    class="fa-solid fa-laptop-code"></i></span>
+                            <span class="block font-bold text-brand-navy">A student</span>
+                            <span class="block text-xs text-gray-500 mt-2 leading-relaxed">I want to learn, build
+                                projects, and grow my coding skills.</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="onboarding-step-two" class="hidden">
+                    <div class="flex items-center justify-between gap-4 mb-6">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-brand-orange">Step 2 of 2</p>
+                            <h3 id="onboarding-question"
+                                class="text-xl sm:text-2xl font-extrabold text-brand-navy mt-1">Tell us a
+                                little more</h3>
+                        </div>
+                        <button type="button" onclick="resetOnboarding()"
+                            class="text-xs font-bold text-brand-navy hover:text-brand-orange">Change role</button>
+                    </div>
+
+                    <div id="onboarding-details" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6"></div>
+                    <button type="button" id="onboarding-cta" onclick="completeOnboarding(event)"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-orange hover:bg-brand-orangeHover text-white font-bold rounded-xl clay-button transition-all">
+                        Continue to your next step <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hero Section -->
+    <section id="overview" class="pt-12 pb-20 bg-gradient-to-b from-white via-brand-grayLight/40 to-white px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto space-y-6 mb-12">
+                <!-- Highlight Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 clay-pill text-xs font-bold text-brand-navy">
+                    <span class="w-2 h-2 rounded-full bg-brand-orange animate-ping"></span>
+                    <span class="text-brand-orange font-extrabold">NEW release:</span> All-in-One School ERP + Coding
+                    LMS + Parent App
+                </div>
+
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-brand-navy leading-tight">
+                    Empowering STEM Education with <span class="text-brand-orange">Seamless Tech</span> Management
+                </h1>
+
+                <p class="text-lg text-brand-charcoal/80 font-normal leading-relaxed">
+                    Designed specifically for schools, academies, and coding clubs. Streamline administrative operations
+                    with our robust <strong>ERP</strong>, elevate learning with an interactive <strong>Coding
+                        LMS</strong>, and build trust with parents via a real-time <strong>Mobile App</strong>.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                    <a href="#demo"
+                        class="w-full sm:w-auto px-8 py-4 bg-brand-orange hover:bg-brand-orangeHover text-white font-bold rounded-2xl clay-button text-base shadow-lg transition-all flex items-center justify-center gap-2">
+                        <span>Schedule a Live Demo</span>
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
+                    <a href="#preview"
+                        class="w-full sm:w-auto px-8 py-4 bg-white text-brand-navy font-bold rounded-2xl clay-card text-base hover:bg-brand-grayLight transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-brand-orange"></i>
+                        <span>Explore System Modules</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Interactive Hero Workspace Preview -->
+            <div id="preview" class="max-w-5xl mx-auto mt-8">
+                <!-- Navigation Tabs -->
+                <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6">
+                    <button onclick="switchTab('erp')" id="tab-erp"
+                        class="tab-btn px-6 py-3 rounded-2xl font-bold text-sm transition-all bg-brand-navy text-white shadow-md">
+                        <i class="fa-solid fa-chart-line mr-2"></i>ERP Dashboard
+                    </button>
+                    <button onclick="switchTab('lms')" id="tab-lms"
+                        class="tab-btn px-6 py-3 rounded-2xl font-bold text-sm transition-all bg-white text-brand-navy hover:bg-brand-grayLight border border-gray-200">
+                        <i class="fa-solid fa-laptop-code mr-2"></i>LMS Learning Space
+                    </button>
+                    <button onclick="switchTab('app')" id="tab-app"
+                        class="tab-btn px-6 py-3 rounded-2xl font-bold text-sm transition-all bg-white text-brand-navy hover:bg-brand-grayLight border border-gray-200">
+                        <i class="fa-solid fa-mobile-screen-button mr-2"></i>Parent Mobile App
+                    </button>
+                </div>
+
+                <!-- Preview Containers -->
+                <div
+                    class="clay-card p-3 sm:p-6 bg-white overflow-hidden min-h-[320px] sm:min-h-[420px] flex items-center justify-center">
+
+                    <!-- ERP Preview -->
+                    <div id="content-erp" class="w-full space-y-6">
+                        <div class="flex items-center justify-between border-b pb-4">
+                            <div class="flex items-center space-x-3">
+                                <span class="p-2.5 rounded-xl bg-orange-100 text-brand-orange font-bold"><i
+                                        class="fa-solid fa-calculator"></i></span>
+                                <div>
+                                    <h3 class="font-bold text-brand-navy">ERP Administrative Suite</h3>
+                                    <p class="text-xs text-gray-500">Live operational overview & automated invoicing</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">System
+                                Active</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-4 rounded-2xl bg-brand-grayLight border border-gray-100">
+                                <span class="text-xs font-semibold text-gray-500">Term Revenue</span>
+                                <p class="text-2xl font-extrabold text-brand-navy mt-1">$42,850</p>
+                                <span class="text-[11px] text-green-600 font-semibold"><i
+                                        class="fa-solid fa-arrow-trend-up"></i> +14% vs last term</span>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-brand-grayLight border border-gray-100">
+                                <span class="text-xs font-semibold text-gray-500">Active Students</span>
+                                <p class="text-2xl font-extrabold text-brand-navy mt-1">680</p>
+                                <span class="text-[11px] text-brand-orange font-semibold">12 Active Club Batches</span>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-brand-grayLight border border-gray-100">
+                                <span class="text-xs font-semibold text-gray-500">Club Resources allocated</span>
+                                <p class="text-2xl font-extrabold text-brand-navy mt-1">142 Kits</p>
+                                <span class="text-[11px] text-blue-600 font-semibold">98% In-use efficiency</span>
+                            </div>
+                        </div>
+                        <!-- Mini Table -->
+                        <div class="overflow-x-auto rounded-xl border border-gray-100">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-brand-navy text-white">
+                                    <tr>
+                                        <th class="p-3">Student</th>
+                                        <th class="p-3">Batch/Club</th>
+                                        <th class="p-3">Fee Status</th>
+                                        <th class="p-3">Invoice</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr>
+                                        <td class="p-3 font-semibold text-brand-navy">Amina Ndung'u</td>
+                                        <td class="p-3 text-gray-600">Python Young Pros (Level 2)</td>
+                                        <td class="p-3"><span
+                                                class="px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold">Paid</span>
+                                        </td>
+                                        <td class="p-3 text-brand-orange font-bold cursor-pointer">#INV-8839</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-semibold text-brand-navy">Liam Omondi</td>
+                                        <td class="p-3 text-gray-600">Robotics & Arduino</td>
+                                        <td class="p-3"><span
+                                                class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-bold">Partial</span>
+                                        </td>
+                                        <td class="p-3 text-brand-orange font-bold cursor-pointer">#INV-8840</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- LMS Preview -->
+                    <div id="content-lms" class="w-full space-y-6 hidden">
+                        <div class="flex items-center justify-between border-b pb-4">
+                            <div class="flex items-center space-x-3">
+                                <span class="p-2.5 rounded-xl bg-blue-100 text-blue-600 font-bold"><i
+                                        class="fa-solid fa-code"></i></span>
+                                <div>
+                                    <h3 class="font-bold text-brand-navy">Interactive Coding LMS Playground</h3>
+                                    <p class="text-xs text-gray-500">Automated grading pipeline & project sandbox</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-orange text-white">Python
+                                3.10 Engine</span>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div class="bg-gray-900 text-green-400 p-4 rounded-xl font-mono text-xs space-y-2">
+                                <div class="text-gray-500"># Lesson 4: Loop Challenge</div>
+                                <div><span class="text-purple-400">def</span> <span
+                                        class="text-blue-300">calculate_score</span>(projects):</div>
+                                <div class="pl-4"><span class="text-purple-400">return</span> sum(projects) * <span
+                                        class="text-amber-300">1.25</span></div>
+                                <div class="mt-4 text-gray-400"># Automated tests output:</div>
+                                <div class="text-green-300">✔ Test Case 1: Passed (0.02s)</div>
+                                <div class="text-green-300">✔ Test Case 2: Passed (0.01s)</div>
+                            </div>
+                            <div class="space-y-3">
+                                <h4 class="font-bold text-sm text-brand-navy">Curriculum Progress</h4>
+                                <div class="space-y-2">
+                                    <div>
+                                        <div class="flex justify-between text-xs font-semibold mb-1">
+                                            <span>Variables & Data Types</span>
+                                            <span class="text-brand-orange">100%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                                            <div class="bg-brand-orange h-2 w-full"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs font-semibold mb-1">
+                                            <span>Functions & Logic Pipelines</span>
+                                            <span class="text-brand-navy">75%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                                            <div class="bg-brand-navy h-2 w-[75%]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-brand-grayLight rounded-xl border border-gray-200 text-xs">
+                                    <span class="font-bold text-brand-navy">Mentor Feedback:</span>
+                                    <p class="text-gray-600 mt-1">"Excellent clean code syntax on your recent game
+                                        submission, Jabali!"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- App Preview -->
+                    <div id="content-app" class="w-full flex justify-center py-4 hidden">
+                        <div class="phone-mockup w-full max-w-[280px] p-4 space-y-4">
+                            <div class="flex items-center justify-between border-b pb-2">
+                                <div class="flex items-center space-x-2">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-brand-orange text-white font-bold flex items-center justify-center text-xs">
+                                        CK
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-extrabold text-brand-navy">Parent Connect</p>
+                                        <p class="text-[10px] text-gray-500">Student: Stacy K.</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-bell text-brand-orange text-sm"></i>
+                            </div>
+                            <div class="bg-brand-grayLight p-3 rounded-xl space-y-2">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="font-bold text-brand-navy">Today's Attendance</span>
+                                    <span
+                                        class="px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold text-[10px]">Present</span>
+                                </div>
+                                <p class="text-[11px] text-gray-500">Coding Club Lab - 04:15 PM</p>
+                            </div>
+                            <div class="bg-brand-navy text-white p-3 rounded-xl space-y-1">
+                                <p class="text-[10px] text-brand-orange uppercase font-bold tracking-wider">Latest
+                                    Project Showcase</p>
+                                <p class="text-xs font-bold">Space Invaders PyGame</p>
+                                <p class="text-[10px] text-gray-300">Grade: 98% • Outstanding Project</p>
+                            </div>
+                            <div
+                                class="flex justify-between items-center p-2 rounded-lg border border-gray-100 text-xs">
+                                <span class="font-semibold text-gray-600">Term Fee Balance</span>
+                                <span class="font-bold text-green-600">Clear</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pillars / Modules Highlight -->
+    <section class="py-16 bg-white border-y border-gray-100 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="text-3xl font-extrabold text-brand-navy">Complete Ecosystem for Tech Education</h2>
+                <p class="text-brand-charcoal/70 mt-3 text-sm">Everything you need to run, teach, and keep parents
+                    engaged seamlessly under one umbrella powered by Coding Clubs Kenya.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- ERP Card -->
+                <div class="clay-card p-8 flex flex-col justify-between">
+                    <div>
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-orange-100 text-brand-orange flex items-center justify-center text-2xl font-bold mb-6">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-brand-navy mb-3">Robust School ERP</h3>
+                        <p class="text-sm text-brand-charcoal/80 leading-relaxed mb-6">
+                            Simplify fee collection, generate digital invoices, control club inventory, and manage
+                            student attendance effortlessly.
+                        </p>
+                    </div>
+                    <a href="#erp"
+                        class="inline-flex items-center font-bold text-sm text-brand-orange hover:text-brand-orangeHover">
+                        Explore ERP Features <i class="fa-solid fa-chevron-right ml-2 text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- LMS Card -->
+                <div class="clay-card p-8 flex flex-col justify-between">
+                    <div>
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-navy-100 bg-brand-navy text-white flex items-center justify-center text-2xl font-bold mb-6">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-brand-navy mb-3">Interactive Coding LMS</h3>
+                        <p class="text-sm text-brand-charcoal/80 leading-relaxed mb-6">
+                            Empower students with structured curriculum, automated code tests, project upload portals,
+                            and interactive quizzes.
+                        </p>
+                    </div>
+                    <a href="#lms"
+                        class="inline-flex items-center font-bold text-sm text-brand-navy hover:text-brand-orange">
+                        Explore LMS Features <i class="fa-solid fa-chevron-right ml-2 text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- Mobile App Card -->
+                <div class="clay-card p-8 flex flex-col justify-between">
+                    <div>
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center text-2xl font-bold mb-6">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-brand-navy mb-3">Parent Mobile App</h3>
+                        <p class="text-sm text-brand-charcoal/80 leading-relaxed mb-6">
+                            Provide total transparency to parents through real-time notifications, project showcases,
+                            attendance, and mentor chats.
+                        </p>
+                    </div>
+                    <a href="#parent-app"
+                        class="inline-flex items-center font-bold text-sm text-green-700 hover:text-green-800">
+                        Explore Mobile App <i class="fa-solid fa-chevron-right ml-2 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: ERP Module Detailed -->
+    <section id="erp" class="py-20 bg-brand-grayLight/50 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <span
+                        class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-100 text-brand-orange">
+                        Module 01 • Operations
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-navy">
+                        Automate Administrative & Financial Overhead
+                    </h2>
+                    <p class="text-brand-charcoal/80 leading-relaxed">
+                        Say goodbye to manual spreadsheets. The Coding Club ERP gives administrators total clarity on
+                        club resources, finances, and student attendance records across multiple branches or school
+                        partner sites.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <div class="clay-card p-4 bg-white">
+                            <i class="fa-solid fa-file-invoice-dollar text-brand-orange text-xl mb-2"></i>
+                            <h4 class="font-bold text-brand-navy text-sm">Automated Invoicing</h4>
+                            <p class="text-xs text-gray-500 mt-1">Generate automated term bills and track payments in
+                                real time.</p>
+                        </div>
+                        <div class="clay-card p-4 bg-white">
+                            <i class="fa-solid fa-cubes text-brand-orange text-xl mb-2"></i>
+                            <h4 class="font-bold text-brand-navy text-sm">Inventory Tracking</h4>
+                            <p class="text-xs text-gray-500 mt-1">Monitor robotics kits, laptops, micro-controllers, and
+                                club gear.</p>
+                        </div>
+                        <div class="clay-card p-4 bg-white">
+                            <i class="fa-solid fa-user-check text-brand-orange text-xl mb-2"></i>
+                            <h4 class="font-bold text-brand-navy text-sm">Smart Attendance</h4>
+                            <p class="text-xs text-gray-500 mt-1">Digital check-ins synced directly with parent mobile
+                                alerts.</p>
+                        </div>
+                        <div class="clay-card p-4 bg-white">
+                            <i class="fa-solid fa-chart-pie text-brand-orange text-xl mb-2"></i>
+                            <h4 class="font-bold text-brand-navy text-sm">Club Resource Allocation</h4>
+                            <p class="text-xs text-gray-500 mt-1">Allocate instructors, rooms, and time-slots
+                                seamlessly.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Image Unsplash -->
+                <div class="relative">
+                    <div class="clay-card p-3 bg-white">
+                        <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1000&q=80"
+                            alt="ERP Dashboard Administration"
+                            class="rounded-2xl w-full h-[280px] sm:h-[400px] object-cover">
+                    </div>
+                    <!-- Floating Stat Badge -->
+                    <div class="absolute -bottom-6 -left-6 clay-card p-4 bg-brand-navy text-white hidden sm:block">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-bolt text-brand-orange text-2xl"></i>
+                            <div>
+                                <p class="text-xs text-gray-300">Admin Efficiency</p>
+                                <p class="text-lg font-bold">70% Time Saved</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: LMS Module Detailed -->
+    <section id="lms" class="py-20 bg-white px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Visual First for LMS -->
+                <div class="order-2 lg:order-1 relative">
+                    <div class="clay-card p-3 bg-white">
+                        <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1000&q=80"
+                            alt="Student coding on computer"
+                            class="rounded-2xl w-full h-[280px] sm:h-[400px] object-cover">
+                    </div>
+                    <!-- Floating Badge -->
+                    <div class="absolute -top-6 -right-6 clay-card p-4 bg-brand-orange text-white hidden sm:block">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-code-commit text-2xl"></i>
+                            <div>
+                                <p class="text-xs text-white/80">Code Submissions</p>
+                                <p class="text-lg font-bold">Auto-Graded Engine</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-1 lg:order-2 space-y-6">
+                    <span
+                        class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700">
+                        Module 02 • Learning & Curriculum
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-navy">
+                        Interactive Coding Curriculum & Auto-Grading Pipelines
+                    </h2>
+                    <p class="text-brand-charcoal/80 leading-relaxed">
+                        Transform how kids learn to code. Our Learning Management System combines gamified video
+                        tutorials, interactive coding sandboxes, quizzes, and automated test-cases so mentors can focus
+                        on coaching rather than manual grading.
+                    </p>
+
+                    <ul class="space-y-3 font-medium text-sm text-brand-navy">
+                        <li class="flex items-center gap-3">
+                            <span
+                                class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs"><i
+                                    class="fa-solid fa-check"></i></span>
+                            <span>Interactive code submission pipelines with instant feedback</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span
+                                class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs"><i
+                                    class="fa-solid fa-check"></i></span>
+                            <span>Pre-loaded STEM curriculum (Scratch, Python, Web Dev, Robotics)</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span
+                                class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs"><i
+                                    class="fa-solid fa-check"></i></span>
+                            <span>Project showcases and portfolio generation for every student</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span
+                                class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs"><i
+                                    class="fa-solid fa-check"></i></span>
+                            <span>Quizzes, badges, and certificates upon module completion</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: Parent Mobile App Detailed -->
+    <section id="parent-app" class="py-20 bg-brand-navy text-white px-4 sm:px-8 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <span
+                    class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-orange/20 text-brand-orange border border-brand-orange/30">
+                    Module 03 • Parent Engagement
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold">Dedicated Mobile App for Parents</h2>
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    Keep parents connected with their child's tech journey. Build long-term trust with real-time
+                    updates, direct mentor chats, and student project visibility right on their smartphones.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                <!-- Left Column Features -->
+                <div class="space-y-6">
+                    <div class="clay-card-dark p-6 space-y-2">
+                        <div class="text-brand-orange text-xl font-bold"><i class="fa-solid fa-bell"></i></div>
+                        <h4 class="font-bold text-white text-base">Real-Time Notifications</h4>
+                        <p class="text-xs text-gray-300">Instant push alerts for class schedules, attendance checks, and
+                            club announcements.</p>
+                    </div>
+                    <div class="clay-card-dark p-6 space-y-2">
+                        <div class="text-brand-orange text-xl font-bold"><i class="fa-solid fa-chart-line"></i></div>
+                        <h4 class="font-bold text-white text-base">Progress & Skill Tracking</h4>
+                        <p class="text-xs text-gray-300">Visual progress bars showing concepts mastered, quiz scores,
+                            and badges earned.</p>
+                    </div>
+                </div>
+
+                <!-- Center Mobile Mockup Display -->
+                <div class="flex justify-center">
+                    <div class="phone-mockup w-full max-w-[300px] p-5 bg-white text-brand-navy space-y-5">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <div>
+                                <p class="text-xs font-extrabold">Coding Clubs Kenya</p>
+                                <p class="text-[10px] text-gray-500">Parent Dashboard</p>
+                            </div>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        </div>
+
+                        <!-- Student Avatar Card -->
+                        <div class="flex items-center space-x-3 bg-brand-grayLight p-3 rounded-2xl">
+                            <div
+                                class="w-10 h-10 rounded-full bg-brand-navy text-white font-bold flex items-center justify-center text-sm">
+                                EO
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-brand-navy">Emmanuel Otieno</h5>
+                                <p class="text-[10px] text-gray-500">Level 3 Python Master</p>
+                            </div>
+                        </div>
+
+                        <!-- Progress Widget -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[11px] font-bold">
+                                <span>Term Coding Score</span>
+                                <span class="text-brand-orange">94%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                                <div class="bg-brand-orange h-2 w-[94%]"></div>
+                            </div>
+                        </div>
+
+                        <!-- Direct Mentor Chat -->
+                        <div class="p-3 bg-blue-50 rounded-2xl border border-blue-100 space-y-2">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-comments text-brand-navy text-xs"></i>
+                                <span class="text-[11px] font-bold text-brand-navy">Mentor Alex</span>
+                            </div>
+                            <p class="text-[10px] text-gray-600">"Emmanuel built a fantastic game today! Check his
+                                project tab."</p>
+                        </div>
+
+                        <button class="w-full py-2.5 bg-brand-navy text-white font-bold text-xs rounded-xl shadow-sm">
+                            Pay Term Fee ($120)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column Features -->
+                <div class="space-y-6">
+                    <div class="clay-card-dark p-6 space-y-2">
+                        <div class="text-brand-orange text-xl font-bold"><i class="fa-solid fa-gamepad"></i></div>
+                        <h4 class="font-bold text-white text-base">Project Portfolio Showcase</h4>
+                        <p class="text-xs text-gray-300">Parents can play games and view apps created by their children
+                            directly in the app.</p>
+                    </div>
+                    <div class="clay-card-dark p-6 space-y-2">
+                        <div class="text-brand-orange text-xl font-bold"><i class="fa-solid fa-credit-card"></i></div>
+                        <h4 class="font-bold text-white text-base">Direct Fee Clearance</h4>
+                        <p class="text-xs text-gray-300">Seamless mobile money or card payments with auto-generated
+                            receipt downloads.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: Pricing Plans -->
+    <section id="pricing" class="py-20 bg-white px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="text-3xl font-extrabold text-brand-navy">Flexible Plans for Every Scale</h2>
+                <p class="text-brand-charcoal/70 text-sm mt-2">Whether you are an independent coding club or a
+                    multi-campus academy.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Starter Plan -->
+                <div class="clay-card p-8 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Starter Club</span>
+                        <h3 class="text-2xl font-bold text-brand-navy">Essential</h3>
+                        <p class="text-2xl font-extrabold text-brand-navy">Request a quote</p>
+                        <p class="text-xs text-gray-500">Ideal for single coding clubs with up to 50 students.</p>
+                        <hr class="border-gray-100">
+                        <ul class="space-y-2 text-xs font-medium text-gray-600">
+                            <li><i class="fa-solid fa-check text-green-500 mr-2"></i>Basic ERP & Attendance</li>
+                            <li><i class="fa-solid fa-check text-green-500 mr-2"></i>Standard LMS Coding Sandbox</li>
+                            <li><i class="fa-solid fa-check text-green-500 mr-2"></i>Parent Email Updates</li>
+                        </ul>
+                    </div>
+                    <a href="https://wa.me/254716815025?text=Hello%20Coding%20Clubs%20Kenya%2C%20I%20would%20like%20a%20quote%20for%20the%20Essential%20plan."
+                        target="_blank" rel="noopener noreferrer"
+                        class="mt-8 w-full text-center py-3 rounded-xl border border-brand-navy text-brand-navy font-bold text-sm hover:bg-brand-grayLight">
+                        Request a quote
+                    </a>
+                </div>
+
+                <!-- Growth Plan (Highlighted) -->
+                <div
+                    class="clay-card p-8 bg-brand-navy text-white flex flex-col justify-between relative transform lg:-translate-y-2">
+                    <div
+                        class="absolute -top-3 left-1/2 transform -translate-x-1/2 px-4 py-1 bg-brand-orange text-white text-[10px] font-extrabold uppercase rounded-full tracking-wider">
+                        Most Popular
+                    </div>
+                    <div class="space-y-4">
+                        <span class="text-xs font-bold uppercase tracking-wider text-brand-orange">Pro Academy</span>
+                        <h3 class="text-2xl font-bold text-white">System Complete</h3>
+                        <p class="text-2xl font-extrabold text-white">Request a quote</p>
+                        <p class="text-xs text-gray-300">Full access for growing STEM academies up to 300 students.</p>
+                        <hr class="border-gray-700">
+                        <ul class="space-y-2 text-xs font-medium text-gray-200">
+                            <li><i class="fa-solid fa-check text-brand-orange mr-2"></i>Advanced ERP + Invoicing Module
+                            </li>
+                            <li><i class="fa-solid fa-check text-brand-orange mr-2"></i>Full LMS + Auto-grading
+                                Pipelines</li>
+                            <li><i class="fa-solid fa-check text-brand-orange mr-2"></i>Dedicated Parent Mobile App
+                                Access</li>
+                            <li><i class="fa-solid fa-check text-brand-orange mr-2"></i>Mentor Chat & Portfolio Showcase
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="https://wa.me/254716815025?text=Hello%20Coding%20Clubs%20Kenya%2C%20I%20would%20like%20a%20quote%20for%20the%20System%20Complete%20plan."
+                        target="_blank" rel="noopener noreferrer"
+                        class="mt-8 w-full text-center py-3 rounded-xl bg-brand-orange text-white font-bold text-sm clay-button hover:bg-brand-orangeHover">
+                        Request a quote
+                    </a>
+                </div>
+
+                <!-- Custom Institutional Plan -->
+                <div class="clay-card p-8 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Enterprise</span>
+                        <h3 class="text-2xl font-bold text-brand-navy">Institutional</h3>
+                        <p class="text-2xl font-extrabold text-brand-navy">Request a quote</p>
+                        <p class="text-xs text-gray-500">For large school networks and nationwide club franchises.</p>
+                        <hr class="border-gray-100">
+                        <ul class="space-y-2 text-xs font-medium text-gray-600">
+                            <li><i class="fa-solid fa-check text-green-500 mr-2"></i>Unlimited Students & Branches</li>
+                            <li><i class="fa-solid fa-check text-green-500 mr-2"></i>Custom Domain & White-labeling</li>
+                            <li><i class="fa-solid fa-check text-green-500 mr-2"></i>Dedicated Server & API Support</li>
+                        </ul>
+                    </div>
+                    <a href="https://wa.me/254716815025?text=Hello%20Coding%20Clubs%20Kenya%2C%20I%20would%20like%20a%20quote%20for%20the%20Institutional%20plan."
+                        target="_blank" rel="noopener noreferrer"
+                        class="mt-8 w-full text-center py-3 rounded-xl border border-brand-navy text-brand-navy font-bold text-sm hover:bg-brand-grayLight">
+                        Request a quote
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Request Call to Action -->
+    <section id="demo" class="py-20 bg-brand-grayLight/60 px-4 sm:px-8">
+        <div class="max-w-4xl mx-auto clay-card p-8 sm:p-12 bg-white">
+            <div class="text-center space-y-3 mb-8">
+                <h2 class="text-3xl font-extrabold text-brand-navy">Experience the Coding Club System</h2>
+                <p class="text-sm text-brand-charcoal/70">
+                    Book a personalized walkthrough with the <strong>Coding Clubs Kenya</strong> team to see how ERP,
+                    LMS, and the Parent Mobile App can elevate your center.
+                </p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); handleDemoSubmit();" class="space-y-4 max-w-xl mx-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-brand-navy mb-1">Your Name</label>
+                        <input type="text" required placeholder="e.g. Jane Doe"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-orange">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-brand-navy mb-1">Institution/School Name</label>
+                        <input type="text" required placeholder="e.g. Nairobi STEM Academy"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-orange">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-brand-navy mb-1">Email Address</label>
+                        <input type="email" required placeholder="e.g. jane@school.ac.ke"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-orange">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-brand-navy mb-1">Estimated Students</label>
+                        <select
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-orange">
+                            <option>1 - 50 Students</option>
+                            <option>51 - 200 Students</option>
+                            <option>200+ Students</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full py-4 bg-brand-orange text-white font-bold text-sm rounded-xl clay-button hover:bg-brand-orangeHover transition-all">
+                    Submit Request for Demonstration
+                </button>
+            </form>
+            <div id="demo-success"
+                class="hidden mt-4 p-4 bg-green-100 text-green-700 font-bold text-center text-xs rounded-xl">
+                Thank you! The Coding Clubs Kenya team will reach out shortly to schedule your demo.
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-brand-navy text-white pt-16 pb-12 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-gray-800">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2">
+                    <div
+                        class="w-8 h-8 rounded-xl bg-brand-orange text-white font-bold flex items-center justify-center text-sm">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <span class="font-extrabold text-lg">Coding Club System</span>
+                </div>
+                <p class="text-xs text-gray-400 leading-relaxed">
+                    A flagship software product developed by <strong>Coding Clubs Kenya</strong> to revolutionize STEM
+                    club administration and student learning experience.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-sm text-brand-orange mb-4">System Modules</h4>
+                <ul class="space-y-2 text-xs text-gray-300">
+                    <li><a href="#erp" class="hover:text-white">ERP Fee Management</a></li>
+                    <li><a href="#erp" class="hover:text-white">Inventory & Allocation</a></li>
+                    <li><a href="#lms" class="hover:text-white">Coding Sandbox LMS</a></li>
+                    <li><a href="#lms" class="hover:text-white">Automated Grading Engine</a></li>
+                    <li><a href="#parent-app" class="hover:text-white">Parent Mobile App</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-sm text-brand-orange mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-xs text-gray-300">
+                    <li><a href="#overview" class="hover:text-white">System Overview</a></li>
+                    <li><a href="#pricing" class="hover:text-white">Pricing Options</a></li>
+                    <li><a href="#demo" class="hover:text-white">Book Demonstration</a></li>
+                    <li><a href="#" class="hover:text-white">Coding Clubs Kenya Portal</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-sm text-brand-orange mb-4">Contact & Support</h4>
+                <ul class="space-y-2 text-xs text-gray-300">
+                    <li><i class="fa-solid fa-envelope mr-2 text-brand-orange"></i>codingclubskenya@gmail.com</li>
+                    <li><i class="fa-solid fa-phone mr-2 text-brand-orange"></i>+254 716 815 025 / 0798 734 442</li>
+                    <li><i class="fa-solid fa-location-dot mr-2 text-brand-orange"></i>Nairobi, Kenya</li>
+                </ul>
+            </div>
+        </div>
+
+        <div
+            class="max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500">
+            <p>© 2026 Coding Club System. A product by Coding Clubs Kenya. All rights reserved.</p>
+            <div class="flex space-x-4 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-gray-300">Privacy Policy</a>
+                <a href="#" class="hover:text-gray-300">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentOnboardingRole = '';
+        let selectedQuotePlan = '';
+
+        // Mobile menu toggle logic
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Tab Switching logic for hero interactive preview
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.getElementById('content-erp').classList.add('hidden');
+            document.getElementById('content-lms').classList.add('hidden');
+            document.getElementById('content-app').classList.add('hidden');
+
+            // Reset tab button styling
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.classList.remove('bg-brand-navy', 'text-white', 'shadow-md');
+                tab.classList.add('bg-white', 'text-brand-navy');
+            });
+
+            // Activate chosen tab
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-' + tabName);
+            activeBtn.classList.remove('bg-white', 'text-brand-navy');
+            activeBtn.classList.add('bg-brand-navy', 'text-white', 'shadow-md');
+        }
+
+        // Progressive onboarding role selection
+        function selectOnboardingRole(role) {
+            const roleContent = {
+                school: {
+                    question: 'Let us plan for your school or club',
+                    fields: [
+                        ['Contact person', 'e.g. Jane Doe', 'text', 'contact-name'],
+                        ['Work email', 'e.g. jane@school.ac.ke', 'email', 'contact-email'],
+                        ['Phone number', 'e.g. +254 700 000 000', 'tel', 'contact-phone'],
+                        ['Organisation name', 'e.g. Nairobi STEM Academy', 'text', 'organisation-name'],
+                        ['Location or town', 'e.g. Nairobi', 'text', 'location'],
+                        ['Number of learners', 'Select learner count', 'select', 'learner-count']
+                    ],
+                    cta: 'Explore school tools'
+                },
+                parent: {
+                    question: 'Let us connect you to your learner',
+                    fields: [
+                        ['Your full name', 'e.g. Jane Doe', 'text', 'contact-name'],
+                        ['Email address', 'e.g. jane@example.com', 'email', 'contact-email'],
+                        ['Phone number', 'e.g. +254 700 000 000', 'tel', 'contact-phone'],
+                        ['Learner name', 'e.g. Amina Ndungu', 'text', 'learner-name'],
+                        ['School or club', 'e.g. Nairobi Coding Club', 'text', 'organisation-name'],
+                        ['Preferred contact method', 'Choose a contact method', 'contact', 'preferred-contact']
+                    ],
+                    cta: 'See the parent experience'
+                },
+                student: {
+                    question: 'Let us shape your learning path',
+                    fields: [
+                        ['Student name', 'e.g. Jabali Otieno', 'text', 'contact-name'],
+                        ['Email address', 'e.g. student@example.com', 'email', 'contact-email'],
+                        ['Parent or guardian phone', 'e.g. +254 700 000 000', 'tel', 'contact-phone'],
+                        ['School or club', 'e.g. Nairobi Coding Club', 'text', 'organisation-name'],
+                        ['Location or town', 'e.g. Nairobi', 'text', 'location'],
+                        ['I want to learn', 'Choose a focus', 'select', 'learning-focus']
+                    ],
+                    cta: 'Start learning'
+                }
+            };
+            const selected = roleContent[role];
+            const details = document.getElementById('onboarding-details');
+            currentOnboardingRole = role;
+
+            document.querySelectorAll('.onboarding-role').forEach((button) => {
+                button.classList.remove('border-brand-orange', 'ring-2', 'ring-brand-orange/30');
+            });
+            document.querySelector(`[data-onboarding-role="${role}"]`).classList.add('border-brand-orange', 'ring-2', 'ring-brand-orange/30');
+            document.getElementById('onboarding-question').textContent = selectedQuotePlan
+                ? `${selected.question} for ${selectedQuotePlan}`
+                : selected.question;
+            const onboardingAction = selectedQuotePlan ? 'Send quote request on WhatsApp' : selected.cta;
+            document.getElementById('onboarding-cta').innerHTML = `${onboardingAction} <i class="fa-solid fa-arrow-right text-xs"></i>`;
+            details.innerHTML = selected.fields.map(([label, placeholder, type, fieldName]) => {
+                if (type === 'select') {
+                    const options = role === 'school'
+                        ? '<option>Select learner count</option><option>1 - 50 learners</option><option>51 - 200 learners</option><option>200+ learners</option>'
+                        : '<option>Choose a focus</option><option>Web development</option><option>Python</option><option>Robotics</option>';
+                    return `<label class="block text-xs font-bold text-brand-navy">${label}<select name="${fieldName}" required class="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-normal focus:outline-none focus:border-brand-orange">${options}</select></label>`;
+                }
+                if (type === 'contact') {
+                    return `<label class="block text-xs font-bold text-brand-navy">${label}<select name="${fieldName}" required class="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-normal focus:outline-none focus:border-brand-orange"><option>${placeholder}</option><option>Phone call</option><option>WhatsApp</option><option>Email</option></select></label>`;
+                }
+                const phoneAttributes = fieldName === 'contact-phone'
+                    ? ' inputmode="tel" pattern="[+0-9 ()-]{7,}" title="Enter a valid phone number with at least 7 digits"'
+                    : '';
+                return `<label class="block text-xs font-bold text-brand-navy">${label}<input name="${fieldName}" type="${type}" required${phoneAttributes} placeholder="${placeholder}" class="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-normal focus:outline-none focus:border-brand-orange"></label>`;
+            }).join('');
+
+            document.getElementById('onboarding-step-one').classList.add('hidden');
+            document.getElementById('onboarding-step-two').classList.remove('hidden');
+            document.getElementById('onboarding-progress-two').classList.remove('bg-gray-200');
+            document.getElementById('onboarding-progress-two').classList.add('bg-brand-orange');
+        }
+
+        function resetOnboarding() {
+            currentOnboardingRole = '';
+            document.getElementById('onboarding-step-two').classList.add('hidden');
+            document.getElementById('onboarding-step-one').classList.remove('hidden');
+            document.getElementById('onboarding-progress-two').classList.remove('bg-brand-orange');
+            document.getElementById('onboarding-progress-two').classList.add('bg-gray-200');
+            document.querySelectorAll('.onboarding-role').forEach((button) => {
+                button.classList.remove('border-brand-orange', 'ring-2', 'ring-brand-orange/30');
+            });
+        }
+
+        function startQuote(event, plan) {
+            event.preventDefault();
+            selectedQuotePlan = plan;
+            document.body.classList.remove('onboarding-active');
+            resetOnboarding();
+            document.getElementById('onboarding').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function completeOnboarding(event) {
+            event.preventDefault();
+            const requiredFields = document.querySelectorAll('#onboarding-details [required]');
+            const incompleteField = Array.from(requiredFields).find((field) => !field.value || field.selectedIndex === 0);
+            if (incompleteField) {
+                incompleteField.focus();
+                incompleteField.reportValidity();
+                return;
+            }
+            const phoneField = document.querySelector('#onboarding-details [name="contact-phone"]');
+            if (phoneField.value.replace(/\D/g, '').length < 7) {
+                phoneField.setCustomValidity('Enter a valid phone number with at least 7 digits.');
+                phoneField.focus();
+                phoneField.reportValidity();
+                return;
+            }
+            phoneField.setCustomValidity('');
+            if (selectedQuotePlan) {
+                const messageFields = Array.from(document.querySelectorAll('#onboarding-details [name]'))
+                    .map((field) => `${field.closest('label').childNodes[0].textContent.trim()}: ${field.value}`)
+                    .join('\n');
+                const message = `Hello Coding Clubs Kenya, I would like a quote for the ${selectedQuotePlan} plan.\n\nRole: ${currentOnboardingRole}\n${messageFields}`;
+                window.open(`https://wa.me/254716815025?text=${encodeURIComponent(message)}`, '_blank');
+                return;
+            }
+            document.body.classList.remove('onboarding-active');
+            document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showOverview(event) {
+            event.preventDefault();
+            document.body.classList.remove('onboarding-active');
+            mobileMenu.classList.add('hidden');
+            document.getElementById('overview').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showPricing(event) {
+            event.preventDefault();
+            document.body.classList.remove('onboarding-active');
+            mobileMenu.classList.add('hidden');
+            document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Demo Form Submission Handler
+        function handleDemoSubmit() {
+            document.getElementById('demo-success').classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>
