@@ -55,10 +55,13 @@ class _ClayButtonState extends State<ClayButton> {
   Widget build(BuildContext context) {
     final reducedMotion = MediaQuery.of(context).disableAnimations;
 
-    final fill = widget.isSecondary ? kCloud : (widget.fillColor ?? kAccent);
+    final isDark = context.isDarkMode;
+    final fill = widget.isSecondary
+        ? (isDark ? kDarkSurfaceHi : kCloud)
+        : (widget.fillColor ?? kAccent);
     final textColor = widget.fillColor != null && (widget.fillColor == kAccent || widget.fillColor == kNavy)
         ? kWhite
-        : (widget.isSecondary ? kNavy : kWhite);
+        : (widget.isSecondary ? context.appBarForegroundColor : kWhite);
     final effectiveFill = _pressed && !reducedMotion ? _pressedColor(fill) : fill;
 
     return SizedBox(
@@ -74,7 +77,7 @@ class _ClayButtonState extends State<ClayButton> {
           color: effectiveFill,
           boxShadow: _effectiveShadows(reducedMotion),
           border: widget.isSecondary && !widget.clayState.isRaised
-              ? Border.all(color: kNavy.withValues(alpha: 0.08))
+              ? Border.all(color: context.appBarForegroundColor.withValues(alpha: 0.08))
               : null,
         ),
         child: Focus(

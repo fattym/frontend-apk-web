@@ -36,8 +36,9 @@ class ClayInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = context.isDarkMode ? kDarkBorder : kCloudLo;
     return Container(
-      decoration: clayInsetDecoration(surface: kCloud, borderRadius: kRadiusSm),
+      decoration: clayInsetDecoration(context, borderRadius: kRadiusSm),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
@@ -48,7 +49,7 @@ class ClayInput extends StatelessWidget {
         style: TextStyle(
           fontFamily: 'Plus Jakarta Sans',
           fontSize: kType14,
-          color: enabled ? kInk : kCloudLo,
+          color: enabled ? context.inkColor : context.inkMutedColor,
           fontWeight: FontWeight.w400,
         ),
         decoration: InputDecoration(
@@ -67,7 +68,7 @@ class ClayInput extends StatelessWidget {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(kRadiusSm),
-            borderSide: BorderSide(color: kCloudLo),
+            borderSide: BorderSide(color: borderColor),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(kRadiusSm),

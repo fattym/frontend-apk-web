@@ -1,5 +1,6 @@
 allprojects {
     repositories {
+        maven { url = uri("/home/joe/flutter-local-maven") }
         google()
         mavenCentral()
     }
